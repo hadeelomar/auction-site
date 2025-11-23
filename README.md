@@ -64,9 +64,9 @@ To run this project in your development machine, follow these steps:
 
 Alternatively, you can run both servers simultaneously from the 'frontend' sub-folder:
 
-    ```console
-    $ npm run dev:all
-    ```
+```console
+$ npm run dev:all
+```
 
 7. Open your browser and go to http://localhost:5173/, where you will see the application. To see the Django server, go to http://localhost:8000/ 
 
