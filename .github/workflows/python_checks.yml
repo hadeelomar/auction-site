@@ -1,0 +1,35 @@
+name: Python Code Quality Checking
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint_and_type_check:
+    runs_on: ubuntu_latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with: 
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        # install linting and check tools
+        pip install flake8 mypy django-stubs
+
+    - name: Run Flake8 (PEP8 and Linting)
+      run: |
+        flake8 . --count --show-source --statistics
+
+    - name: Run MyPy (Static type checking)
+      run: |
+        mypy . --exclude 'migrations' --ignore-missing-imports
