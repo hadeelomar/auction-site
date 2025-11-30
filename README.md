@@ -22,7 +22,7 @@ A full-stack Single Page Application built with Django for the backend API and V
 | Item listing and search (frontend) | | | |
 | Bidding system (backend) | | | |
 | Bidding UI | | | |
-| Data modelling (Users, Items, Bids, Question) | | | |
+| Data modelling (Users, Items, Bids, Question) | o | | |
 | Backend type hints | | | |
 
 
