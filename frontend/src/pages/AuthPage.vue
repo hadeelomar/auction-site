@@ -1,5 +1,6 @@
 <template>
   <div class="auth-container">
+    <!-- left side -->
     <div class="decorative-side">
       <div class="orbit-container">
         <h1 class="orbit-center-text">Auction Site</h1>
@@ -60,7 +61,7 @@
       </div>
     </div>
 
-    <!-- right side -->
+    <!-- right side - form -->
     <div class="form-side">
       <div class="form-container">
         <div class="reveal-box">
@@ -76,7 +77,6 @@
         <!-- form -->
         <form @submit.prevent="handleSubmit" class="auth-form">
           <!-- email field -->
-        <form @submit.prevent="handleSubmit" class="auth-form">
           <div class="form-group">
             <div class="reveal-box reveal-delay-2">
               <label for="email" class="form-label">
@@ -167,7 +167,6 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
 const isSignup = ref(false)
 const showPassword = ref(false)
 
@@ -215,9 +214,6 @@ const validateForm = (): boolean => {
 const handleSubmit = async () => {
   if (validateForm()) {
     await router.push('/dashboard')
-const handleSubmit = () => {
-  if (validateForm()) {
-    console.log('Form submitted:', formData)
   }
 }
 
@@ -607,7 +603,6 @@ const handleForgotPassword = () => {
   text-decoration: underline;
 }
 
-/* responsive */
 @media (max-width: 1024px) {
   .decorative-side {
     display: none;
