@@ -1,10 +1,46 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from datetime import date
+from typing import Optional
 
-# Create your models here.
 
+class User(AbstractUser):
+    """
+    Custom User model that extends Django's AbstractUser.
+    Adds the profile image and date of birth fields for our app.
+    """
 
-class PageView(models.Model):
-    count = models.IntegerField(default=0)
+    profile_image = models.ImageField(
+        upload_to="profile_images/",
+        null=True,
+        blank=True,
+        help_text="User's profile picture",
+    )
 
-    def __str__(self):
-        return f"Page view count: {self.count}"
+    date_of_birth = models.DateField(
+        null=True, blank=True, help_text="User's date of birth"
+    )
+
+    class Meta:
+        db_table = "users"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+
+    def __str__(self) -> str:
+        return self.username
+
+    def age(self) -> Optional[int]:
+        """
+        Computed property that calculates the user's age from their date of birth.
+        """
+        if self.date_of_birth:
+            today = date.today()
+            return (
+                today.year
+                - self.date_of_birth.year
+                - (
+                    (today.month, today.day)
+                    < (self.date_of_birth.month, self.date_of_birth.day)
+                )
+            )
+        return None
