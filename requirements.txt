@@ -1,0 +1,16 @@
+asgiref==3.9.1
+Django==5.2.6
+gunicorn==23.0.0
+packaging==25.0
+psycopg2-binary==2.9.10
+setuptools==78.1.1
+sqlparse==0.5.3
+wheel==0.45.1
+whitenoise==6.9.0
+
+# development and quality checks
+mypy==1.10.1
+django-stubs==5.2.0
+flake8==7.1.0
+black==24.4.2
+pre-commit==3.7.1
