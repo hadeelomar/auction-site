@@ -45,12 +45,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',  # Added for CORS support
-    'api',  # Added api app
+    'corsheaders',
+    'api',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Must be at the top for CORS
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -145,8 +145,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 INTERNAL_IPS = ['127.0.0.1']
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite default dev server
-    "http://localhost:3000",  # Alternative frontend port
+    "http://localhost:5173",
+    "http://localhost:3000",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:3000",
 ]
