@@ -2,6 +2,11 @@ import { createRouter, createWebHistory } from "vue-router"
 import AuthPage from "../pages/AuthPage.vue"
 import DashboardPage from "../pages/DashboardPage.vue"
 import { useAuthStore } from "../stores/auth"
+import BrowseAuctionsPage from "../pages/BrowseAuctionsPage.vue"
+import CreateAuctionPage from "../pages/CreateAuctionPage.vue"
+import MyBidsPage from "../pages/MyBidsPage.vue"
+import MyAuctionsPage from "../pages/MyAuctionsPage.vue"
+import ProfilePage from "../pages/ProfilePage.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,6 +20,36 @@ const router = createRouter({
       path: "/dashboard",
       name: "dashboard",
       component: DashboardPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/browse",
+      name: "browse-auctions",
+      component: BrowseAuctionsPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/create",
+      name: "create-auction",
+      component: CreateAuctionPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/bids",
+      name: "my-bids",
+      component: MyBidsPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/auctions",
+      name: "my-auctions",
+      component: MyAuctionsPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/profile",
+      name: "profile",
+      component: ProfilePage,
       meta: { requiresAuth: true },
     },
   ],

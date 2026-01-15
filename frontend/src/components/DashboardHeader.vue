@@ -2,8 +2,8 @@
   <header class="header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="header-title">Welcome, {{ authStore.user?.first_name || 'User' }}</h1>
-        <p class="header-subtitle">Welcome back to your auction dashboard</p>
+        <h1 class="header-title">{{ pageTitle }}</h1>
+        <p class="header-subtitle">{{ subtitle }}</p>
       </div>
       <div class="header-right">
         <button class="icon-button notification-button">
@@ -41,20 +41,28 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
-const isDark = true
-
-defineProps<{
+const props = defineProps<{
+  pageTitle: string
+  isDark: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   'toggle-theme': []
 }>()
+
+const subtitle = computed(() => {
+  if (props.pageTitle.startsWith('Welcome')) {
+    return 'Welcome back to your auction dashboard'
+  }
+  return ''
+})
 
 const handleSignOut = async () => {
   await authStore.logout()
@@ -84,7 +92,7 @@ const handleSignOut = async () => {
 
 .header-title {
   font-size: 1.875rem;
-  font-weight: 700;
+  font-weight: 500;
   color: #f3f4f6;
   margin: 0;
 }

@@ -29,6 +29,7 @@ class User(AbstractUser):
     def __str__(self) -> str:
         return self.username
 
+    @property
     def age(self) -> Optional[int]:
         """
         Computed property that calculates the user's age from their date of birth.
