@@ -41,7 +41,7 @@ def signup(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'error': 'Email already exists'}, status=400)
     
     user: User = User.objects.create_user(
-        username=email,  # use email as username
+        username=email,  # Use email as username
         email=email,
         password=password,
         first_name=first_name,
@@ -151,6 +151,8 @@ def update_profile(request: HttpRequest) -> JsonResponse:
     last_name: str = request.POST.get('last_name', '')
     email: str = request.POST.get('email', '')
     date_of_birth: str = request.POST.get('date_of_birth', '')
+    current_password: str = request.POST.get('current_password', '')
+    new_password: str = request.POST.get('new_password', '')
     
     # update user fields
     if first_name:
@@ -158,14 +160,21 @@ def update_profile(request: HttpRequest) -> JsonResponse:
     if last_name:
         user.last_name = last_name
     if email and email != user.email:
-        # Check if email already exists
+        # check if email already exists
         if User.objects.filter(email=email).exclude(id=user.id).exists():
             return JsonResponse({'error': 'Email already in use'}, status=400)
         user.email = email
-        user.username = email  # Update username too since we use email as username
+        user.username = email  # update username too since we use email as username
     
     if date_of_birth:
         user.date_of_birth = date_of_birth
+    
+    if current_password and new_password:
+        if not user.check_password(current_password):
+            return JsonResponse({'error': 'Current password is incorrect'}, status=400)
+        if len(new_password) < 6:
+            return JsonResponse({'error': 'Password must be at least 6 characters'}, status=400)
+        user.set_password(new_password)
     
     # handle profile image upload
     if 'profile_image' in request.FILES:

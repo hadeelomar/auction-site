@@ -2,35 +2,39 @@
   <div class="dashboard-wrapper">
     <Sidebar 
       :open="sidebarOpen" 
-      :selected="selectedPage"
       @toggle="sidebarOpen = !sidebarOpen"
-      @select="selectedPage = $event"
     />
     <div class="dashboard-content">
       <DashboardHeader 
+        :page-title="pageTitle"
         :isDark="isDark" 
-        @toggle-theme="isDark = !isDark"
+        @toggle-theme="toggleTheme"
       />
       <main class="main-content">
-        <DashboardOverview v-if="selectedPage === 'Dashboard'" />
-        <div v-else class="empty-state">
-          <h2>{{ selectedPage }}</h2>
-          <p>This page is under construction</p>
-        </div>
+        <DashboardOverview />
       </main>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useAuthStore } from '../stores/auth'
 import Sidebar from '../components/Sidebar.vue'
 import DashboardHeader from '../components/DashboardHeader.vue'
 import DashboardOverview from '../components/DashboardOverview.vue'
 
+const authStore = useAuthStore()
 const sidebarOpen = ref(true)
-const selectedPage = ref('Dashboard')
 const isDark = ref(true)
+
+const pageTitle = computed(() => {
+  return `Welcome, ${authStore.user?.first_name || 'User'}`
+})
+
+const toggleTheme = () => {
+  isDark.value = !isDark.value
+}
 
 watch(isDark, (newValue) => {
   if (newValue) {
