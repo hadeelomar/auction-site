@@ -2,7 +2,7 @@
   <header class="header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="header-title">Dashboard</h1>
+        <h1 class="header-title">Welcome, {{ authStore.user?.first_name || 'User' }}</h1>
         <p class="header-subtitle">Welcome back to your auction dashboard</p>
       </div>
       <div class="header-right">
@@ -22,6 +22,13 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
+        <button class="icon-button sign-out-button" @click="handleSignOut" title="Sign out">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" x2="9" y1="12" y2="12"/>
+          </svg>
+        </button>
         <button class="icon-button profile-button">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
@@ -34,13 +41,25 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '../stores/auth'
+import { useRouter } from 'vue-router'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const isDark = true
+
 defineProps<{
-  isDark: boolean
 }>()
 
 defineEmits<{
   'toggle-theme': []
 }>()
+
+const handleSignOut = async () => {
+  await authStore.logout()
+  router.push('/')
+}
 </script>
 
 <style scoped>
@@ -127,5 +146,15 @@ defineEmits<{
 
 .profile-button:hover {
   opacity: 0.9;
+}
+
+.sign-out-button {
+  color: #ef4444;
+}
+
+.sign-out-button:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
 }
 </style>

@@ -42,7 +42,7 @@
         </div>
 
         <svg class="orbit-path orbit-path-3" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.2" />
+          <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="0.2" />
         </svg>
         <div class="orbit orbit-3">
           <!-- dollar sign icon -->
@@ -76,6 +76,29 @@
 
         <!-- form -->
         <form @submit.prevent="handleSubmit" class="auth-form">
+          <!-- full name field for signup -->
+          <div v-if="isSignup" class="form-group">
+            <div class="reveal-box reveal-delay-2">
+              <label for="fullName" class="form-label">
+                Full Name <span class="required">*</span>
+              </label>
+            </div>
+            <div class="reveal-box reveal-delay-2 full-width">
+              <div class="input-wrapper">
+                <input
+                  id="fullName"
+                  v-model="formData.fullName"
+                  type="text"
+                  class="form-input"
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div class="error-container">
+                <span v-if="errors.fullName" class="error-message">{{ errors.fullName }}</span>
+              </div>
+            </div>
+          </div>
+
           <!-- email field -->
           <div class="form-group">
             <div class="reveal-box reveal-delay-2">
@@ -138,14 +161,43 @@
             </div>
           </div>
 
-          <!-- submit button -->
+          <!-- password confirmation field for signup -->
+          <div v-if="isSignup" class="form-group">
+            <div class="reveal-box reveal-delay-4">
+              <label for="passwordConfirm" class="form-label">
+                Confirm Password <span class="required">*</span>
+              </label>
+            </div>
+            <div class="reveal-box reveal-delay-4 full-width">
+              <div class="input-wrapper">
+                <input
+                  id="passwordConfirm"
+                  v-model="formData.passwordConfirm"
+                  type="password"
+                  class="form-input"
+                  placeholder="Confirm your password"
+                />
+              </div>
+              <div class="error-container">
+                <span v-if="errors.passwordConfirm" class="error-message">{{ errors.passwordConfirm }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- API Error Message -->
+          <div v-if="errors.api" class="reveal-box full-width">
+            <div class="api-error">{{ errors.api }}</div>
+          </div>
+
+          <!-- Submit Button -->
           <div class="reveal-box reveal-delay-4 full-width">
-            <button type="submit" class="submit-button">
-              {{ isSignup ? 'Sign up' : 'Sign in' }} →
+            <button type="submit" class="submit-button" :class="{ loading: isLoading }" :disabled="isLoading">
+              <span v-if="!isLoading">{{ isSignup ? 'Sign up' : 'Sign in' }} →</span>
+              <span v-else>Loading...</span>
             </button>
           </div>
 
-          <!-- forgot password / toggle mode -->
+          <!-- Forgot Password / Toggle Mode -->
           <div class="reveal-box reveal-delay-5 full-width">
             <div class="footer-links">
               <button v-if="!isSignup" type="button" class="link-button" @click="handleForgotPassword">
@@ -165,19 +217,28 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
+
 const isSignup = ref(false)
 const showPassword = ref(false)
+const isLoading = ref(false)
 
 const formData = reactive({
+  fullName: '',
   email: '',
-  password: ''
+  password: '',
+  passwordConfirm: ''
 })
 
 const errors = reactive({
+  fullName: '',
   email: '',
-  password: ''
+  password: '',
+  passwordConfirm: '',
+  api: ''
 })
 
 const toggleMode = () => {
@@ -197,6 +258,11 @@ const validateForm = (): boolean => {
     errors[key as keyof typeof errors] = ''
   })
 
+  if (isSignup.value && formData.fullName.trim().length < 3) {
+    errors.fullName = 'Full name must be at least 3 characters'
+    isValid = false
+  }
+
   const emailRegex = /\S+@\S+\.\S+/
   if (!emailRegex.test(formData.email)) {
     errors.email = 'Invalid email address'
@@ -208,12 +274,43 @@ const validateForm = (): boolean => {
     isValid = false
   }
 
+  if (isSignup.value && formData.password !== formData.passwordConfirm) {
+    errors.passwordConfirm = 'Passwords do not match'
+    isValid = false
+  }
+
   return isValid
 }
 
 const handleSubmit = async () => {
   if (validateForm()) {
-    await router.push('/dashboard')
+    isLoading.value = true
+    errors.api = ''
+
+    try {
+      let result
+      
+      if (isSignup.value) {
+        result = await authStore.signup(
+          formData.fullName,
+          formData.email,
+          formData.password,
+          formData.passwordConfirm
+        )
+      } else {
+        result = await authStore.login(formData.email, formData.password)
+      }
+
+      if (result.success) {
+        await router.push('/dashboard')
+      } else {
+        errors.api = result.error || 'Authentication failed'
+      }
+    } catch (err) {
+      errors.api = 'An unexpected error occurred'
+    } finally {
+      isLoading.value = false
+    }
   }
 }
 
@@ -559,6 +656,16 @@ const handleForgotPassword = () => {
   color: #ef4444;
 }
 
+.api-error {
+  padding: 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 0.5rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
 .submit-button {
   position: relative;
   display: block;
@@ -574,10 +681,36 @@ const handleForgotPassword = () => {
   cursor: pointer;
   outline: none;
   transition: all 0.2s;
+  overflow: hidden;
 }
 
 .submit-button:hover {
   background: #374151;
+}
+
+.submit-button.loading {
+  pointer-events: none;
+  background: #374151;
+}
+
+.submit-button.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.3), transparent);
+  animation: loading-shine 1s infinite;
+}
+
+@keyframes loading-shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .footer-links {

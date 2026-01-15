@@ -17,9 +17,12 @@ Including another URLconf
 from django.urls import path
 from api import views
 
+app_name = 'api'
+
 urlpatterns = [
-    path("auth/signup/", views.signup, name="signup"),
-    path("auth/login/", views.login, name="login"),
-    path("auth/logout/", views.logout, name="logout"),
-    path("auth/user/", views.current_user, name="current-user"),
+    path('auth/csrf/', views.get_csrf_token, name='csrf'),
+    path('auth/signup/', views.signup, name='signup'),
+    path('auth/login/', views.login, name='login'),
+    path('auth/logout/', views.logout, name='logout'),
+    path('auth/user/', views.current_user, name='current-user'),
 ]
