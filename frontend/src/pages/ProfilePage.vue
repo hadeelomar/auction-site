@@ -1,220 +1,127 @@
 <template>
-  <div class="dashboard-wrapper">
-    <Sidebar :open="sidebarOpen" @toggle="sidebarOpen = !sidebarOpen" />
-    <div class="dashboard-content">
-      <DashboardHeader 
-        page-title="Profile Settings"
-        :isDark="isDark" 
-        @toggle-theme="isDark = !isDark"
-      />
-      <main class="main-content">
-        <div class="profile-container">
-          <!-- Profile header with animations -->
-          <div class="profile-header reveal-box" :class="{ 'revealed': isRevealed }">
-            <h1 class="profile-title">Profile Settings</h1>
-            <p class="profile-subtitle">Manage your account information</p>
-          </div>
+  <div class="page-wrapper">
+    <Navbar />
+    
+    <main class="main-content">
+      <div class="profile-container">
+        <!-- profile header -->
+        <div class="profile-header reveal-box" :class="{ 'revealed': isRevealed }">
+          <h1 class="profile-title">Profile Settings</h1>
+          <p class="profile-subtitle">Manage your account information</p>
+        </div>
 
-          <form @submit.prevent="handleSubmit" class="profile-form">
-            <!-- Avatar Upload Section -->
-            <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.1s">
-              <h2 class="section-title">Profile Picture</h2>
-              <div class="avatar-upload-container">
-                <div
-                  :class="['avatar-preview', { 'dragging': isDragging }]"
-                  @click="openFileDialog"
-                  @dragenter="handleDragEnter"
-                  @dragleave="handleDragLeave"
-                  @dragover="handleDragOver"
-                  @drop="handleDrop"
+        <form @submit.prevent="handleSubmit" class="profile-form">
+          <!-- avatar upload -->
+          <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.1s">
+            <h2 class="section-title">Profile Picture</h2>
+            <div class="avatar-upload-container">
+              <div
+                :class="['avatar-preview', { 'dragging': isDragging }]"
+                @click="openFileDialog"
+                @dragenter="handleDragEnter"
+                @dragleave="handleDragLeave"
+                @dragover="handleDragOver"
+                @drop="handleDrop"
+              >
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept="image/*"
+                  @change="handleFileChange"
+                  class="file-input"
+                />
+                <img v-if="previewUrl" :src="previewUrl" alt="Profile" class="avatar-image" />
+                <div v-else class="avatar-placeholder">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </div>
+                <button
+                  v-if="previewUrl"
+                  type="button"
+                  class="remove-button"
+                  @click.stop="removeImage"
                 >
-                  <input
-                    ref="fileInput"
-                    type="file"
-                    accept="image/*"
-                    @change="handleFileChange"
-                    class="file-input"
-                  />
-                  <img v-if="previewUrl" :src="previewUrl" alt="Profile" class="avatar-image" />
-                  <div v-else class="avatar-placeholder">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                  </div>
-                  <button
-                    v-if="previewUrl"
-                    type="button"
-                    class="remove-button"
-                    @click.stop="removeImage"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  </button>
-                </div>
-                <div class="avatar-info">
-                  <p class="avatar-label">{{ previewUrl ? 'Avatar uploaded' : 'Upload avatar' }}</p>
-                  <p class="avatar-hint">PNG, JPG up to 5MB</p>
-                </div>
-                <span v-if="errors.image" class="error-message">{{ errors.image }}</span>
-              </div>
-            </div>
-
-            <!-- Personal Information -->
-            <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.2s">
-              <h2 class="section-title">Personal Information</h2>
-              
-              <div class="form-grid">
-                <!-- Added first name and last name fields -->
-                <div class="form-group">
-                  <label for="firstName" class="form-label">
-                    First Name <span class="required">*</span>
-                  </label>
-                  <input
-                    id="firstName"
-                    v-model="formData.firstName"
-                    type="text"
-                    class="form-input"
-                    placeholder="Enter first name"
-                  />
-                  <span v-if="errors.firstName" class="error-message">{{ errors.firstName }}</span>
-                </div>
-
-                <div class="form-group">
-                  <label for="lastName" class="form-label">
-                    Last Name <span class="required">*</span>
-                  </label>
-                  <input
-                    id="lastName"
-                    v-model="formData.lastName"
-                    type="text"
-                    class="form-input"
-                    placeholder="Enter last name"
-                  />
-                  <span v-if="errors.lastName" class="error-message">{{ errors.lastName }}</span>
-                </div>
-
-                <div class="form-group">
-                  <label for="email" class="form-label">
-                    Email <span class="required">*</span>
-                  </label>
-                  <input
-                    id="email"
-                    v-model="formData.email"
-                    type="email"
-                    class="form-input"
-                    placeholder="Enter your email"
-                  />
-                  <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
-                </div>
-
-                <div class="form-group">
-                  <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                  <input
-                    id="dateOfBirth"
-                    v-model="formData.dateOfBirth"
-                    type="date"
-                    class="form-input"
-                  />
-                  <span v-if="errors.dateOfBirth" class="error-message">{{ errors.dateOfBirth }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Added password change section -->
-            <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.3s">
-              <h2 class="section-title">Change Password</h2>
-              <p class="section-description">Leave blank if you don't want to change your password</p>
-              
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="currentPassword" class="form-label">Current Password</label>
-                  <input
-                    id="currentPassword"
-                    v-model="formData.currentPassword"
-                    type="password"
-                    class="form-input"
-                    placeholder="Enter current password"
-                    autocomplete="current-password"
-                  />
-                  <span v-if="errors.currentPassword" class="error-message">{{ errors.currentPassword }}</span>
-                </div>
-
-                <div class="form-group">
-                  <label for="newPassword" class="form-label">New Password</label>
-                  <input
-                    id="newPassword"
-                    v-model="formData.newPassword"
-                    type="password"
-                    class="form-input"
-                    placeholder="Enter new password"
-                    autocomplete="new-password"
-                  />
-                  <span v-if="errors.newPassword" class="error-message">{{ errors.newPassword }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="form-actions reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.4s">
-              <button type="button" class="cancel-button" @click="loadUserData">
-                Reset
-              </button>
-              <button type="submit" class="save-button" :disabled="isLoading">
-                <span v-if="!isLoading">Save Changes</span>
-                <span v-else>Saving...</span>
-              </button>
-            </div>
-          </form>
-
-          <!-- Cropper Modal -->
-          <div v-if="showCropper" class="modal-overlay" @click="closeCropper">
-            <div class="modal-content" @click.stop>
-              <div class="modal-header">
-                <h3 class="modal-title">Crop Image</h3>
-                <button type="button" class="modal-close" @click="closeCropper">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"/>
                     <line x1="6" y1="6" x2="18" y2="18"/>
                   </svg>
                 </button>
               </div>
-              <div class="cropper-container">
-                <canvas ref="cropperCanvas" class="cropper-canvas"></canvas>
-                <div class="crop-overlay">
-                  <div
-                    ref="cropBox"
-                    class="crop-box"
-                    :style="cropBoxStyle"
-                    @mousedown="startDrag"
-                  >
-                    <div class="crop-grid">
-                      <div class="grid-line"></div>
-                      <div class="grid-line"></div>
-                      <div class="grid-line grid-horizontal"></div>
-                      <div class="grid-line grid-horizontal"></div>
-                    </div>
-                  </div>
-                </div>
+              <div class="avatar-info">
+                <p class="avatar-label">{{ previewUrl ? 'Avatar uploaded' : 'Upload avatar' }}</p>
+                <p class="avatar-hint">PNG, JPG up to 5MB</p>
               </div>
-              <div class="modal-actions">
-                <button type="button" class="modal-button-secondary" @click="closeCropper">
-                  Cancel
-                </button>
-                <button type="button" class="modal-button-primary" @click="applyCrop">
-                  Apply Crop
-                </button>
+              <span v-if="errors.image" class="error-message">{{ errors.image }}</span>
+            </div>
+          </div>
+
+          <!-- personal info -->
+          <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.2s">
+            <h2 class="section-title">Personal Information</h2>
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="firstName" class="form-label">First Name <span class="required">*</span></label>
+                <input id="firstName" v-model="formData.firstName" type="text" class="form-input" placeholder="Enter first name" />
+                <span v-if="errors.firstName" class="error-message">{{ errors.firstName }}</span>
+              </div>
+
+              <div class="form-group">
+                <label for="lastName" class="form-label">Last Name <span class="required">*</span></label>
+                <input id="lastName" v-model="formData.lastName" type="text" class="form-input" placeholder="Enter last name" />
+                <span v-if="errors.lastName" class="error-message">{{ errors.lastName }}</span>
+              </div>
+
+              <div class="form-group">
+                <label for="email" class="form-label">Email <span class="required">*</span></label>
+                <input id="email" v-model="formData.email" type="email" class="form-input" placeholder="Enter your email" />
+                <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
+              </div>
+
+              <div class="form-group">
+                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                <input id="dateOfBirth" v-model="formData.dateOfBirth" type="date" class="form-input" />
+                <span v-if="errors.dateOfBirth" class="error-message">{{ errors.dateOfBirth }}</span>
               </div>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+
+          <!-- password change -->
+          <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.3s">
+            <h2 class="section-title">Change Password</h2>
+            <p class="section-description">Leave blank if you don't want to change your password</p>
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="currentPassword" class="form-label">Current Password</label>
+                <input id="currentPassword" v-model="formData.currentPassword" type="password" class="form-input" placeholder="Enter current password" />
+                <span v-if="errors.currentPassword" class="error-message">{{ errors.currentPassword }}</span>
+              </div>
+
+              <div class="form-group">
+                <label for="newPassword" class="form-label">New Password</label>
+                <input id="newPassword" v-model="formData.newPassword" type="password" class="form-input" placeholder="Enter new password" />
+                <span v-if="errors.newPassword" class="error-message">{{ errors.newPassword }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- form actions -->
+          <div class="form-actions reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.4s">
+            <button type="button" class="cancel-button" @click="loadUserData">Reset</button>
+            <button type="submit" class="save-button" :disabled="isLoading">
+              <span v-if="!isLoading">Save Changes</span>
+              <span v-else>Saving...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
   </div>
 
-  <!-- Toast Notification -->
+  <!-- toast -->
   <Transition name="toast">
     <div v-if="toast.show" :class="['toast', `toast-${toast.type}`]">
       <svg v-if="toast.type === 'success'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -231,21 +138,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
-import Sidebar from '../components/Sidebar.vue'
-import DashboardHeader from '../components/DashboardHeader.vue'
+import Navbar from '../components/Navbar.vue'
 
 const authStore = useAuthStore()
-const sidebarOpen = ref(true)
-const isDark = ref(true)
 
 const fileInput = ref<HTMLInputElement | null>(null)
-const cropperCanvas = ref<HTMLCanvasElement | null>(null)
-const cropBox = ref<HTMLDivElement | null>(null)
 
 const isDragging = ref(false)
-const showCropper = ref(false)
 const isLoading = ref(false)
 const selectedFile = ref<File | null>(null)
 const previewUrl = ref<string>('')
@@ -277,276 +178,100 @@ const toast = reactive({
   type: 'success' as 'success' | 'error'
 })
 
-// Cropper state
-const cropState = reactive({
-  image: null as HTMLImageElement | null,
-  x: 50,
-  y: 50,
-  size: 200,
-  dragging: false,
-  startX: 0,
-  startY: 0
-})
-
-const cropBoxStyle = computed(() => ({
-  left: `${cropState.x}px`,
-  top: `${cropState.y}px`,
-  width: `${cropState.size}px`,
-  height: `${cropState.size}px`
-}))
-
-const openFileDialog = () => {
-  fileInput.value?.click()
-}
+const openFileDialog = () => fileInput.value?.click()
 
 const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement
-  if (target.files && target.files[0]) {
-    processFile(target.files[0])
-  }
+  if (target.files && target.files[0]) processFile(target.files[0])
 }
 
-const handleDragEnter = (e: DragEvent) => {
-  e.preventDefault()
-  e.stopPropagation()
-  isDragging.value = true
-}
-
-const handleDragLeave = (e: DragEvent) => {
-  e.preventDefault()
-  e.stopPropagation()
-  isDragging.value = false
-}
-
-const handleDragOver = (e: DragEvent) => {
-  e.preventDefault()
-  e.stopPropagation()
-}
+const handleDragEnter = (e: DragEvent) => { e.preventDefault(); e.stopPropagation(); isDragging.value = true }
+const handleDragLeave = (e: DragEvent) => { e.preventDefault(); e.stopPropagation(); isDragging.value = false }
+const handleDragOver = (e: DragEvent) => { e.preventDefault(); e.stopPropagation() }
 
 const handleDrop = (e: DragEvent) => {
-  e.preventDefault()
-  e.stopPropagation()
-  isDragging.value = false
-
-  if (e.dataTransfer?.files && e.dataTransfer.files[0]) {
-    processFile(e.dataTransfer.files[0])
-  }
+  e.preventDefault(); e.stopPropagation(); isDragging.value = false
+  if (e.dataTransfer?.files && e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0])
 }
 
 const processFile = (file: File) => {
   errors.image = ''
-
-  // Validate file type
-  if (!file.type.startsWith('image/')) {
-    errors.image = 'Please select an image file'
-    return
-  }
-
-  // Validate file size (5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    errors.image = 'File size must be less than 5MB'
-    return
-  }
-
+  if (!file.type.startsWith('image/')) { errors.image = 'Please select an image file'; return }
+  if (file.size > 5 * 1024 * 1024) { errors.image = 'File size must be less than 5MB'; return }
   selectedFile.value = file
-  loadImageForCropping(file)
+  autoCropImage(file)
 }
 
-const loadImageForCropping = (file: File) => {
+const autoCropImage = (file: File) => {
   const reader = new FileReader()
   reader.onload = (e) => {
     const img = new Image()
     img.onload = () => {
-      cropState.image = img
-      showCropper.value = true
-      drawCropper()
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+      
+      const size = Math.min(img.width, img.height)
+      const x = (img.width - size) / 2
+      const y = (img.height - size) / 2
+      
+      canvas.width = 200
+      canvas.height = 200
+      ctx.drawImage(img, x, y, size, size, 0, 0, 200, 200)
+      
+      canvas.toBlob((blob) => {
+        if (blob) {
+          croppedBlob.value = blob
+          previewUrl.value = URL.createObjectURL(blob)
+        }
+      }, 'image/jpeg', 0.9)
     }
     img.src = e.target?.result as string
   }
   reader.readAsDataURL(file)
 }
 
-const drawCropper = () => {
-  if (!cropperCanvas.value || !cropState.image) return
-
-  const canvas = cropperCanvas.value
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-
-  const maxWidth = 600
-  const maxHeight = 400
-  const scale = Math.min(maxWidth / cropState.image.width, maxHeight / cropState.image.height, 1)
-
-  canvas.width = cropState.image.width * scale
-  canvas.height = cropState.image.height * scale
-
-  ctx.drawImage(cropState.image, 0, 0, canvas.width, canvas.height)
-
-  // Initialize crop box in center
-  cropState.size = Math.min(canvas.width, canvas.height) * 0.5
-  cropState.x = (canvas.width - cropState.size) / 2
-  cropState.y = (canvas.height - cropState.size) / 2
-}
-
-const startDrag = (e: MouseEvent) => {
-  cropState.dragging = true
-  cropState.startX = e.clientX - cropState.x
-  cropState.startY = e.clientY - cropState.y
-
-  document.addEventListener('mousemove', onDrag)
-  document.addEventListener('mouseup', stopDrag)
-}
-
-const onDrag = (e: MouseEvent) => {
-  if (!cropState.dragging || !cropperCanvas.value) return
-
-  const canvas = cropperCanvas.value
-  const newX = e.clientX - cropState.startX
-  const newY = e.clientY - cropState.startY
-
-  cropState.x = Math.max(0, Math.min(newX, canvas.width - cropState.size))
-  cropState.y = Math.max(0, Math.min(newY, canvas.height - cropState.size))
-}
-
-const stopDrag = () => {
-  cropState.dragging = false
-  document.removeEventListener('mousemove', onDrag)
-  document.removeEventListener('mouseup', stopDrag)
-}
-
-const applyCrop = () => {
-  if (!cropperCanvas.value || !cropState.image) return
-
-  const canvas = document.createElement('canvas')
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-
-  canvas.width = 200
-  canvas.height = 200
-
-  const scale = cropState.image.width / cropperCanvas.value.width
-
-  ctx.drawImage(
-    cropState.image,
-    cropState.x * scale,
-    cropState.y * scale,
-    cropState.size * scale,
-    cropState.size * scale,
-    0,
-    0,
-    200,
-    200
-  )
-
-  canvas.toBlob((blob) => {
-    if (blob) {
-      croppedBlob.value = blob
-      previewUrl.value = URL.createObjectURL(blob)
-      closeCropper()
-    }
-  }, 'image/jpeg', 0.9)
-}
-
-const closeCropper = () => {
-  showCropper.value = false
-  cropState.image = null
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
-}
-
-const removeImage = () => {
+const removeImage = () => { 
   previewUrl.value = ''
   selectedFile.value = null
   croppedBlob.value = null
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
+  if (fileInput.value) fileInput.value.value = '' 
 }
 
 const validateForm = (): boolean => {
   let isValid = true
-
-  errors.firstName = ''
-  errors.lastName = ''
-  errors.email = ''
-  errors.dateOfBirth = ''
-  errors.currentPassword = ''
-  errors.newPassword = ''
-
-  if (!formData.firstName.trim()) {
-    errors.firstName = 'First name is required'
-    isValid = false
-  }
-
-  if (!formData.lastName.trim()) {
-    errors.lastName = 'Last name is required'
-    isValid = false
-  }
-
-  const emailRegex = /\S+@\S+\.\S+/
-  if (!emailRegex.test(formData.email)) {
-    errors.email = 'Invalid email address'
-    isValid = false
-  }
-
-  if (formData.dateOfBirth) {
-    const date = new Date(formData.dateOfBirth)
-    if (date > new Date()) {
-      errors.dateOfBirth = 'Date cannot be in the future'
-      isValid = false
-    }
-  }
-
+  errors.firstName = ''; errors.lastName = ''; errors.email = ''; errors.dateOfBirth = ''; errors.currentPassword = ''; errors.newPassword = ''
+  if (!formData.firstName.trim()) { errors.firstName = 'First name is required'; isValid = false }
+  if (!formData.lastName.trim()) { errors.lastName = 'Last name is required'; isValid = false }
+  if (!/\S+@\S+\.\S+/.test(formData.email)) { errors.email = 'Invalid email address'; isValid = false }
+  if (formData.dateOfBirth && new Date(formData.dateOfBirth) > new Date()) { errors.dateOfBirth = 'Date cannot be in the future'; isValid = false }
   if ((formData.currentPassword || formData.newPassword) && (!formData.currentPassword || !formData.newPassword)) {
-    if (!formData.currentPassword) {
-      errors.currentPassword = 'Current password required to change password'
-    }
-    if (!formData.newPassword) {
-      errors.newPassword = 'New password required'
-    }
+    if (!formData.currentPassword) errors.currentPassword = 'Current password required'
+    if (!formData.newPassword) errors.newPassword = 'New password required'
     isValid = false
   }
-
-  if (formData.newPassword && formData.newPassword.length < 6) {
-    errors.newPassword = 'Password must be at least 6 characters'
-    isValid = false
-  }
-
+  if (formData.newPassword && formData.newPassword.length < 6) { errors.newPassword = 'Password must be at least 6 characters'; isValid = false }
   return isValid
 }
 
 const handleSubmit = async () => {
   if (!validateForm()) return
-
   isLoading.value = true
-
   try {
     await fetchCsrfToken()
     const csrfToken = getCookie('csrftoken')
-
     const formDataToSend = new FormData()
     formDataToSend.append('first_name', formData.firstName)
     formDataToSend.append('last_name', formData.lastName)
     formDataToSend.append('email', formData.email)
-    if (formData.dateOfBirth) {
-      formDataToSend.append('date_of_birth', formData.dateOfBirth)
-    }
-    if (formData.currentPassword) {
-      formDataToSend.append('current_password', formData.currentPassword)
-    }
-    if (formData.newPassword) {
-      formDataToSend.append('new_password', formData.newPassword)
-    }
-    if (croppedBlob.value) {
-      formDataToSend.append('profile_image', croppedBlob.value, 'profile.jpg')
-    }
+    if (formData.dateOfBirth) formDataToSend.append('date_of_birth', formData.dateOfBirth)
+    if (formData.currentPassword) formDataToSend.append('current_password', formData.currentPassword)
+    if (formData.newPassword) formDataToSend.append('new_password', formData.newPassword)
+    if (croppedBlob.value) formDataToSend.append('profile_image', croppedBlob.value, 'profile.jpg')
 
     const response = await fetch('http://localhost:8000/api/profile/update/', {
       method: 'POST',
-      headers: {
-        'X-CSRFToken': csrfToken || ''
-      },
+      headers: { 'X-CSRFToken': csrfToken || '' },
       credentials: 'include',
       body: formDataToSend
     })
@@ -554,8 +279,7 @@ const handleSubmit = async () => {
     if (response.ok) {
       await authStore.checkAuth()
       showToast('Profile updated successfully', 'success')
-      formData.currentPassword = ''
-      formData.newPassword = ''
+      formData.currentPassword = ''; formData.newPassword = ''
     } else {
       const error = await response.json()
       showToast(error.error || 'Failed to update profile', 'error')
@@ -574,9 +298,7 @@ const loadUserData = async () => {
     formData.lastName = authStore.user.last_name || ''
     formData.email = authStore.user.email || ''
     formData.dateOfBirth = authStore.user.date_of_birth || ''
-    if (authStore.user.profile_image) {
-      previewUrl.value = authStore.user.profile_image
-    }
+    if (authStore.user.profile_image) previewUrl.value = authStore.user.profile_image
   }
 }
 
@@ -588,57 +310,39 @@ function getCookie(name: string): string | null {
 }
 
 async function fetchCsrfToken() {
-  try {
-    await fetch('http://localhost:8000/api/auth/csrf/', {
-      credentials: 'include'
-    })
-  } catch (err) {
-    console.error('Failed to fetch CSRF token:', err)
-  }
+  try { await fetch('http://localhost:8000/api/auth/csrf/', { credentials: 'include' }) } catch (err) { console.error('Failed to fetch CSRF token:', err) }
 }
 
 function showToast(message: string, type: 'success' | 'error' = 'success') {
-  toast.message = message
-  toast.type = type
-  toast.show = true
-  
-  setTimeout(() => {
-    toast.show = false
-  }, 3000)
+  toast.message = message; toast.type = type; toast.show = true
+  setTimeout(() => { toast.show = false }, 3000)
 }
 
 onMounted(async () => {
   await loadUserData()
-  setTimeout(() => {
-    isRevealed.value = true
-  }, 50)
+  setTimeout(() => { isRevealed.value = true }, 50)
 })
 </script>
 
 <style scoped>
-/* Remove duplicate dashboard-wrapper styles, they're inherited */
-.dashboard-wrapper {
-  display: flex;
+.page-wrapper {
   min-height: 100vh;
-  width: 100%;
-  background: #0a0e1a;
-}
-
-.dashboard-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
+  background: #f9fafb;
 }
 
 .main-content {
-  flex: 1;
+  max-width: 800px;
+  margin: 0 auto;
   padding: 2rem;
 }
 
 .profile-container {
-  max-width: 800px;
-  margin: 0 auto;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .profile-header {
@@ -646,15 +350,14 @@ onMounted(async () => {
 }
 
 .profile-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: #f3f4f6;
+  color: #111827;
   margin-bottom: 0.5rem;
 }
 
 .profile-subtitle {
-  font-size: 1rem;
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 .profile-form {
@@ -664,45 +367,48 @@ onMounted(async () => {
 }
 
 .form-section {
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
   padding: 1.5rem;
 }
 
 .section-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #f3f4f6;
-  margin-bottom: 1.5rem;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.section-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
 }
 
 .avatar-upload-container {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 1rem;
 }
 
 .avatar-preview {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  border: 2px dashed #374151;
-  overflow: hidden;
+  border: 2px dashed #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
+  overflow: hidden;
 }
 
-.avatar-preview:hover {
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
-}
-
-.avatar-preview.dragging {
-  border-color: #60a5fa;
-  background: rgba(96, 165, 250, 0.1);
+.avatar-preview:hover, .avatar-preview.dragging {
+  border-color: #ea580c;
+  background: #fff7ed;
 }
 
 .file-input {
@@ -716,57 +422,51 @@ onMounted(async () => {
 }
 
 .avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #374151;
   color: #9ca3af;
 }
 
 .remove-button {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 0;
+  right: 0;
   width: 24px;
   height: 24px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 50%;
-  color: #f3f4f6;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.remove-button:hover {
-  background: #ef4444;
-  border-color: #ef4444;
 }
 
 .avatar-info {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .avatar-label {
-  font-size: 0.875rem;
   font-weight: 500;
-  color: #f3f4f6;
-  margin-bottom: 0.25rem;
+  color: #374151;
 }
 
 .avatar-hint {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 0.8125rem;
+  color: #9ca3af;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .form-group {
@@ -778,7 +478,7 @@ onMounted(async () => {
 .form-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #f3f4f6;
+  color: #374151;
 }
 
 .required {
@@ -788,33 +488,24 @@ onMounted(async () => {
 .form-input {
   width: 100%;
   height: 44px;
-  padding: 0.75rem 1rem;
+  padding: 0 1rem;
   font-size: 0.9375rem;
-  color: #f3f4f6;
-  background: #0f1523;
-  border: 1px solid #374151;
-  border-radius: 0.5rem;
-  transition: all 0.3s;
+  color: #111827;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
   outline: none;
-}
-
-.form-input::placeholder {
-  color: #6b7280;
-}
-
-.form-input:hover {
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+  transition: all 0.2s;
 }
 
 .form-input:focus {
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+  border-color: #ea580c;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
 }
 
 .error-message {
   font-size: 0.75rem;
-  color: #ef4444;
+  color: #dc2626;
 }
 
 .form-actions {
@@ -823,201 +514,54 @@ onMounted(async () => {
   gap: 1rem;
 }
 
-.cancel-button,
-.save-button {
-  height: 44px;
-  padding: 0 1.5rem;
-  font-size: 0.9375rem;
+.cancel-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  border-radius: 0.5rem;
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
-  outline: none;
-}
-
-.cancel-button {
-  background: transparent;
-  border: 1px solid #374151;
-  color: #f3f4f6;
 }
 
 .cancel-button:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: #f3f4f6;
 }
 
 .save-button {
-  background: #3b82f6;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ea580c, #f97316);
   border: none;
-  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .save-button:hover {
-  background: #2563eb;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
 }
 
 .save-button:disabled {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+.reveal-box {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.modal-content {
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 0.75rem;
-  width: 90%;
-  max-width: 700px;
-  max-height: 90vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+.reveal-box.revealed {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem;
-  border-bottom: 1px solid #374151;
-}
-
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #f3f4f6;
-}
-
-.modal-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: transparent;
-  border: none;
-  color: #9ca3af;
-  cursor: pointer;
-  border-radius: 0.375rem;
-  transition: all 0.2s;
-}
-
-.modal-close:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #f3f4f6;
-}
-
-.cropper-container {
-  position: relative;
-  padding: 2rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #0f1523;
-  min-height: 400px;
-}
-
-.cropper-canvas {
-  max-width: 100%;
-  max-height: 400px;
-  display: block;
-}
-
-.crop-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-}
-
-.crop-box {
-  position: absolute;
-  border: 2px solid #60a5fa;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
-  cursor: move;
-  pointer-events: all;
-}
-
-.crop-grid {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-}
-
-.grid-line {
-  border-right: 1px solid rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.grid-line:nth-child(3),
-.grid-line:nth-child(6),
-.grid-line:nth-child(9) {
-  border-right: none;
-}
-
-.grid-line.grid-horizontal:nth-child(7),
-.grid-line.grid-horizontal:nth-child(8),
-.grid-line.grid-horizontal:nth-child(9) {
-  border-bottom: none;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  padding: 1.5rem;
-  border-top: 1px solid #374151;
-}
-
-.modal-button-secondary,
-.modal-button-primary {
-  height: 40px;
-  padding: 0 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-}
-
-.modal-button-secondary {
-  background: transparent;
-  border: 1px solid #374151;
-  color: #f3f4f6;
-}
-
-.modal-button-secondary:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.modal-button-primary {
-  background: #3b82f6;
-  border: none;
-  color: white;
-}
-
-.modal-button-primary:hover {
-  background: #2563eb;
-}
-
-/* Toast Styles */
 .toast {
   position: fixed;
   bottom: 2rem;
@@ -1026,20 +570,21 @@ onMounted(async () => {
   align-items: center;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 0.5rem;
-  color: #f3f4f6;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-  z-index: 1001;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
 }
 
 .toast-success {
-  border-left: 3px solid #10b981;
+  background: #d1fae5;
+  color: #065f46;
 }
 
 .toast-error {
-  border-left: 3px solid #ef4444;
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .toast-enter-active,
@@ -1047,31 +592,9 @@ onMounted(async () => {
   transition: all 0.3s ease;
 }
 
-.toast-enter-from {
-  transform: translateX(100%);
-  opacity: 0;
-}
-
+.toast-enter-from,
 .toast-leave-to {
-  transform: translateX(100%);
   opacity: 0;
-}
-
-/* Added reveal animation styles like login page */
-.reveal-box {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.reveal-box.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.section-description {
-  font-size: 0.875rem;
-  color: #9ca3af;
-  margin-bottom: 1.5rem;
+  transform: translateY(1rem);
 }
 </style>

@@ -1,112 +1,136 @@
 <template>
-  <div class="dashboard-wrapper">
-    <Sidebar :open="sidebarOpen" @toggle="sidebarOpen = !sidebarOpen" />
-    <div class="dashboard-content">
-      <DashboardHeader 
-        :page-title="pageTitle"
-        :isDark="isDark" 
-        @toggle-theme="isDark = !isDark"
-      />
-      <main class="main-content">
-        <div class="page-container">
-          <!-- Back Button -->
-          <button class="back-btn" @click="goBack">
-            &larr; Back to Auctions
-          </button>
+  <div class="page-wrapper">
+    <Navbar />
+    
+    <main class="main-content">
+      <div class="page-container">
+        <!-- Back Button -->
+        <button class="back-btn" @click="goBack">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+          Back to Auctions
+        </button>
 
-          <!-- Loading State -->
-          <div v-if="isLoading" class="loading-state">
-            <p>Loading auction details...</p>
-          </div>
+        <!-- Loading State -->
+        <div v-if="isLoading" class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading auction details...</p>
+        </div>
 
-          <!-- Error State -->
-          <div v-else-if="error" class="error-state">
-            <p>{{ error }}</p>
-            <button class="retry-btn" @click="fetchAuction">Try Again</button>
-          </div>
+        <!-- Error State -->
+        <div v-else-if="error" class="error-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>{{ error }}</p>
+          <button class="retry-btn" @click="fetchAuction">Try Again</button>
+        </div>
 
-          <!-- Auction Details -->
-          <div v-else-if="auction" class="auction-detail">
-            <div class="auction-grid">
-              <!-- Image Section -->
-              <div class="auction-image-section">
-                <div class="auction-image-container">
-                  <img 
-                    v-if="auction.image" 
-                    :src="auction.image" 
-                    :alt="auction.title"
-                    class="auction-image"
-                  />
-                  <div v-else class="no-image">
-                    <span>No Image Available</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Info Section -->
-              <div class="auction-info-section">
-                <div class="auction-header">
-                  <h1 class="auction-title">{{ auction.title }}</h1>
-                  <span :class="['status-badge', auction.is_active ? 'active' : 'ended']">
-                    {{ auction.is_active ? 'Active' : 'Ended' }}
-                  </span>
-                </div>
-
-                <p class="auction-description">{{ auction.description }}</p>
-
-                <div class="price-section">
-                  <div class="price-item">
-                    <span class="price-label">Starting Price</span>
-                    <span class="price-value">${{ formatPrice(auction.starting_price) }}</span>
-                  </div>
-                  <div class="price-item current">
-                    <span class="price-label">Current Price</span>
-                    <span class="price-value">${{ formatPrice(auction.current_price) }}</span>
-                  </div>
-                </div>
-
-                <div class="auction-meta">
-                  <div class="meta-item">
-                    <span class="meta-label">Seller</span>
-                    <span class="meta-value">{{ ownerName }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <span class="meta-label">Listed On</span>
-                    <span class="meta-value">{{ formatDate(auction.created_at) }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <span class="meta-label">Ends At</span>
-                    <span class="meta-value">{{ formatDate(auction.ends_at) }}</span>
-                  </div>
-                </div>
-
-                <!-- Bidding Placeholder (Issue #13) -->
-                <div class="placeholder-section">
-                  <h3>Place a Bid</h3>
-                  <p class="placeholder-text">Bidding interface coming soon (Issue #13)</p>
+        <!-- Auction Details -->
+        <div v-else-if="auction" class="auction-detail">
+          <div class="auction-grid">
+            <!-- Image Section -->
+            <div class="auction-image-section">
+              <div class="auction-image-container">
+                <img 
+                  v-if="auction.image" 
+                  :src="auction.image" 
+                  :alt="auction.title"
+                  class="auction-image"
+                />
+                <div v-else class="no-image">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                    <circle cx="9" cy="9" r="2"/>
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                  </svg>
+                  <span>No Image Available</span>
                 </div>
               </div>
             </div>
 
-            <!-- Q&A Placeholder (Issue #15) -->
-            <div class="qa-section">
-              <h2>Questions & Answers</h2>
-              <div class="placeholder-section">
-                <p class="placeholder-text">Q&A section coming soon (Issue #15)</p>
+            <!-- Info Section -->
+            <div class="auction-info-section">
+              <div class="auction-header">
+                <h1 class="auction-title">{{ auction.title }}</h1>
+                <span :class="['status-badge', auction.is_active ? 'active' : 'ended']">
+                  {{ auction.is_active ? 'Active' : 'Ended' }}
+                </span>
               </div>
+
+              <p class="auction-description">{{ auction.description }}</p>
+
+              <div class="price-section">
+                <div class="price-item">
+                  <span class="price-label">Starting Price</span>
+                  <span class="price-value">{{ formatPrice(auction.starting_price) }}</span>
+                </div>
+                <div class="price-item current">
+                  <span class="price-label">Current Price</span>
+                  <span class="price-value highlight">{{ formatPrice(auction.current_price) }}</span>
+                </div>
+              </div>
+
+              <div class="auction-meta">
+                <div class="meta-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  <span class="meta-label">Seller:</span>
+                  <span class="meta-value">{{ ownerName }}</span>
+                </div>
+                <div class="meta-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                    <line x1="16" x2="16" y1="2" y2="6"/>
+                    <line x1="8" x2="8" y1="2" y2="6"/>
+                    <line x1="3" x2="21" y1="10" y2="10"/>
+                  </svg>
+                  <span class="meta-label">Listed:</span>
+                  <span class="meta-value">{{ formatDate(auction.created_at) }}</span>
+                </div>
+                <div class="meta-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  <span class="meta-label">Ends:</span>
+                  <span class="meta-value">{{ formatDate(auction.ends_at) }}</span>
+                </div>
+              </div>
+
+              <!-- Bidding Section -->
+              <div class="bidding-section">
+                <h3>Place a Bid</h3>
+                <p class="placeholder-text">Bidding interface coming soon (Issue #13)</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Q&A Section -->
+          <div class="qa-section">
+            <h2>Questions & Answers</h2>
+            <div class="qa-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <p>Q&A section coming soon (Issue #15)</p>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Sidebar from '../components/Sidebar.vue'
-import DashboardHeader from '../components/DashboardHeader.vue'
+import Navbar from '../components/Navbar.vue'
 
 interface AuctionOwner {
   id: number
@@ -131,17 +155,11 @@ interface AuctionItem {
 const route = useRoute()
 const router = useRouter()
 
-const sidebarOpen = ref(true)
-const isDark = ref(true)
 const auction = ref<AuctionItem | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 
 const API_BASE_URL = 'http://localhost:8000/api'
-
-const pageTitle = computed(() => {
-  return auction.value?.title || 'Auction Details'
-})
 
 const ownerName = computed(() => {
   if (!auction.value?.owner) return 'Unknown'
@@ -153,7 +171,7 @@ const ownerName = computed(() => {
 })
 
 function formatPrice(price: string): string {
-  return parseFloat(price).toFixed(2)
+  return '£' + parseFloat(price).toFixed(2)
 }
 
 function formatDate(dateString: string): string {
@@ -168,7 +186,7 @@ function formatDate(dateString: string): string {
 }
 
 function goBack(): void {
-  router.push({ name: 'browse-auctions' })
+  router.push({ name: 'home' })
 }
 
 async function fetchAuction(): Promise<void> {
@@ -213,22 +231,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.dashboard-wrapper {
-  display: flex;
+.page-wrapper {
   min-height: 100vh;
-  width: 100%;
-  background: #0a0e1a;
-}
-
-.dashboard-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
+  background: #f9fafb;
 }
 
 .main-content {
-  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 2rem;
 }
 
@@ -237,30 +247,29 @@ onMounted(() => {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   background: transparent;
-  border: 1px solid #374151;
-  color: #9ca3af;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  border-radius: 8px;
   cursor: pointer;
   margin-bottom: 1.5rem;
+  font-size: 0.875rem;
   transition: all 0.2s;
 }
 
 .back-btn:hover {
-  background: #1f2937;
-  color: #fff;
+  background: #f3f4f6;
+  color: #111827;
+  border-color: #d1d5db;
 }
 
 .loading-state,
@@ -269,25 +278,41 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
-  background: #0f1523;
-  border: 1px solid #1f2937;
-  border-radius: 0.75rem;
+  min-height: 400px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
   color: #6b7280;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #ea580c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .retry-btn {
-  margin-top: 1rem;
-  background: #3b82f6;
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, #ea580c, #f97316);
   border: none;
   color: #fff;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
 .retry-btn:hover {
-  background: #2563eb;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
 }
 
 .auction-detail {
@@ -309,9 +334,9 @@ onMounted(() => {
 }
 
 .auction-image-section {
-  background: #0f1523;
-  border: 1px solid #1f2937;
-  border-radius: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
   overflow: hidden;
 }
 
@@ -320,6 +345,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #f9fafb;
 }
 
 .auction-image {
@@ -329,8 +355,12 @@ onMounted(() => {
 }
 
 .no-image {
-  color: #6b7280;
-  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
 }
 
 .auction-info-section {
@@ -347,43 +377,45 @@ onMounted(() => {
 }
 
 .auction-title {
-  color: #fff;
+  color: #111827;
   font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0;
+  line-height: 1.3;
 }
 
 .status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+  padding: 0.375rem 0.875rem;
+  border-radius: 50px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .status-badge.active {
-  background: #065f46;
-  color: #34d399;
+  background: #d1fae5;
+  color: #065f46;
 }
 
 .status-badge.ended {
-  background: #7f1d1d;
-  color: #fca5a5;
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .auction-description {
-  color: #9ca3af;
-  line-height: 1.6;
+  color: #6b7280;
+  line-height: 1.7;
   margin: 0;
 }
 
 .price-section {
   display: flex;
   gap: 2rem;
-  padding: 1rem;
-  background: #0f1523;
-  border: 1px solid #1f2937;
-  border-radius: 0.75rem;
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
 }
 
 .price-item {
@@ -394,75 +426,99 @@ onMounted(() => {
 
 .price-label {
   color: #6b7280;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .price-value {
-  color: #fff;
+  color: #111827;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.price-item.current .price-value {
-  color: #34d399;
+.price-value.highlight {
+  color: #ea580c;
 }
 
 .auction-meta {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: #0f1523;
-  border: 1px solid #1f2937;
-  border-radius: 0.75rem;
+  gap: 0.875rem;
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
 }
 
 .meta-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+}
+
+.meta-item svg {
+  flex-shrink: 0;
 }
 
 .meta-label {
-  color: #6b7280;
   font-size: 0.875rem;
 }
 
 .meta-value {
-  color: #d1d5db;
+  color: #111827;
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
-.placeholder-section {
+.bidding-section {
   padding: 1.5rem;
-  background: #0f1523;
-  border: 1px dashed #374151;
-  border-radius: 0.75rem;
+  background: #fff7ed;
+  border: 2px dashed #fed7aa;
+  border-radius: 12px;
   text-align: center;
 }
 
-.placeholder-section h3 {
-  color: #fff;
+.bidding-section h3 {
+  color: #111827;
   margin: 0 0 0.5rem 0;
-  font-size: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
 }
 
 .placeholder-text {
-  color: #6b7280;
+  color: #9a3412;
   margin: 0;
   font-size: 0.875rem;
 }
 
 .qa-section {
-  background: #0f1523;
-  border: 1px solid #1f2937;
-  border-radius: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
   padding: 1.5rem;
 }
 
 .qa-section h2 {
-  color: #fff;
+  color: #111827;
   margin: 0 0 1rem 0;
   font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.qa-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  background: #f9fafb;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+  color: #9ca3af;
+}
+
+.qa-placeholder p {
+  margin: 0;
+  font-size: 0.875rem;
 }
 </style>

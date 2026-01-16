@@ -36,7 +36,7 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  async function signup(fullName: string, email: string, password: string, passwordConfirm: string) {
+  async function signup(fullName: string, email: string, password: string, passwordConfirm: string, dateOfBirth: string) {
     isLoading.value = true
     error.value = null
 
@@ -56,6 +56,7 @@ export const useAuthStore = defineStore("auth", () => {
           email,
           password,
           password_confirm: passwordConfirm,
+          date_of_birth: dateOfBirth
         }),
       })
 
