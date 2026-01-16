@@ -1,30 +1,14 @@
-# Auction Site (Working title) ECS639U Group Coursework - Group 36
+# Bido - ECS639U Group Coursework - Group 36
 
-A full-stack Single Page Application built with Django for the backend API and Vue for the frontend (Vue router for frontend routing and Pinia for a global store).
+A full-stack auction site, SPA, built with Django for the backend API and Vue for the frontend (Vue router for frontend routing and Pinia for a global store).
 
 **Group members:** Hadeel, Milad, Omar
 
-## Contribution table
-| Task | Hadeel | Milad | Omar |
-|------|--------|-------|-------|
-| Authentication system | | | |
-| Pinia global store | | | |
-| Q&A system (backend) | | | |
-| Profile page (backend) | | | |
-| Item creation (backend) | | | |
-| Item listing and search (backend) | | | |
-| API architecture (Django REST endpoints) | | | |
-| Cron jobs and email system | | | |
-| Vue router setup | | | |
-| Q&A system (frontend) | | | |
-| Profile page (frontend) | | | |
-| Item creation (frontend) | | | |
-| Item listing and search (frontend) | | | |
-| Bidding system (backend) | | | |
-| Bidding UI | | | |
-| Data modelling (Users, Items, Bids, Question) | o | | |
-| Backend type hints | | | |
+## Contribution
 
+- **Hadeel**: Led coordination and UI direction, implemented authentication, editable profile page, deployment to OpenShift, and the cron/email winner notification system.
+- **Milad**: Implemented the item details experience including bidding UI, plus Q&A and bidding models/endpoints and their frontend integration.
+- **Omar**: Implemented auction item models/endpoints and search endpoint, and built the browse and create auction pages including live Ajax search.
 
 ## Local development
 
