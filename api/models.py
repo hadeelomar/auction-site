@@ -5,11 +5,6 @@ from typing import Optional
 
 
 class User(AbstractUser):
-    """
-    Custom User model that extends Django's AbstractUser.
-    Adds the profile image and date of birth fields for our app.
-    """
-
     profile_image = models.ImageField(
         upload_to="profile_images/",
         null=True,
@@ -29,11 +24,7 @@ class User(AbstractUser):
     def __str__(self) -> str:
         return self.username
 
-    @property
     def age(self) -> Optional[int]:
-        """
-        Computed property that calculates the user's age from their date of birth.
-        """
         if self.date_of_birth:
             today = date.today()
             return (
@@ -45,3 +36,24 @@ class User(AbstractUser):
                 )
             )
         return None
+
+
+class AuctionItem(models.Model):
+    title = models.CharField(max_length=150)
+    description = models.TextField()
+    image = models.ImageField(upload_to="items/", null=True, blank=True)
+    starting_price = models.DecimalField(max_digits=10, decimal_places=2)
+    current_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    ends_at = models.DateTimeField(null=True, blank=True)
+
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="items"
+    )
+
+    class Meta:
+        db_table = "auction_items"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
