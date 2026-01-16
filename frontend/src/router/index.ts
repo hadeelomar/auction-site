@@ -7,6 +7,7 @@ import CreateAuctionPage from "../pages/CreateAuctionPage.vue"
 import MyBidsPage from "../pages/MyBidsPage.vue"
 import MyAuctionsPage from "../pages/MyAuctionsPage.vue"
 import ProfilePage from "../pages/ProfilePage.vue"
+import AuctionDetailPage from "../pages/AuctionDetailPage.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,12 @@ const router = createRouter({
       path: "/profile",
       name: "profile",
       component: ProfilePage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/auction/:id",
+      name: "auction-detail",
+      component: AuctionDetailPage,
       meta: { requiresAuth: true },
     },
   ],
