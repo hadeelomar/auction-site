@@ -241,13 +241,14 @@ def auctions(request: HttpRequest) -> JsonResponse:
     POST /api/auctions -> create auction
     """
     if request.method == "GET":
-        items = AuctionItem.objects.filter(
-            ends_at__gt=timezone.now()
-        ).order_by("-created_at")
+        items = AuctionItem.objects.filter(ends_at__gt=timezone.now()).order_by(
+            "-created_at"
+        )
 
-        return JsonResponse({
-            "items": [auction_item_to_dict(request, item) for item in items]
-        }, status=200)
+        return JsonResponse(
+            {"items": [auction_item_to_dict(request, item) for item in items]},
+            status=200,
+        )
 
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)

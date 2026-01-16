@@ -52,6 +52,7 @@ class AuctionItem(models.Model):
     Auction Item model
     Includes the title, description, image, starting item
     """
+
     title = models.CharField(max_length=150)
     description = models.TextField()
     image = models.ImageField(upload_to="items/", null=True, blank=True)
@@ -60,9 +61,7 @@ class AuctionItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     ends_at = models.DateTimeField()
 
-    owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="items"
-    )
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="items")
 
     class Meta:
         db_table = "auction_items"
