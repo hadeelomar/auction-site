@@ -10,27 +10,34 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/stable/ref/settings/
 """
 
-from pathlib import Path
-import os
 from . import database
+import os
 
-# ---------------------------------------------------------
-# BASE
-# ---------------------------------------------------------
+from pathlib import Path
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv(
     'DJANGO_SECRET_KEY',
+    # safe value used for development when DJANGO_SECRET_KEY might not be set
     'django-insecure-8^fq+a!kh-4pm8#y(urc^&zum$01nvb69$s=vnif(#gn6o7)_!'
 )
 
-DEBUG = True  # Development only
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-# ---------------------------------------------------------
-# INSTALLED APPS
-# ---------------------------------------------------------
+
+# Application definition
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,41 +45,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Third-party
-    'rest_framework',
     'corsheaders',
-
-    # Local
     'api',
 ]
 
-AUTH_USER_MODEL = 'api.User'
-
-# ---------------------------------------------------------
-# MIDDLEWARE
-# ---------------------------------------------------------
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-# ---------------------------------------------------------
-# URLS / WSGI
-# ---------------------------------------------------------
 ROOT_URLCONF = 'project.urls'
-WSGI_APPLICATION = 'project.wsgi.application'
 
-# ---------------------------------------------------------
-# TEMPLATES
-# 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -89,23 +79,34 @@ TEMPLATES = [
     },
 ]
 
-# ---------------------------------------------------------
-# DATABASE
-# ---------------------------------------------------------
+WSGI_APPLICATION = 'project.wsgi.application'
+
+
+# Database
+# https://docs.djangoproject.com/en/stable/ref/settings/#databases
+
+
 DATABASES = {
     'default': database.config()
 }
 
-# ---------------------------------------------------------
-# AUTH + PASSWORDS
-# ---------------------------------------------------------
+AUTH_USER_MODEL = 'api.User'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Password validation
+# https://docs.djangoproject.com/en/stable/ref/settings/#auth-password-validators
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {'min_length': 6}
+        'OPTIONS': {
+            'min_length': 6,  # Reduced to 6 for coursework
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -115,41 +116,34 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# ---------------------------------------------------------
-# STATIC FILES
-# ---------------------------------------------------------
-STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+# Internationalization
+# https://docs.djangoproject.com/en/stable/topics/i18n/
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/stable/howto/static-files/
+
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/stable/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ---------------------------------------------------------
-# MEDIA FILES
-# ---------------------------------------------------------
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+INTERNAL_IPS = ['127.0.0.1']
 
-# ---------------------------------------------------------
-# INTERNATIONALIZATION
-# ---------------------------------------------------------
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_TZ = True
-
-# ---------------------------------------------------------
-# DEFAULT PRIMARY KEY
-# ---------------------------------------------------------
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# ---------------------------------------------------------
-# CORS CONFIG (Frontend Dev)
-# ---------------------------------------------------------
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
@@ -180,13 +174,14 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+
+CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:3000",
 ]
-
-SESSION_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 1209600
