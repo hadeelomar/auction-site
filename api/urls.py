@@ -26,4 +26,6 @@ urlpatterns = [
     path('auth/logout/', views.logout, name='logout'),
     path('auth/user/', views.current_user, name='current-user'),
     path('profile/update/', views.update_profile, name='update-profile'),
+    path("auctions/", views.auctions, name="auctions"),
+    path("auctions/<int:item_id>/", views.auction_detail, name="auction-detail"),
 ]
