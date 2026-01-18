@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpRequest
+from django.http import JsonResponse, HttpRequest, HttpResponse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils import timezone
@@ -348,3 +348,9 @@ def auction_detail(request: HttpRequest, item_id: int) -> JsonResponse:
         return JsonResponse({"error": "Auction item not found"}, status=404)
 
     return JsonResponse({"item": auction_item_to_dict(request, item)}, status=200)
+
+def health(request: HttpRequest) -> HttpResponse:
+    """
+    Health endpoint
+    """
+    return HttpResponse("OK")
