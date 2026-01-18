@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from django.utils.dateparse import parse_date
 
 from api.models import User, AuctionItem
 
@@ -31,24 +32,37 @@ def signup(request: HttpRequest) -> JsonResponse:
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
-    full_name: str = data.get('full_name', '')
-    email: str = data.get('email', '')
+    full_name: str = data.get('full_name', '').strip()
+    email: str = data.get('email', '').strip().lower()
     password: str = data.get('password', '')
+    date_of_birth_raw = data.get('date_of_birth') 
+    date_of_birth = None
+    if date_of_birth_raw:
+        date_of_birth = parse_date(date_of_birth_raw)
+        if not date_of_birth:
+            return JsonResponse({'error': 'Invalid date_of_birth format'}, status=400)
 
-    name_parts = full_name.strip().split(' ', 1)
-    first_name = name_parts[0] if name_parts else ''
+    name_parts = full_name.split(' ', 1) if full_name else []
+    first_name = name_parts[0] if len(name_parts) > 0 else ''
     last_name = name_parts[1] if len(name_parts) > 1 else ''
+
+    if not email or not password:
+        return JsonResponse({'error': 'Email and password are required'}, status=400)
 
     if User.objects.filter(email=email).exists():
         return JsonResponse({'error': 'Email already exists'}, status=400)
 
-    user: User = User.objects.create_user(
-        username=email,
-        email=email,
-        password=password,
-        first_name=first_name,
-        last_name=last_name
-    )
+    try:
+        user: User = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            date_of_birth=date_of_birth
+        )
+    except ValueError:
+        return JsonResponse({'error': 'Invalid date_of_birth format'}, status=400)
 
     auth_login(request, user)
     request.session['username'] = email
@@ -60,9 +74,11 @@ def signup(request: HttpRequest) -> JsonResponse:
             'username': user.username,
             'email': user.email,
             'first_name': user.first_name,
-            'last_name': user.last_name
+            'last_name': user.last_name,
+            'date_of_birth': str(user.date_of_birth) if user.date_of_birth else None
         }
     }, status=201)
+
 
 
 def login(request: HttpRequest) -> JsonResponse:
@@ -115,7 +131,7 @@ def logout(request: HttpRequest) -> JsonResponse:
 
 def current_user(request: HttpRequest) -> JsonResponse:
     """
-    Get current authenticated user.
+    Get current authenticated user
     """
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -127,10 +143,14 @@ def current_user(request: HttpRequest) -> JsonResponse:
             'email': request.user.email,
             'first_name': request.user.first_name,
             'last_name': request.user.last_name,
+            'date_of_birth': str(request.user.date_of_birth) if request.user.date_of_birth else None,
+            'profile_image': request.build_absolute_uri(request.user.profile_image.url) if request.user.profile_image else None,
+            'age': request.user.age,
             'is_authenticated': True
         }, status=200)
 
     return JsonResponse({'is_authenticated': False}, status=401)
+
 
 
 def update_profile(request: HttpRequest) -> JsonResponse:
@@ -164,7 +184,11 @@ def update_profile(request: HttpRequest) -> JsonResponse:
         user.username = email
 
     if date_of_birth:
-        user.date_of_birth = date_of_birth
+        dob = parse_date(date_of_birth)  # expects "YYYY-MM-DD"
+        if not dob:
+            return JsonResponse({'error': 'Invalid date_of_birth format'}, status=400)
+        user.date_of_birth = dob
+
 
     if current_password and new_password:
         if not user.check_password(current_password):
@@ -208,7 +232,7 @@ def update_profile(request: HttpRequest) -> JsonResponse:
             'last_name': user.last_name,
             'date_of_birth': str(user.date_of_birth) if user.date_of_birth else None,
             'profile_image': profile_image_url,
-            'age': user.age()
+            'age': user.age
         }
     }, status=200)
 
