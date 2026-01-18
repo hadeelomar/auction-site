@@ -4,6 +4,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.dateparse import parse_date
+from django.shortcuts import render
 
 from api.models import User, AuctionItem
 
@@ -354,3 +355,9 @@ def health(request: HttpRequest) -> HttpResponse:
     Health endpoint
     """
     return HttpResponse("OK")
+
+def spa(request: HttpRequest) -> HttpResponse:
+    """
+    Rendering build files
+    """
+    return render(request, "api/spa/index.html")
