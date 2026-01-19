@@ -6,7 +6,7 @@ from django.utils.dateparse import parse_datetime
 from django.utils.dateparse import parse_date
 from django.shortcuts import render
 
-from api.models import User, AuctionItem, Bid
+from api.models import User, AuctionItem, Bid, Question, Reply
 
 import json
 from typing import Dict, Any
@@ -431,6 +431,164 @@ def place_bid(request: HttpRequest) -> JsonResponse:
             }
         },
         "item": auction_item_to_dict(request, item)
+    }, status=201)
+
+
+@csrf_exempt
+def questions(request: HttpRequest) -> JsonResponse:
+    """
+    GET  /api/questions?item_id=X -> list questions for an item (paginated, with nested replies)
+    POST /api/questions -> create a question
+    """
+    if request.method == "GET":
+        item_id = request.GET.get("item_id")
+        if not item_id:
+            return JsonResponse({"error": "item_id is required"}, status=400)
+
+        try:
+            item = AuctionItem.objects.get(id=item_id)
+        except AuctionItem.DoesNotExist:
+            return JsonResponse({"error": "Auction item not found"}, status=404)
+
+        page = int(request.GET.get("page", 1))
+        per_page = int(request.GET.get("per_page", 10))
+        offset = (page - 1) * per_page
+
+        questions_qs = Question.objects.filter(item=item).select_related("user").prefetch_related("replies__user")
+        total = questions_qs.count()
+        questions_list = questions_qs[offset:offset + per_page]
+
+        result = []
+        for q in questions_list:
+            replies = []
+            for r in q.replies.all():
+                replies.append({
+                    "id": r.id,
+                    "reply_text": r.reply_text,
+                    "timestamp": r.timestamp.isoformat(),
+                    "user": {
+                        "id": r.user.id,
+                        "email": r.user.email,
+                        "first_name": r.user.first_name,
+                        "last_name": r.user.last_name,
+                    }
+                })
+            result.append({
+                "id": q.id,
+                "question_text": q.question_text,
+                "timestamp": q.timestamp.isoformat(),
+                "user": {
+                    "id": q.user.id,
+                    "email": q.user.email,
+                    "first_name": q.user.first_name,
+                    "last_name": q.user.last_name,
+                },
+                "replies": replies
+            })
+
+        return JsonResponse({
+            "questions": result,
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total": total,
+                "total_pages": (total + per_page - 1) // per_page
+            }
+        }, status=200)
+
+    elif request.method == "POST":
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Authentication required"}, status=401)
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+        item_id = data.get("item_id")
+        question_text = data.get("question_text", "").strip()
+
+        if not item_id:
+            return JsonResponse({"error": "item_id is required"}, status=400)
+
+        if not question_text:
+            return JsonResponse({"error": "question_text is required"}, status=400)
+
+        try:
+            item = AuctionItem.objects.get(id=item_id)
+        except AuctionItem.DoesNotExist:
+            return JsonResponse({"error": "Auction item not found"}, status=404)
+
+        question = Question.objects.create(
+            user=request.user,
+            item=item,
+            question_text=question_text
+        )
+
+        return JsonResponse({
+            "message": "Question created successfully",
+            "question": {
+                "id": question.id,
+                "question_text": question.question_text,
+                "timestamp": question.timestamp.isoformat(),
+                "user": {
+                    "id": request.user.id,
+                    "email": request.user.email,
+                    "first_name": request.user.first_name,
+                    "last_name": request.user.last_name,
+                },
+                "replies": []
+            }
+        }, status=201)
+
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+
+@csrf_exempt
+def question_reply(request: HttpRequest, question_id: int) -> JsonResponse:
+    """
+    POST /api/questions/:id/reply -> add a reply to a question
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Authentication required"}, status=401)
+
+    try:
+        question = Question.objects.select_related("user", "item").get(id=question_id)
+    except Question.DoesNotExist:
+        return JsonResponse({"error": "Question not found"}, status=404)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    reply_text = data.get("reply_text", "").strip()
+
+    if not reply_text:
+        return JsonResponse({"error": "reply_text is required"}, status=400)
+
+    reply = Reply.objects.create(
+        question=question,
+        user=request.user,
+        reply_text=reply_text
+    )
+
+    return JsonResponse({
+        "message": "Reply created successfully",
+        "reply": {
+            "id": reply.id,
+            "reply_text": reply.reply_text,
+            "timestamp": reply.timestamp.isoformat(),
+            "user": {
+                "id": request.user.id,
+                "email": request.user.email,
+                "first_name": request.user.first_name,
+                "last_name": request.user.last_name,
+            }
+        }
     }, status=201)
 
 

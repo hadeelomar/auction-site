@@ -89,3 +89,39 @@ class Bid(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - ${self.bid_amount} on {self.item.title}"
+
+
+class Question(models.Model):
+    """
+    Question model for auction item Q&A.
+    """
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="questions")
+    item = models.ForeignKey(AuctionItem, on_delete=models.CASCADE, related_name="questions")
+    question_text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "questions"
+        ordering = ["-timestamp"]
+
+    def __str__(self):
+        return f"{self.user.username}: {self.question_text[:50]}"
+
+
+class Reply(models.Model):
+    """
+    Reply model for Q&A questions.
+    """
+
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="replies")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="replies")
+    reply_text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "replies"
+        ordering = ["timestamp"]
+
+    def __str__(self):
+        return f"{self.user.username}: {self.reply_text[:50]}"
