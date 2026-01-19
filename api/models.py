@@ -69,3 +69,23 @@ class AuctionItem(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Bid(models.Model):
+    """
+    Bid model for auction items.
+    Tracks user bids with amount, timestamp, and winning status.
+    """
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids")
+    item = models.ForeignKey(AuctionItem, on_delete=models.CASCADE, related_name="bids")
+    bid_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_winning = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "bids"
+        ordering = ["-timestamp"]
+
+    def __str__(self):
+        return f"{self.user.username} - ${self.bid_amount} on {self.item.title}"
