@@ -28,4 +28,5 @@ urlpatterns = [
     path('profile/update/', views.update_profile, name='update-profile'),
     path("auctions/", views.auctions, name="auctions"),
     path("auctions/<int:item_id>/", views.auction_detail, name="auction-detail"),
+    path("bids/", views.place_bid, name="place-bid"),
 ]

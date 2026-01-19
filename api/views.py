@@ -1,12 +1,12 @@
 from django.http import JsonResponse, HttpRequest, HttpResponse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.dateparse import parse_date
 from django.shortcuts import render
 
-from api.models import User, AuctionItem
+from api.models import User, AuctionItem, Bid
 
 import json
 from typing import Dict, Any
@@ -21,6 +21,7 @@ def get_csrf_token(request: HttpRequest) -> JsonResponse:
     return JsonResponse({'detail': 'CSRF cookie set'})
 
 
+@csrf_exempt
 def signup(request: HttpRequest) -> JsonResponse:
     """
     User registration endpoint.
@@ -82,6 +83,7 @@ def signup(request: HttpRequest) -> JsonResponse:
 
 
 
+@csrf_exempt
 def login(request: HttpRequest) -> JsonResponse:
     """
     User login endpoint.
@@ -117,6 +119,7 @@ def login(request: HttpRequest) -> JsonResponse:
     return JsonResponse({'error': 'Invalid credentials'}, status=401)
 
 
+@csrf_exempt
 def logout(request: HttpRequest) -> JsonResponse:
     """
     User logout endpoint.
@@ -260,6 +263,7 @@ def auction_item_to_dict(request: HttpRequest, item: AuctionItem) -> Dict[str, A
     }
 
 
+@csrf_exempt
 def auctions(request: HttpRequest) -> JsonResponse:
     """
     GET  /api/auctions -> list ACTIVE auctions
@@ -349,6 +353,86 @@ def auction_detail(request: HttpRequest, item_id: int) -> JsonResponse:
         return JsonResponse({"error": "Auction item not found"}, status=404)
 
     return JsonResponse({"item": auction_item_to_dict(request, item)}, status=200)
+
+
+@csrf_exempt
+def place_bid(request: HttpRequest) -> JsonResponse:
+    """
+    POST /api/bids
+    Place a bid on an auction item.
+    Validates bid_amount > current_price and auction hasn't ended.
+    Updates Item.current_price and marks previous bids as not winning.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Authentication required"}, status=401)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    item_id = data.get("item_id")
+    bid_amount_raw = data.get("bid_amount")
+
+    if not item_id:
+        return JsonResponse({"error": "item_id is required"}, status=400)
+
+    if not bid_amount_raw:
+        return JsonResponse({"error": "bid_amount is required"}, status=400)
+
+    try:
+        bid_amount = Decimal(str(bid_amount_raw))
+    except (InvalidOperation, TypeError):
+        return JsonResponse({"error": "Invalid bid_amount"}, status=400)
+
+    try:
+        item = AuctionItem.objects.select_related("owner").get(id=item_id)
+    except AuctionItem.DoesNotExist:
+        return JsonResponse({"error": "Auction item not found"}, status=404)
+
+    if item.ends_at <= timezone.now():
+        return JsonResponse({"error": "Auction has ended"}, status=400)
+
+    if item.owner == request.user:
+        return JsonResponse({"error": "Cannot bid on your own auction"}, status=400)
+
+    if bid_amount <= item.current_price:
+        return JsonResponse({
+            "error": f"Bid must be greater than current price (${item.current_price})"
+        }, status=400)
+
+    Bid.objects.filter(item=item, is_winning=True).update(is_winning=False)
+
+    bid = Bid.objects.create(
+        user=request.user,
+        item=item,
+        bid_amount=bid_amount,
+        is_winning=True
+    )
+
+    item.current_price = bid_amount
+    item.save()
+
+    return JsonResponse({
+        "message": "Bid placed successfully",
+        "bid": {
+            "id": bid.id,
+            "bid_amount": str(bid.bid_amount),
+            "timestamp": bid.timestamp.isoformat(),
+            "is_winning": bid.is_winning,
+            "user": {
+                "id": request.user.id,
+                "email": request.user.email,
+                "first_name": request.user.first_name,
+                "last_name": request.user.last_name,
+            }
+        },
+        "item": auction_item_to_dict(request, item)
+    }, status=201)
+
 
 def health(request: HttpRequest) -> HttpResponse:
     """
