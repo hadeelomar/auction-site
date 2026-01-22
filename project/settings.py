@@ -219,10 +219,9 @@ EMAIL_SUBJECT_PREFIX = '[Auction Site] '
 # Email templates directory
 TEMPLATES[0]['DIRS'].append(os.path.join(BASE_DIR, 'templates'))
 
-# Django Allauth configuration
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# Django Allauth configuration (updated for allauth 0.60+)
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_ADAPTER = 'api.adapters.CustomAccountAdapter'
