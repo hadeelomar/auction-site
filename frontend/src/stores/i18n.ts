@@ -170,7 +170,7 @@ export const useI18nStore = defineStore('i18n', () => {
     })}`
   }
 
-  async function initialize(): Promise<void> {
+  async function initialise(): Promise<void> {
     await Promise.all([fetchLanguages(), fetchCurrencies()])
     
     // Apply RTL if needed
@@ -195,6 +195,6 @@ export const useI18nStore = defineStore('i18n', () => {
     setCurrency,
     convertPrice,
     formatPrice,
-    initialize
+    initialise
   }
 })

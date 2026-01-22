@@ -1,5 +1,5 @@
 """
-Internationalization utilities for the auction site.
+Internationalisation utilities for the auction site.
 Includes language detection, currency conversion, and locale helpers.
 """
 from django.http import JsonResponse, HttpRequest

@@ -103,7 +103,7 @@
               <span v-if="auction.starting_price > auction.current_price" class="discount-badge">
                 {{ Math.round((1 - auction.current_price / auction.starting_price) * 100) }}% OFF
               </span>
-              <button class="favorite-btn" @click.prevent>
+              <button class="favourite-btn" @click.prevent>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                 </svg>
@@ -451,7 +451,7 @@ onMounted(() => {
   border-radius: 6px;
 }
 
-.favorite-btn {
+.favourite-btn {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
@@ -469,7 +469,7 @@ onMounted(() => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.favorite-btn:hover {
+.favourite-btn:hover {
   color: #ef4444;
 }
 
