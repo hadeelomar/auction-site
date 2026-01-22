@@ -519,6 +519,93 @@ def place_bid(request: HttpRequest) -> JsonResponse:
     }, status=201)
 
 
+def user_bids(request: HttpRequest) -> JsonResponse:
+    """
+    GET /api/user/bids
+    Get all bids placed by the current user with auction details.
+    Returns bid status (winning, outbid, won, lost) and time remaining.
+    """
+    if request.method != "GET":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Authentication required"}, status=401)
+
+    # Get all bids by the user, grouped by auction item
+    user_bids_qs = Bid.objects.filter(user=request.user).select_related('item', 'item__owner').order_by('-timestamp')
+    
+    # Group bids by item to get the user's highest bid per item
+    items_with_bids = {}
+    for bid in user_bids_qs:
+        item_id = bid.item.id
+        if item_id not in items_with_bids:
+            items_with_bids[item_id] = {
+                'item': bid.item,
+                'user_highest_bid': bid,
+                'user_bid_amount': bid.bid_amount
+            }
+        elif bid.bid_amount > items_with_bids[item_id]['user_bid_amount']:
+            items_with_bids[item_id]['user_highest_bid'] = bid
+            items_with_bids[item_id]['user_bid_amount'] = bid.bid_amount
+
+    bids_list = []
+    now = timezone.now()
+
+    for item_id, data in items_with_bids.items():
+        item = data['item']
+        user_bid = data['user_highest_bid']
+        
+        # Determine bid status
+        auction_ended = item.ends_at <= now
+        is_winning_bid = user_bid.is_winning
+        
+        if auction_ended:
+            if is_winning_bid:
+                status = 'won'
+                status_text = 'Won'
+            else:
+                status = 'lost'
+                status_text = 'Lost'
+            time_left = 'Ended'
+        else:
+            if is_winning_bid:
+                status = 'winning'
+                status_text = 'Winning'
+            else:
+                status = 'outbid'
+                status_text = 'Outbid'
+            
+            # Calculate time remaining
+            time_diff = item.ends_at - now
+            days = time_diff.days
+            hours = time_diff.seconds // 3600
+            if days > 0:
+                time_left = f'{days}d {hours}h left'
+            elif hours > 0:
+                time_left = f'{hours}h left'
+            else:
+                minutes = time_diff.seconds // 60
+                time_left = f'{minutes}m left'
+
+        image_url = request.build_absolute_uri(item.image.url) if item.image else None
+
+        bids_list.append({
+            'id': item.id,
+            'bid_id': user_bid.id,
+            'title': item.title,
+            'image': image_url,
+            'yourBid': str(user_bid.bid_amount),
+            'currentBid': str(item.current_price),
+            'status': status,
+            'statusText': status_text,
+            'timeLeft': time_left,
+            'endsAt': item.ends_at.isoformat(),
+            'isActive': not auction_ended
+        })
+
+    return JsonResponse({'bids': bids_list}, status=200)
+
+
 @csrf_exempt
 def questions(request: HttpRequest) -> JsonResponse:
     """
