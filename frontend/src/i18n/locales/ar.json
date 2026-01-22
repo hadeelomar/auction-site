@@ -5,6 +5,7 @@
     "signup": "إنشاء حساب",
     "logout": "تسجيل الخروج",
     "search": "بحث",
+    "searchPlaceholder": "ابحث عن منتجات...",
     "loading": "جاري التحميل...",
     "error": "خطأ",
     "success": "نجاح",
@@ -15,7 +16,8 @@
     "view": "عرض",
     "back": "رجوع",
     "next": "التالي",
-    "submit": "إرسال"
+    "submit": "إرسال",
+    "retry": "إعادة المحاولة"
   },
   "nav": {
     "browse": "تصفح المزادات",
@@ -107,5 +109,24 @@
     "askPlaceholder": "اطرح سؤالاً حول هذا المنتج...",
     "replyPlaceholder": "اكتب رداً...",
     "loadingQuestions": "جاري تحميل الأسئلة..."
+  },
+  "myBids": {
+    "title": "عروضي",
+    "description": "تتبع جميع عروضك النشطة والسابقة",
+    "activeBids": "العروض النشطة",
+    "noBidsYet": "لا توجد عروض في هذه الفئة بعد"
+  },
+  "myAuctions": {
+    "title": "مزاداتي",
+    "description": "إدارة المزادات التي أنشأتها",
+    "newAuction": "مزاد جديد",
+    "loading": "جاري تحميل مزاداتك...",
+    "currentBid": "العرض الحالي",
+    "noAuctions": "لم تقم بإنشاء أي مزادات بعد",
+    "createFirst": "أنشئ مزادك الأول",
+    "deleting": "جاري الحذف..."
+  },
+  "footer": {
+    "allRightsReserved": "جميع الحقوق محفوظة."
   }
 }

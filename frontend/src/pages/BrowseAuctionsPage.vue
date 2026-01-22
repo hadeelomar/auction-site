@@ -159,7 +159,7 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
-        <p>2026 AuctionHub. All rights reserved.</p>
+        <p>2026 Bido. {{ t('footer.allRightsReserved') }}</p>
       </div>
     </footer>
   </div>

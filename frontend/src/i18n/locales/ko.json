@@ -5,6 +5,7 @@
     "signup": "회원가입",
     "logout": "로그아웃",
     "search": "검색",
+    "searchPlaceholder": "상품 검색...",
     "loading": "로딩 중...",
     "error": "오류",
     "success": "성공",
@@ -15,7 +16,8 @@
     "view": "보기",
     "back": "뒤로",
     "next": "다음",
-    "submit": "제출"
+    "submit": "제출",
+    "retry": "다시 시도"
   },
   "nav": {
     "browse": "경매 둘러보기",
@@ -107,5 +109,24 @@
     "askPlaceholder": "이 상품에 대해 질문하세요...",
     "replyPlaceholder": "답변 작성...",
     "loadingQuestions": "질문 로딩 중..."
+  },
+  "myBids": {
+    "title": "내 입찰",
+    "description": "모든 활성 및 과거 입찰 추적",
+    "activeBids": "활성 입찰",
+    "noBidsYet": "이 카테고리에 아직 입찰이 없습니다"
+  },
+  "myAuctions": {
+    "title": "내 경매",
+    "description": "생성한 경매 관리",
+    "newAuction": "새 경매",
+    "loading": "경매 로딩 중...",
+    "currentBid": "현재 입찰",
+    "noAuctions": "아직 경매를 만들지 않았습니다",
+    "createFirst": "첫 경매 만들기",
+    "deleting": "삭제 중..."
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved."
   }
 }

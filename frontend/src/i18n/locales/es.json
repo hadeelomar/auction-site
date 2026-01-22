@@ -5,6 +5,7 @@
     "signup": "Registrarse",
     "logout": "Cerrar sesión",
     "search": "Buscar",
+    "searchPlaceholder": "Buscar artículos...",
     "loading": "Cargando...",
     "error": "Error",
     "success": "Éxito",
@@ -15,7 +16,8 @@
     "view": "Ver",
     "back": "Atrás",
     "next": "Siguiente",
-    "submit": "Enviar"
+    "submit": "Enviar",
+    "retry": "Reintentar"
   },
   "nav": {
     "browse": "Explorar subastas",
@@ -107,5 +109,24 @@
     "askPlaceholder": "Haz una pregunta sobre este artículo...",
     "replyPlaceholder": "Escribe una respuesta...",
     "loadingQuestions": "Cargando preguntas..."
+  },
+  "myBids": {
+    "title": "Mis Ofertas",
+    "description": "Sigue todas tus ofertas activas y pasadas",
+    "activeBids": "Ofertas Activas",
+    "noBidsYet": "No hay ofertas en esta categoría todavía"
+  },
+  "myAuctions": {
+    "title": "Mis Subastas",
+    "description": "Administra las subastas que has creado",
+    "newAuction": "Nueva Subasta",
+    "loading": "Cargando tus subastas...",
+    "currentBid": "oferta actual",
+    "noAuctions": "Aún no has creado ninguna subasta",
+    "createFirst": "Crea tu primera subasta",
+    "deleting": "Eliminando..."
+  },
+  "footer": {
+    "allRightsReserved": "Todos los derechos reservados."
   }
 }

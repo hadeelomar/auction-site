@@ -15,7 +15,9 @@
     "view": "View",
     "back": "Back",
     "next": "Next",
-    "submit": "Submit"
+    "submit": "Submit",
+    "searchPlaceholder": "Search for items...",
+    "retry": "Retry"
   },
   "nav": {
     "browse": "Browse Auctions",
@@ -107,5 +109,24 @@
     "askPlaceholder": "Ask a question about this item...",
     "replyPlaceholder": "Write a reply...",
     "loadingQuestions": "Loading questions..."
+  },
+  "myBids": {
+    "title": "My Bids",
+    "description": "Track all your active and past bids",
+    "activeBids": "Active Bids",
+    "noBidsYet": "No bids in this category yet"
+  },
+  "myAuctions": {
+    "title": "My Auctions",
+    "description": "Manage auctions you've created",
+    "newAuction": "New Auction",
+    "loading": "Loading your auctions...",
+    "currentBid": "current bid",
+    "noAuctions": "You haven't created any auctions yet",
+    "createFirst": "Create your first auction",
+    "deleting": "Deleting..."
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved."
   }
 }

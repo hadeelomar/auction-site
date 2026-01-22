@@ -5,6 +5,7 @@
     "signup": "הרשמה",
     "logout": "התנתקות",
     "search": "חיפוש",
+    "searchPlaceholder": "חפש פריטים...",
     "loading": "טוען...",
     "error": "שגיאה",
     "success": "הצלחה",
@@ -15,7 +16,8 @@
     "view": "צפה",
     "back": "חזרה",
     "next": "הבא",
-    "submit": "שלח"
+    "submit": "שלח",
+    "retry": "נסה שוב"
   },
   "nav": {
     "browse": "עיין במכירות",
@@ -107,5 +109,24 @@
     "askPlaceholder": "שאל שאלה על פריט זה...",
     "replyPlaceholder": "כתוב תשובה...",
     "loadingQuestions": "טוען שאלות..."
+  },
+  "myBids": {
+    "title": "ההצעות שלי",
+    "description": "עקוב אחר כל ההצעות הפעילות והקודמות שלך",
+    "activeBids": "הצעות פעילות",
+    "noBidsYet": "אין עדיין הצעות בקטגוריה זו"
+  },
+  "myAuctions": {
+    "title": "המכירות שלי",
+    "description": "נהל את המכירות שיצרת",
+    "newAuction": "מכירה חדשה",
+    "loading": "טוען את המכירות שלך...",
+    "currentBid": "הצעה נוכחית",
+    "noAuctions": "עדיין לא יצרת מכירות",
+    "createFirst": "צור את המכירה הראשונה שלך",
+    "deleting": "מוחק..."
+  },
+  "footer": {
+    "allRightsReserved": "כל הזכויות שמורות."
   }
 }

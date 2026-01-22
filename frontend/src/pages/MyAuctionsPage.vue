@@ -6,27 +6,27 @@
       <div class="page-container">
         <div class="page-header">
           <div class="header-content">
-            <h1 class="page-title">My Auctions</h1>
-            <p class="page-description">Manage auctions you've created</p>
+            <h1 class="page-title">{{ t('myAuctions.title') }}</h1>
+            <p class="page-description">{{ t('myAuctions.description') }}</p>
           </div>
           <router-link to="/create" class="create-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14"/>
               <path d="M12 5v14"/>
             </svg>
-            New Auction
+            {{ t('myAuctions.newAuction') }}
           </router-link>
         </div>
 
         <!-- Loading state -->
         <div v-if="loading" class="loading-state">
-          <p>Loading your auctions...</p>
+          <p>{{ t('myAuctions.loading') }}</p>
         </div>
         
         <!-- Error state -->
         <div v-else-if="error" class="error-state">
           <p>{{ error }}</p>
-          <button @click="fetchMyAuctions" class="retry-button">Retry</button>
+          <button @click="fetchMyAuctions" class="retry-button">{{ t('common.retry') }}</button>
         </div>
         
         <!-- auctions list -->
@@ -39,15 +39,15 @@
               <h3 class="auction-title">{{ auction.title }}</h3>
               <div class="auction-stats">
                 <span class="stat">
-                  <strong>{{ formatPrice(auction.current_price) }}</strong> current bid
+                  <strong>{{ formatPrice(auction.current_price) }}</strong> {{ t('myAuctions.currentBid') }}
                 </span>
                 <span class="stat">
-                  <strong>{{ auction.bid_count }}</strong> bids
+                  <strong>{{ auction.bid_count }}</strong> {{ t('browse.bids') }}
                 </span>
               </div>
               <div class="auction-meta">
                 <span :class="['auction-status', auction.ends_at > new Date().toISOString() ? 'active' : 'ended']">
-                  {{ auction.ends_at > new Date().toISOString() ? 'Active' : 'Ended' }}
+                  {{ auction.ends_at > new Date().toISOString() ? t('auction.active') : t('auction.ended') }}
                 </span>
                 <span class="auction-time">{{ auction.time_left }}</span>
               </div>
@@ -59,7 +59,7 @@
                 :disabled="auction.bid_count > 0"
                 :title="auction.bid_count > 0 ? 'Cannot edit auction with bids' : 'Edit auction'"
               >
-                Edit
+                {{ t('common.edit') }}
               </button>
               <button 
                 @click="handleDelete(auction)" 
@@ -67,7 +67,7 @@
                 :disabled="deletingAuction === auction.id || auction.bid_count > 0"
                 :title="auction.bid_count > 0 ? 'Cannot delete auction with bids' : 'Delete auction'"
               >
-                {{ deletingAuction === auction.id ? 'Deleting...' : 'Delete' }}
+                {{ deletingAuction === auction.id ? t('myAuctions.deleting') : t('common.delete') }}
               </button>
             </div>
           </div>
@@ -78,8 +78,8 @@
               <path d="m3.3 7 8.7 5 8.7-5"/>
               <path d="M12 22V12"/>
             </svg>
-            <p>You haven't created any auctions yet</p>
-            <router-link to="/create" class="empty-create-button">Create your first auction</router-link>
+            <p>{{ t('myAuctions.noAuctions') }}</p>
+            <router-link to="/create" class="empty-create-button">{{ t('myAuctions.createFirst') }}</router-link>
           </div>
         </div>
       </div>
@@ -90,7 +90,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Navbar from '../components/Navbar.vue'
+import { useI18nStore } from '../stores/i18n'
+
+const { t } = useI18n()
+const i18nStore = useI18nStore()
 
 interface Auction {
   id: number
@@ -118,7 +123,7 @@ const deletingAuction = ref<number | null>(null)
 
 const router = useRouter()
 
-const formatPrice = (price: number): string => '£' + price.toLocaleString()
+const formatPrice = (price: number): string => i18nStore.formatPrice(price)
 
 const fetchMyAuctions = async () => {
   try {

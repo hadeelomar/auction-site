@@ -5,6 +5,7 @@
     "signup": "Inscription",
     "logout": "Déconnexion",
     "search": "Rechercher",
+    "searchPlaceholder": "Rechercher des articles...",
     "loading": "Chargement...",
     "error": "Erreur",
     "success": "Succès",
@@ -15,7 +16,8 @@
     "view": "Voir",
     "back": "Retour",
     "next": "Suivant",
-    "submit": "Soumettre"
+    "submit": "Soumettre",
+    "retry": "Réessayer"
   },
   "nav": {
     "browse": "Parcourir les enchères",
@@ -107,5 +109,24 @@
     "askPlaceholder": "Posez une question sur cet article...",
     "replyPlaceholder": "Écrivez une réponse...",
     "loadingQuestions": "Chargement des questions..."
+  },
+  "myBids": {
+    "title": "Mes Enchères",
+    "description": "Suivez toutes vos enchères actives et passées",
+    "activeBids": "Enchères Actives",
+    "noBidsYet": "Aucune enchère dans cette catégorie"
+  },
+  "myAuctions": {
+    "title": "Mes Ventes",
+    "description": "Gérez les ventes que vous avez créées",
+    "newAuction": "Nouvelle Vente",
+    "loading": "Chargement de vos ventes...",
+    "currentBid": "enchère actuelle",
+    "noAuctions": "Vous n'avez pas encore créé de vente",
+    "createFirst": "Créez votre première vente",
+    "deleting": "Suppression..."
+  },
+  "footer": {
+    "allRightsReserved": "Tous droits réservés."
   }
 }

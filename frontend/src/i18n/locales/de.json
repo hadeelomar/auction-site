@@ -5,6 +5,7 @@
     "signup": "Registrieren",
     "logout": "Abmelden",
     "search": "Suchen",
+    "searchPlaceholder": "Nach Artikeln suchen...",
     "loading": "Laden...",
     "error": "Fehler",
     "success": "Erfolg",
@@ -15,7 +16,8 @@
     "view": "Ansehen",
     "back": "Zurück",
     "next": "Weiter",
-    "submit": "Absenden"
+    "submit": "Absenden",
+    "retry": "Wiederholen"
   },
   "nav": {
     "browse": "Auktionen durchsuchen",
@@ -107,5 +109,24 @@
     "askPlaceholder": "Stellen Sie eine Frage zu diesem Artikel...",
     "replyPlaceholder": "Schreiben Sie eine Antwort...",
     "loadingQuestions": "Fragen werden geladen..."
+  },
+  "myBids": {
+    "title": "Meine Gebote",
+    "description": "Verfolgen Sie alle Ihre aktiven und vergangenen Gebote",
+    "activeBids": "Aktive Gebote",
+    "noBidsYet": "Noch keine Gebote in dieser Kategorie"
+  },
+  "myAuctions": {
+    "title": "Meine Auktionen",
+    "description": "Verwalten Sie Ihre erstellten Auktionen",
+    "newAuction": "Neue Auktion",
+    "loading": "Ihre Auktionen werden geladen...",
+    "currentBid": "aktuelles Gebot",
+    "noAuctions": "Sie haben noch keine Auktionen erstellt",
+    "createFirst": "Erstellen Sie Ihre erste Auktion",
+    "deleting": "Wird gelöscht..."
+  },
+  "footer": {
+    "allRightsReserved": "Alle Rechte vorbehalten."
   }
 }

@@ -5,6 +5,7 @@
     "signup": "新規登録",
     "logout": "ログアウト",
     "search": "検索",
+    "searchPlaceholder": "商品を検索...",
     "loading": "読み込み中...",
     "error": "エラー",
     "success": "成功",
@@ -15,7 +16,8 @@
     "view": "表示",
     "back": "戻る",
     "next": "次へ",
-    "submit": "送信"
+    "submit": "送信",
+    "retry": "再試行"
   },
   "nav": {
     "browse": "オークションを探す",
@@ -107,5 +109,24 @@
     "askPlaceholder": "この商品について質問する...",
     "replyPlaceholder": "返信を書く...",
     "loadingQuestions": "質問を読み込み中..."
+  },
+  "myBids": {
+    "title": "マイ入札",
+    "description": "すべてのアクティブな入札と過去の入札を追跡",
+    "activeBids": "アクティブな入札",
+    "noBidsYet": "このカテゴリにはまだ入札がありません"
+  },
+  "myAuctions": {
+    "title": "マイオークション",
+    "description": "作成したオークションを管理",
+    "newAuction": "新規オークション",
+    "loading": "オークションを読み込み中...",
+    "currentBid": "現在の入札",
+    "noAuctions": "まだオークションを作成していません",
+    "createFirst": "最初のオークションを作成",
+    "deleting": "削除中..."
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved."
   }
 }

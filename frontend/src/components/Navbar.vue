@@ -24,7 +24,7 @@
         <input 
           type="text" 
           v-model="searchQuery"
-          placeholder="Search for items..."
+          :placeholder="t('common.searchPlaceholder')"
           class="search-input"
           @keyup.enter="handleSearch"
         />

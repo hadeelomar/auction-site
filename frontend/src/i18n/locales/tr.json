@@ -5,6 +5,7 @@
     "signup": "Kayıt Ol",
     "logout": "Çıkış Yap",
     "search": "Ara",
+    "searchPlaceholder": "Ürün ara...",
     "loading": "Yükleniyor...",
     "error": "Hata",
     "success": "Başarılı",
@@ -15,7 +16,8 @@
     "view": "Görüntüle",
     "back": "Geri",
     "next": "İleri",
-    "submit": "Gönder"
+    "submit": "Gönder",
+    "retry": "Tekrar dene"
   },
   "nav": {
     "browse": "Açık Artırmalara Göz At",
@@ -107,5 +109,24 @@
     "askPlaceholder": "Bu ürün hakkında soru sorun...",
     "replyPlaceholder": "Yanıt yazın...",
     "loadingQuestions": "Sorular yükleniyor..."
+  },
+  "myBids": {
+    "title": "Tekliflerim",
+    "description": "Tüm aktif ve geçmiş tekliflerinizi takip edin",
+    "activeBids": "Aktif Teklifler",
+    "noBidsYet": "Bu kategoride henüz teklif yok"
+  },
+  "myAuctions": {
+    "title": "Açık Artırmalarım",
+    "description": "Oluşturduğunuz açık artırmaları yönetin",
+    "newAuction": "Yeni Açık Artırma",
+    "loading": "Açık artırmalarınız yükleniyor...",
+    "currentBid": "mevcut teklif",
+    "noAuctions": "Henüz açık artırma oluşturmadınız",
+    "createFirst": "İlk açık artırmanızı oluşturun",
+    "deleting": "Siliniyor..."
+  },
+  "footer": {
+    "allRightsReserved": "Tüm hakları saklıdır."
   }
 }

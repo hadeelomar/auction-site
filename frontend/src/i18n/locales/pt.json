@@ -5,6 +5,7 @@
     "signup": "Cadastrar",
     "logout": "Sair",
     "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar itens...",
     "loading": "Carregando...",
     "error": "Erro",
     "success": "Sucesso",
@@ -15,7 +16,8 @@
     "view": "Ver",
     "back": "Voltar",
     "next": "Próximo",
-    "submit": "Enviar"
+    "submit": "Enviar",
+    "retry": "Tentar novamente"
   },
   "nav": {
     "browse": "Explorar Leilões",
@@ -107,5 +109,24 @@
     "askPlaceholder": "Faça uma pergunta sobre este item...",
     "replyPlaceholder": "Escreva uma resposta...",
     "loadingQuestions": "Carregando perguntas..."
+  },
+  "myBids": {
+    "title": "Meus Lances",
+    "description": "Acompanhe todos os seus lances ativos e anteriores",
+    "activeBids": "Lances Ativos",
+    "noBidsYet": "Nenhum lance nesta categoria ainda"
+  },
+  "myAuctions": {
+    "title": "Meus Leilões",
+    "description": "Gerencie os leilões que você criou",
+    "newAuction": "Novo Leilão",
+    "loading": "Carregando seus leilões...",
+    "currentBid": "lance atual",
+    "noAuctions": "Você ainda não criou nenhum leilão",
+    "createFirst": "Crie seu primeiro leilão",
+    "deleting": "Excluindo..."
+  },
+  "footer": {
+    "allRightsReserved": "Todos os direitos reservados."
   }
 }

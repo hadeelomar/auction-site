@@ -5,15 +5,15 @@
     <main class="main-content">
       <div class="page-container">
         <div class="page-header">
-          <h1 class="page-title">My Bids</h1>
-          <p class="page-description">Track all your active and past bids</p>
+          <h1 class="page-title">{{ t('myBids.title') }}</h1>
+          <p class="page-description">{{ t('myBids.description') }}</p>
         </div>
 
         <!-- tabs -->
         <div class="tabs">
-          <button :class="['tab', { active: activeTab === 'active' }]" @click="activeTab = 'active'">Active Bids</button>
-          <button :class="['tab', { active: activeTab === 'won' }]" @click="activeTab = 'won'">Won</button>
-          <button :class="['tab', { active: activeTab === 'lost' }]" @click="activeTab = 'lost'">Lost</button>
+          <button :class="['tab', { active: activeTab === 'active' }]" @click="activeTab = 'active'">{{ t('myBids.activeBids') }}</button>
+          <button :class="['tab', { active: activeTab === 'won' }]" @click="activeTab = 'won'">{{ t('bids.won') }}</button>
+          <button :class="['tab', { active: activeTab === 'lost' }]" @click="activeTab = 'lost'">{{ t('bids.lost') }}</button>
         </div>
 
         <!-- bids list -->
@@ -25,8 +25,8 @@
             <div class="bid-details">
               <h3 class="bid-title">{{ bid.title }}</h3>
               <div class="bid-info">
-                <span class="bid-amount">Your bid: <strong>{{ formatPrice(bid.yourBid) }}</strong></span>
-                <span class="bid-current">Current: <strong>{{ formatPrice(bid.currentBid) }}</strong></span>
+                <span class="bid-amount">{{ t('bids.yourBid') }}: <strong>{{ formatPrice(bid.yourBid) }}</strong></span>
+                <span class="bid-current">{{ t('bids.currentBid') }}: <strong>{{ formatPrice(bid.currentBid) }}</strong></span>
               </div>
               <div class="bid-meta">
                 <span :class="['bid-status', bid.status]">{{ bid.statusText }}</span>
@@ -34,8 +34,8 @@
               </div>
             </div>
             <div class="bid-actions">
-              <button v-if="bid.status === 'outbid'" class="rebid-button">Rebid</button>
-              <router-link :to="`/auction/${bid.id}`" class="view-button">View</router-link>
+              <button v-if="bid.status === 'outbid'" class="rebid-button">{{ t('bids.rebid') }}</button>
+              <router-link :to="`/auction/${bid.id}`" class="view-button">{{ t('common.view') }}</router-link>
             </div>
           </div>
 
@@ -47,7 +47,7 @@
               <path d="m9 7 8 8"/>
               <path d="m21 11-8-8"/>
             </svg>
-            <p>No bids in this category yet</p>
+            <p>{{ t('myBids.noBidsYet') }}</p>
           </div>
         </div>
       </div>
@@ -57,9 +57,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Navbar from '../components/Navbar.vue'
 import { useI18nStore } from '../stores/i18n'
 
+const { t } = useI18n()
 const i18nStore = useI18nStore()
 const activeTab = ref('active')
 
