@@ -53,6 +53,15 @@ class AuctionItem(models.Model):
     Includes the title, description, image, starting item
     """
 
+    CATEGORY_CHOICES = [
+        ('electronics', 'Electronics'),
+        ('fashion', 'Fashion'),
+        ('home', 'Home'),
+        ('sports', 'Sports'),
+        ('art', 'Art'),
+        ('vehicles', 'Vehicles'),
+    ]
+
     title = models.CharField(max_length=150)
     description = models.TextField()
     image = models.ImageField(upload_to="items/", null=True, blank=True)
@@ -60,12 +69,21 @@ class AuctionItem(models.Model):
     current_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     ends_at = models.DateTimeField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='electronics')
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="items")
 
     class Meta:
         db_table = "auction_items"
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=['title']),
+            models.Index(fields=['current_price']),
+            models.Index(fields=['ends_at']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['-ends_at']),
+        ]
 
     def __str__(self):
         return self.title
