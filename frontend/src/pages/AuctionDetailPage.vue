@@ -186,11 +186,106 @@
           <!-- Q&A Section -->
           <div class="qa-section">
             <h2>Questions & Answers</h2>
-            <div class="qa-placeholder">
+            
+            <!-- Ask Question Form -->
+            <div v-if="authStore.isAuthenticated" class="ask-question-form">
+              <div v-if="questionMessage" :class="['qa-message', questionMessageType]">
+                {{ questionMessage }}
+              </div>
+              <form @submit.prevent="submitQuestion">
+                <textarea
+                  v-model="newQuestionText"
+                  placeholder="Ask a question about this item..."
+                  class="question-input"
+                  :disabled="isSubmittingQuestion"
+                  rows="3"
+                ></textarea>
+                <button 
+                  type="submit" 
+                  class="submit-question-btn"
+                  :disabled="isSubmittingQuestion || !newQuestionText.trim()"
+                >
+                  <span v-if="isSubmittingQuestion">Posting...</span>
+                  <span v-else>Ask Question</span>
+                </button>
+              </form>
+            </div>
+            <div v-else class="login-prompt">
+              <p>Please <router-link to="/login">sign in</router-link> to ask a question.</p>
+            </div>
+
+            <!-- Loading State -->
+            <div v-if="isLoadingQuestions" class="qa-loading">
+              <div class="loading-spinner-small"></div>
+              <span>Loading questions...</span>
+            </div>
+
+            <!-- Questions List -->
+            <div v-else-if="questions.length > 0" class="questions-list">
+              <div v-for="question in questions" :key="question.id" class="question-item">
+                <div class="question-header">
+                  <span class="question-author">{{ question.user.first_name }} {{ question.user.last_name }}</span>
+                  <span class="question-time">{{ formatRelativeTime(question.timestamp) }}</span>
+                </div>
+                <p class="question-text">{{ question.question_text }}</p>
+                
+                <!-- Replies -->
+                <div v-if="question.replies.length > 0" class="replies-list">
+                  <div v-for="reply in question.replies" :key="reply.id" class="reply-item">
+                    <div class="reply-header">
+                      <span class="reply-author">{{ reply.user.first_name }} {{ reply.user.last_name }}</span>
+                      <span class="reply-time">{{ formatRelativeTime(reply.timestamp) }}</span>
+                    </div>
+                    <p class="reply-text">{{ reply.reply_text }}</p>
+                  </div>
+                </div>
+
+                <!-- Reply Form -->
+                <div v-if="authStore.isAuthenticated" class="reply-form-container">
+                  <button 
+                    v-if="replyingToQuestionId !== question.id"
+                    @click="replyingToQuestionId = question.id"
+                    class="reply-toggle-btn"
+                  >
+                    Reply
+                  </button>
+                  <div v-else class="reply-form">
+                    <textarea
+                      v-model="replyText"
+                      placeholder="Write a reply..."
+                      class="reply-input"
+                      :disabled="isSubmittingReply"
+                      rows="2"
+                    ></textarea>
+                    <div class="reply-form-actions">
+                      <button 
+                        type="button"
+                        @click="replyingToQuestionId = null; replyText = ''"
+                        class="cancel-reply-btn"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="button"
+                        @click="submitReply(question.id)"
+                        class="submit-reply-btn"
+                        :disabled="isSubmittingReply || !replyText.trim()"
+                      >
+                        <span v-if="isSubmittingReply">Posting...</span>
+                        <span v-else>Post Reply</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- No Questions -->
+            <div v-else class="no-questions">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
-              <p>Q&A section coming soon (Issue #15)</p>
+              <p>No questions yet. Be the first to ask!</p>
             </div>
           </div>
         </div>
@@ -240,6 +335,28 @@ interface Bid {
   user: BidUser
 }
 
+interface QuestionUser {
+  id: number
+  email: string
+  first_name: string
+  last_name: string
+}
+
+interface Reply {
+  id: number
+  reply_text: string
+  timestamp: string
+  user: QuestionUser
+}
+
+interface Question {
+  id: number
+  question_text: string
+  timestamp: string
+  user: QuestionUser
+  replies: Reply[]
+}
+
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
@@ -253,6 +370,16 @@ const isSubmittingBid = ref(false)
 const bidMessage = ref<string | null>(null)
 const bidMessageType = ref<'success' | 'error'>('success')
 let pollingInterval: ReturnType<typeof setInterval> | null = null
+
+const questions = ref<Question[]>([])
+const isLoadingQuestions = ref(false)
+const newQuestionText = ref('')
+const isSubmittingQuestion = ref(false)
+const questionMessage = ref<string | null>(null)
+const questionMessageType = ref<'success' | 'error'>('success')
+const replyingToQuestionId = ref<number | null>(null)
+const replyText = ref('')
+const isSubmittingReply = ref(false)
 
 const API_BASE_URL = 'http://localhost:8000/api'
 
@@ -447,11 +574,117 @@ function stopPolling(): void {
   }
 }
 
+function showQuestionMessage(message: string, type: 'success' | 'error'): void {
+  questionMessage.value = message
+  questionMessageType.value = type
+  setTimeout(() => {
+    questionMessage.value = null
+  }, 5000)
+}
+
+async function fetchQuestions(): Promise<void> {
+  if (!auction.value) return
+
+  isLoadingQuestions.value = true
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/questions/?item_id=${auction.value.id}`, {
+      credentials: 'include'
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      questions.value = data.questions
+    }
+  } catch (err) {
+    console.error('Failed to fetch questions:', err)
+  } finally {
+    isLoadingQuestions.value = false
+  }
+}
+
+async function submitQuestion(): Promise<void> {
+  if (!auction.value || !newQuestionText.value.trim()) return
+
+  isSubmittingQuestion.value = true
+  questionMessage.value = null
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/questions/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        item_id: auction.value.id,
+        question_text: newQuestionText.value.trim()
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      showQuestionMessage(data.error || 'Failed to post question', 'error')
+      return
+    }
+
+    questions.value.unshift(data.question)
+    newQuestionText.value = ''
+    showQuestionMessage('Question posted successfully!', 'success')
+  } catch (err) {
+    showQuestionMessage('Could not connect to the server', 'error')
+    console.error(err)
+  } finally {
+    isSubmittingQuestion.value = false
+  }
+}
+
+async function submitReply(questionId: number): Promise<void> {
+  if (!replyText.value.trim()) return
+
+  isSubmittingReply.value = true
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/questions/${questionId}/reply/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        reply_text: replyText.value.trim()
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      showQuestionMessage(data.error || 'Failed to post reply', 'error')
+      return
+    }
+
+    const question = questions.value.find(q => q.id === questionId)
+    if (question) {
+      question.replies.push(data.reply)
+    }
+
+    replyText.value = ''
+    replyingToQuestionId.value = null
+  } catch (err) {
+    showQuestionMessage('Could not connect to the server', 'error')
+    console.error(err)
+  } finally {
+    isSubmittingReply.value = false
+  }
+}
+
 onMounted(async () => {
   await fetchAuction()
   if (auction.value?.is_active) {
     startPolling()
   }
+  await fetchQuestions()
 })
 
 onUnmounted(() => {
@@ -876,12 +1109,290 @@ onUnmounted(() => {
 
 .qa-section h2 {
   color: #111827;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.5rem 0;
   font-size: 1.25rem;
   font-weight: 600;
 }
 
-.qa-placeholder {
+.ask-question-form {
+  margin-bottom: 1.5rem;
+}
+
+.ask-question-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.question-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.question-input:focus {
+  outline: none;
+  border-color: #ea580c;
+}
+
+.question-input:disabled {
+  opacity: 0.6;
+  background: #f9fafb;
+}
+
+.submit-question-btn {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #ea580c, #f97316);
+  border: none;
+  color: #fff;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.submit-question-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+}
+
+.submit-question-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-prompt {
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-prompt p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.login-prompt a {
+  color: #ea580c;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-prompt a:hover {
+  text-decoration: underline;
+}
+
+.qa-message {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.qa-message.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.qa-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.qa-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.loading-spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #ea580c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.question-item {
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.question-author {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.question-time {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.question-text {
+  color: #374151;
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.9375rem;
+}
+
+.replies-list {
+  margin-top: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.reply-item {
+  padding: 0.75rem;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.reply-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.375rem;
+}
+
+.reply-author {
+  font-weight: 500;
+  color: #111827;
+  font-size: 0.8125rem;
+}
+
+.reply-time {
+  color: #9ca3af;
+  font-size: 0.6875rem;
+}
+
+.reply-text {
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.875rem;
+}
+
+.reply-form-container {
+  margin-top: 0.75rem;
+}
+
+.reply-toggle-btn {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.reply-toggle-btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.reply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reply-input {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.reply-input:focus {
+  outline: none;
+  border-color: #ea580c;
+}
+
+.reply-input:disabled {
+  opacity: 0.6;
+  background: #f9fafb;
+}
+
+.reply-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.cancel-reply-btn {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.cancel-reply-btn:hover {
+  background: #f3f4f6;
+}
+
+.submit-reply-btn {
+  background: #ea580c;
+  border: none;
+  color: #fff;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.submit-reply-btn:hover:not(:disabled) {
+  background: #dc4c07;
+}
+
+.submit-reply-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.no-questions {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -893,7 +1404,7 @@ onUnmounted(() => {
   color: #9ca3af;
 }
 
-.qa-placeholder p {
+.no-questions p {
   margin: 0;
   font-size: 0.875rem;
 }
