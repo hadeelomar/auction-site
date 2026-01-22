@@ -106,7 +106,79 @@
               <!-- Bidding Section -->
               <div class="bidding-section">
                 <h3>Place a Bid</h3>
-                <p class="placeholder-text">Bidding interface coming soon (Issue #13)</p>
+                
+                <!-- Success/Error Messages -->
+                <div v-if="bidMessage" :class="['bid-message', bidMessageType]">
+                  {{ bidMessage }}
+                </div>
+
+                <!-- Bidding Disabled States -->
+                <div v-if="!auction.is_active" class="bid-disabled">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                  </svg>
+                  <span>This auction has ended</span>
+                </div>
+
+                <div v-else-if="isOwnAuction" class="bid-disabled">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                  </svg>
+                  <span>You cannot bid on your own auction</span>
+                </div>
+
+                <div v-else-if="isHighestBidder" class="bid-disabled winning">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  <span>You are the highest bidder!</span>
+                </div>
+
+                <!-- Bid Form -->
+                <form v-else @submit.prevent="submitBid" class="bid-form">
+                  <div class="bid-input-group">
+                    <span class="currency-symbol">£</span>
+                    <input
+                      v-model="bidAmount"
+                      type="number"
+                      step="0.01"
+                      :min="minBidAmount"
+                      :placeholder="`Min: ${formatPrice(minBidAmount.toString())}`"
+                      class="bid-input"
+                      :disabled="isSubmittingBid"
+                      required
+                    />
+                  </div>
+                  <button 
+                    type="submit" 
+                    class="bid-btn"
+                    :disabled="isSubmittingBid || !isValidBid"
+                  >
+                    <span v-if="isSubmittingBid">Placing Bid...</span>
+                    <span v-else>Place Bid</span>
+                  </button>
+                </form>
+
+                <p v-if="auction.is_active && !isOwnAuction && !isHighestBidder" class="bid-hint">
+                  Enter an amount greater than {{ formatPrice(auction.current_price) }}
+                </p>
+              </div>
+
+              <!-- Bid History -->
+              <div v-if="bids.length > 0" class="bid-history">
+                <h3>Bid History</h3>
+                <div class="bid-list">
+                  <div v-for="bid in bids" :key="bid.id" class="bid-item">
+                    <div class="bid-info">
+                      <span class="bidder-name">{{ bid.user.first_name }} {{ bid.user.last_name }}</span>
+                      <span class="bid-time">{{ formatRelativeTime(bid.timestamp) }}</span>
+                    </div>
+                    <span class="bid-amount">{{ formatPrice(bid.bid_amount) }}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -128,9 +200,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Navbar from '../components/Navbar.vue'
+import { useAuthStore } from '../stores/auth'
 
 interface AuctionOwner {
   id: number
@@ -152,12 +225,34 @@ interface AuctionItem {
   is_active: boolean
 }
 
+interface BidUser {
+  id: number
+  email: string
+  first_name: string
+  last_name: string
+}
+
+interface Bid {
+  id: number
+  bid_amount: string
+  timestamp: string
+  is_winning: boolean
+  user: BidUser
+}
+
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 const auction = ref<AuctionItem | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+const bids = ref<Bid[]>([])
+const bidAmount = ref<number | null>(null)
+const isSubmittingBid = ref(false)
+const bidMessage = ref<string | null>(null)
+const bidMessageType = ref<'success' | 'error'>('success')
+let pollingInterval: ReturnType<typeof setInterval> | null = null
 
 const API_BASE_URL = 'http://localhost:8000/api'
 
@@ -168,6 +263,29 @@ const ownerName = computed(() => {
     return `${first_name} ${last_name}`.trim()
   }
   return email
+})
+
+const currentUserId = computed(() => authStore.user?.id ?? null)
+
+const isOwnAuction = computed(() => {
+  if (!auction.value || !currentUserId.value) return false
+  return auction.value.owner.id === currentUserId.value
+})
+
+const isHighestBidder = computed(() => {
+  if (!currentUserId.value || bids.value.length === 0) return false
+  const highestBid = bids.value[0]
+  return highestBid.user.id === currentUserId.value
+})
+
+const minBidAmount = computed(() => {
+  if (!auction.value) return 0
+  return parseFloat(auction.value.current_price) + 0.01
+})
+
+const isValidBid = computed(() => {
+  if (!bidAmount.value || !auction.value) return false
+  return bidAmount.value > parseFloat(auction.value.current_price)
 })
 
 function formatPrice(price: string): string {
@@ -185,8 +303,31 @@ function formatDate(dateString: string): string {
   })
 }
 
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffSecs = Math.floor(diffMs / 1000)
+  const diffMins = Math.floor(diffSecs / 60)
+  const diffHours = Math.floor(diffMins / 60)
+  const diffDays = Math.floor(diffHours / 24)
+
+  if (diffSecs < 60) return 'just now'
+  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+  return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+}
+
 function goBack(): void {
   router.push({ name: 'home' })
+}
+
+function showMessage(message: string, type: 'success' | 'error'): void {
+  bidMessage.value = message
+  bidMessageType.value = type
+  setTimeout(() => {
+    bidMessage.value = null
+  }, 5000)
 }
 
 async function fetchAuction(): Promise<void> {
@@ -217,6 +358,7 @@ async function fetchAuction(): Promise<void> {
 
     const data = await response.json()
     auction.value = data.item
+    await fetchBids()
   } catch (err) {
     error.value = 'Could not connect to the server'
     console.error(err)
@@ -225,8 +367,95 @@ async function fetchAuction(): Promise<void> {
   }
 }
 
-onMounted(() => {
-  fetchAuction()
+async function fetchBids(): Promise<void> {
+  if (!auction.value) return
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/auctions/${auction.value.id}/`, {
+      credentials: 'include'
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      const newPrice = data.item.current_price
+      
+      if (auction.value && newPrice !== auction.value.current_price) {
+        auction.value.current_price = newPrice
+        auction.value.is_active = data.item.is_active
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch bids:', err)
+  }
+}
+
+async function submitBid(): Promise<void> {
+  if (!auction.value || !bidAmount.value || !isValidBid.value) return
+
+  isSubmittingBid.value = true
+  bidMessage.value = null
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/bids/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        item_id: auction.value.id,
+        bid_amount: bidAmount.value.toFixed(2)
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      showMessage(data.error || 'Failed to place bid', 'error')
+      return
+    }
+
+    auction.value.current_price = data.item.current_price
+    auction.value.is_active = data.item.is_active
+    
+    bids.value.unshift(data.bid)
+    
+    bidAmount.value = null
+    showMessage('Bid placed successfully!', 'success')
+  } catch (err) {
+    showMessage('Could not connect to the server', 'error')
+    console.error(err)
+  } finally {
+    isSubmittingBid.value = false
+  }
+}
+
+function startPolling(): void {
+  pollingInterval = setInterval(async () => {
+    if (auction.value?.is_active) {
+      await fetchBids()
+    } else {
+      stopPolling()
+    }
+  }, 7000)
+}
+
+function stopPolling(): void {
+  if (pollingInterval) {
+    clearInterval(pollingInterval)
+    pollingInterval = null
+  }
+}
+
+onMounted(async () => {
+  await fetchAuction()
+  if (auction.value?.is_active) {
+    startPolling()
+  }
+})
+
+onUnmounted(() => {
+  stopPolling()
 })
 </script>
 
@@ -472,23 +701,170 @@ onMounted(() => {
 
 .bidding-section {
   padding: 1.5rem;
-  background: #fff7ed;
-  border: 2px dashed #fed7aa;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
-  text-align: center;
 }
 
 .bidding-section h3 {
   color: #111827;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 1rem 0;
   font-size: 1.125rem;
   font-weight: 600;
 }
 
-.placeholder-text {
-  color: #9a3412;
-  margin: 0;
+.bid-message {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
   font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.bid-message.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.bid-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.bid-disabled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.bid-disabled.winning {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.bid-form {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.bid-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.currency-symbol {
+  padding: 0 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.bid-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.75rem 0.75rem 0.75rem 0;
+  font-size: 1rem;
+  color: #111827;
+  outline: none;
+}
+
+.bid-input::placeholder {
+  color: #9ca3af;
+}
+
+.bid-input:disabled {
+  opacity: 0.6;
+}
+
+.bid-btn {
+  background: linear-gradient(135deg, #ea580c, #f97316);
+  border: none;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.bid-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+}
+
+.bid-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bid-hint {
+  margin: 0.75rem 0 0 0;
+  color: #6b7280;
+  font-size: 0.8125rem;
+}
+
+.bid-history {
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.bid-history h3 {
+  color: #111827;
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.bid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bid-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.bid-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.bidder-name {
+  color: #111827;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.bid-time {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.bid-amount {
+  color: #ea580c;
+  font-weight: 700;
+  font-size: 1rem;
 }
 
 .qa-section {
