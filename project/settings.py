@@ -188,3 +188,16 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
     "https://group36-web-apps-ap22223.apps.a.comp-teach.qmul.ac.uk",
 ]
+
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('GMAIL_EMAIL', '')
+EMAIL_HOST_PASSWORD = os.getenv('GMAIL_APP_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('GMAIL_EMAIL', '')
+EMAIL_SUBJECT_PREFIX = '[Auction Site] '
+
+# Email templates directory
+TEMPLATES[0]['DIRS'].append(os.path.join(BASE_DIR, 'templates'))

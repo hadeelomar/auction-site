@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auction Won - Congratulations!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            background-color: #f9fafb;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+        }
+        
+        .header {
+            background: #ffffff;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #ea580c, #f97316);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-text {
+            color: #111827;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .header h1 {
+            color: #111827;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .winner-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+        
+        .auction-details {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        
+        .auction-details h3 {
+            color: #111827;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: #6b7280;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .price {
+            color: #059669;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .cta-section {
+            text-align: center;
+            margin: 32px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ea580c, #f97316);
+            color: white;
+            padding: 16px 32px;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(234, 88, 12, 0.4);
+        }
+        
+        .next-steps {
+            background: #fff3cd;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        
+        .next-steps h4 {
+            color: #92400e;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .next-steps ul {
+            color: #92400e;
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .next-steps li {
+            margin-bottom: 8px;
+        }
+        
+        .next-steps li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .footer {
+            background: #f3f4f6;
+            padding: 24px 30px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .footer p:last-child {
+            margin-bottom: 0;
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .cta-button {
+                width: 100%;
+                padding: 14px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/>
+                        <path d="m16 16 6-6"/>
+                        <path d="m8 8 6-6"/>
+                        <path d="m9 7 8 8"/>
+                        <path d="m21 11-8-8"/>
+                    </svg>
+                </div>
+                <span class="logo-text">Bido</span>
+            </div>
+            <h1>🎉 Congratulations, you won!</h1>
+            <p>Your bid was the highest and the auction is now yours</p>
+        </div>
+
+        <div class="content">
+            <div class="winner-badge">
+                🏆 AUCTION WINNER
+            </div>
+
+            <div class="auction-details">
+                <h3>Auction Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Item:</span>
+                    <span class="detail-value">{{ auction_title }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Winning Bid:</span>
+                    <span class="detail-value price">£{{ winning_bid }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Auction Ended:</span>
+                    <span class="detail-value">{{ end_date }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Seller:</span>
+                    <span class="detail-value">{{ seller_name }}</span>
+                </div>
+                {% if auction_description %}
+                <div class="detail-row">
+                    <span class="detail-label">Description:</span>
+                    <span class="detail-value">{{ auction_description }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="cta-section">
+                <a href="{{ auction_url }}" class="cta-button">View Auction Details</a>
+            </div>
+
+            <div class="next-steps">
+                <h4>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                    </svg>
+                    Next Steps
+                </h4>
+                <ul>
+                    <li>Contact the seller to arrange payment and delivery</li>
+                    <li>Keep all communication records for your protection</li>
+                    <li>Leave feedback for the seller after receiving your item</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Thank you for using Bido!</strong></p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p> 2026 Bido. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
