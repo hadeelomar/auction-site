@@ -17,13 +17,13 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.conf import settings
-from api.views import health, spa
+from api.views import health, spa, login_view, signup_view
 
 urlpatterns = [
+    path('login/', login_view, name='login'),
+    path('signup/', signup_view, name='signup'),
     path('health', health),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
-    path("", spa),
-    path('', spa),
-    re_path(r"^(?!api/|admin/).*", spa),
+    re_path(r"^(?!api/|admin/|static/).*", spa),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,13 +1,18 @@
 from django.http import JsonResponse, HttpRequest, HttpResponse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.views import LogoutView
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.dateparse import parse_date
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import reverse_lazy
 from django.db import models
 
 from api.models import User, AuctionItem, Bid, Question, Reply
+from api.forms import CustomAuthenticationForm, CustomUserCreationForm
 
 import json
 from typing import Dict, Any
@@ -999,6 +1004,111 @@ def search_auctions(request: HttpRequest) -> JsonResponse:
             'category': category
         }
     })
+
+
+# Django Auth Views
+def login_view(request):
+    """Django login view with the same styling as Vue component"""
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                auth_login(request, user)
+                # Check if this is an AJAX request
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': True, 'redirect': 'http://localhost:5173/'})
+                return redirect('http://localhost:5173/')
+            else:
+                messages.error(request, 'Invalid email or password.')
+        else:
+            messages.error(request, 'Invalid email or password.')
+    else:
+        form = CustomAuthenticationForm()
+    
+    return render(request, 'auth/login.html', {'form': form})
+
+def signup_view(request):
+    """Django signup view with the same styling as Vue component"""
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Log the user in immediately after signup
+            auth_login(request, user)
+            # Check if this is an AJAX request
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect': 'http://localhost:5173/'})
+            messages.success(request, 'Account created successfully!')
+            return redirect('http://localhost:5173/')
+        else:
+            # Handle form errors
+            error_messages = []
+            for field, errors in form.errors.items():
+                for error in errors:
+                    error_messages.append(error)
+            messages.error(request, ' '.join(error_messages))
+    else:
+        form = CustomUserCreationForm()
+    
+    return render(request, 'auth/signup.html', {'form': form})
+
+class CustomLogoutView(LogoutView):
+    """Custom logout view"""
+    next_page = 'http://localhost:5173/login'
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_login(request):
+    """API endpoint for login (for AJAX requests)"""
+    form = CustomAuthenticationForm(request, data=request.POST)
+    if form.is_valid():
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            return JsonResponse({
+                'success': True,
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                }
+            })
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid email or password'})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid email or password'})
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_signup(request):
+    """API endpoint for signup (for AJAX requests)"""
+    form = CustomUserCreationForm(request.POST)
+    if form.is_valid():
+        user = form.save()
+        auth_login(request, user)
+        return JsonResponse({
+            'success': True,
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            }
+        })
+    else:
+        # Return form errors
+        errors = {}
+        for field, field_errors in form.errors.items():
+            errors[field] = field_errors
+        return JsonResponse({'success': False, 'errors': errors})
 
 def spa(request: HttpRequest) -> HttpResponse:
     """

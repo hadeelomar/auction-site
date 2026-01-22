@@ -11,16 +11,6 @@ const router = createRouter({
       component: BrowseAuctionsPage,
     },
     {
-      path: "/login",
-      name: "login",
-      component: () => import("../pages/AuthPage.vue"),
-    },
-    {
-      path: "/signup",
-      name: "signup",
-      component: () => import("../pages/AuthPage.vue"),
-    },
-    {
       path: "/auction/:id",
       name: "auction-detail",
       component: () => import("../pages/AuctionDetailPage.vue"),
@@ -63,7 +53,9 @@ router.beforeEach(async (to) => {
   await authStore.checkAuth()
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    return { name: "login" }
+    // Redirect to Django login page instead of Vue route
+    window.location.href = "http://localhost:8000/login/"
+    return false
   }
 })
 

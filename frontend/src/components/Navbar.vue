@@ -103,8 +103,8 @@
         </template>
 
         <template v-else>
-          <router-link to="/login" class="login-button">Sign In</router-link>
-          <router-link to="/signup" class="signup-button">Sign Up</router-link>
+          <a href="http://localhost:8000/login/" class="login-button">Sign In</a>
+          <a href="http://localhost:8000/signup/" class="signup-button">Sign Up</a>
         </template>
       </div>
     </div>
