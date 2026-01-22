@@ -32,6 +32,7 @@ urlpatterns = [
     path("auctions/search/", views.search_auctions, name="search-auctions"),
     path("auctions/<int:item_id>/", views.auction_detail, name="auction-detail"),
     path("bids/", views.place_bid, name="place-bid"),
+    path("user/bids/", views.user_bids, name="user-bids"),
     path("questions/", views.questions, name="questions"),
     path("questions/<int:question_id>/reply/", views.question_reply, name="question-reply"),
 ]
