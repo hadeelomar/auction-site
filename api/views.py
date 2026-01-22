@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.dateparse import parse_date
 from django.shortcuts import render
+from django.db import models
 
 from api.models import User, AuctionItem, Bid, Question, Reply
 
@@ -253,6 +254,7 @@ def auction_item_to_dict(request: HttpRequest, item: AuctionItem) -> Dict[str, A
         "image": image_url,
         "created_at": item.created_at.isoformat(),
         "ends_at": item.ends_at.isoformat(),
+        "category": item.category,
         "owner": {
             "id": item.owner.id,
             "email": item.owner.email,
@@ -340,19 +342,97 @@ def auctions(request: HttpRequest) -> JsonResponse:
     }, status=201)
 
 
+@csrf_exempt
 def auction_detail(request: HttpRequest, item_id: int) -> JsonResponse:
     """
-    GET /api/auctions/<id>
+    GET /api/auctions/<id> - Get auction details
+    PUT /api/auctions/<id> - Update auction
+    DELETE /api/auctions/<id> - Delete auction
     """
-    if request.method != "GET":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-
     try:
         item = AuctionItem.objects.select_related("owner").get(id=item_id)
     except AuctionItem.DoesNotExist:
         return JsonResponse({"error": "Auction item not found"}, status=404)
 
-    return JsonResponse({"item": auction_item_to_dict(request, item)}, status=200)
+    if request.method == "GET":
+        return JsonResponse({"item": auction_item_to_dict(request, item)}, status=200)
+    
+    elif request.method == "PUT":
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Authentication required"}, status=401)
+        
+        if item.owner != request.user:
+            return JsonResponse({"error": "You can only edit your own auctions"}, status=403)
+        
+        # Check if auction has bids - if so, don't allow editing
+        if item.bids.exists():
+            return JsonResponse({"error": "Cannot edit auction with existing bids"}, status=400)
+        
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        
+        title = data.get('title', '').strip()
+        description = data.get('description', '').strip()
+        starting_price = data.get('starting_price')
+        end_date_str = data.get('end_date')
+        category = data.get('category', '')
+        
+        # Validation
+        if title:
+            item.title = title
+        if description:
+            item.description = description
+        if category:
+            item.category = category
+        if starting_price:
+            try:
+                starting_price_decimal = Decimal(starting_price)
+                if starting_price_decimal <= 0:
+                    return JsonResponse({'error': 'Starting price must be greater than 0'}, status=400)
+                item.starting_price = starting_price_decimal
+                item.current_price = starting_price_decimal
+            except (ValueError, InvalidOperation):
+                return JsonResponse({'error': 'Invalid starting price'}, status=400)
+        if end_date_str:
+            try:
+                end_date = parse_datetime(end_date_str)
+                if not end_date:
+                    return JsonResponse({'error': 'Invalid end date format'}, status=400)
+                now = timezone.now()
+                if timezone.is_naive(end_date):
+                    end_date = timezone.make_aware(end_date)
+                if end_date <= now:
+                    return JsonResponse({'error': 'End date must be in future'}, status=400)
+                item.ends_at = end_date
+            except ValueError:
+                return JsonResponse({'error': 'Invalid end date format'}, status=400)
+        
+        item.save()
+        
+        return JsonResponse({
+            "message": "Auction updated successfully",
+            "item": auction_item_to_dict(request, item)
+        }, status=200)
+    
+    elif request.method == "DELETE":
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Authentication required"}, status=401)
+        
+        if item.owner != request.user:
+            return JsonResponse({"error": "You can only delete your own auctions"}, status=403)
+        
+        # Check if auction has bids - if so, don't allow deletion
+        if item.bids.exists():
+            return JsonResponse({"error": "Cannot delete auction with existing bids"}, status=400)
+        
+        item.delete()
+        
+        return JsonResponse({"message": "Auction deleted successfully"}, status=200)
+    
+    else:
+        return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
 @csrf_exempt
@@ -592,11 +672,333 @@ def question_reply(request: HttpRequest, question_id: int) -> JsonResponse:
     }, status=201)
 
 
+@csrf_exempt
+def create_auction(request: HttpRequest) -> JsonResponse:
+    """
+    POST /api/auctions/create/ -> Create a new auction item
+    """
+    try:
+        if request.method != 'POST':
+            return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
+
+        # Handle FormData (for file uploads) or JSON
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            title = request.POST.get('title', '').strip()
+            description = request.POST.get('description', '').strip()
+            starting_price = request.POST.get('starting_price')
+            end_date_str = request.POST.get('end_date')
+            category = request.POST.get('category', 'electronics')
+            image_file = request.FILES.get('image')
+        else:
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+            title = data.get('title', '').strip()
+            description = data.get('description', '').strip()
+            starting_price = data.get('starting_price')
+            end_date_str = data.get('end_date')
+            category = data.get('category', 'electronics')
+            image_file = None
+
+        # Validation
+        if not title:
+            return JsonResponse({'error': 'Title is required'}, status=400)
+        if not description:
+            return JsonResponse({'error': 'Description is required'}, status=400)
+        if not starting_price:
+            return JsonResponse({'error': 'Starting price is required'}, status=400)
+        if not end_date_str:
+            return JsonResponse({'error': 'End date is required'}, status=400)
+
+        try:
+            starting_price_decimal = Decimal(starting_price)
+            if starting_price_decimal <= 0:
+                return JsonResponse({'error': 'Starting price must be greater than 0'}, status=400)
+        except (ValueError, InvalidOperation):
+            return JsonResponse({'error': 'Invalid starting price'}, status=400)
+
+        try:
+            end_date = parse_datetime(end_date_str)
+            if not end_date:
+                return JsonResponse({'error': 'Invalid end date format'}, status=400)
+            now = timezone.now()
+            if timezone.is_naive(end_date):
+                end_date = timezone.make_aware(end_date)
+            if end_date <= now:
+                return JsonResponse({'error': 'End date must be in future'}, status=400)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid end date format'}, status=400)
+
+        # Create auction item
+        auction = AuctionItem.objects.create(
+            title=title,
+            description=description,
+            starting_price=starting_price_decimal,
+            current_price=starting_price_decimal,
+            ends_at=end_date,
+            category=category,
+            owner=request.user,
+            image=image_file
+        )
+
+        return JsonResponse({
+            'message': 'Auction created successfully',
+            'auction': {
+                'id': auction.id,
+                'title': auction.title,
+                'description': auction.description,
+                'starting_price': float(auction.starting_price),
+                'current_price': float(auction.current_price),
+                'ends_at': auction.ends_at.isoformat(),
+                'category': auction.category,
+                'image': auction.image.url if auction.image else None,
+                'owner': {
+                    'id': auction.owner.id,
+                    'username': auction.owner.username,
+                    'first_name': auction.owner.first_name,
+                    'last_name': auction.owner.last_name,
+                }
+            }
+        }, status=201)
+
+    except Exception as e:
+        return JsonResponse({'error': f'Failed to create auction: {str(e)}'}, status=500)
+
+
+@csrf_exempt
+def create_sample_auctions(request: HttpRequest) -> JsonResponse:
+    """
+    Create sample auction items for testing
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        # Create sample users first
+        from api.models import User
+        
+        # Get or create sample users
+        user, _ = User.objects.get_or_create(
+            username='demo_seller',
+            defaults={
+                'email': 'demo@example.com',
+                'first_name': 'Demo',
+                'last_name': 'Seller'
+            }
+        )
+        
+        sample_auctions = [
+            {
+                'title': 'Vintage Camera',
+                'description': 'Classic film camera from the 1960s. Excellent condition, fully functional. Great for photography enthusiasts and collectors.',
+                'starting_price': '150.00',
+                'current_price': '200.00',
+                'category': 'electronics',
+                'ends_at': (timezone.now() + timezone.timedelta(days=7)).isoformat(),
+            },
+            {
+                'title': 'Designer Handbag',
+                'description': 'Authentic designer handbag in excellent condition. Premium leather with gold hardware.',
+                'starting_price': '250.00',
+                'current_price': '300.00', 
+                'category': 'fashion',
+                'ends_at': (timezone.now() + timezone.timedelta(days=3)).isoformat(),
+            },
+            {
+                'title': 'Modern Sofa',
+                'description': 'Comfortable 3-seater sofa in pristine condition. Perfect for any living room.',
+                'starting_price': '500.00',
+                'current_price': '750.00',
+                'category': 'home',
+                'ends_at': (timezone.now() + timezone.timedelta(days=5)).isoformat(),
+            },
+            {
+                'title': 'Mountain Bike',
+                'description': 'High-performance mountain bike with recent servicing. Excellent trails.',
+                'starting_price': '800.00',
+                'current_price': '1200.00',
+                'category': 'sports',
+                'ends_at': (timezone.now() + timezone.timedelta(days=2)).isoformat(),
+            },
+            {
+                'title': 'Abstract Painting',
+                'description': 'Original abstract painting by emerging artist. Vibrant colors, museum quality.',
+                'starting_price': '300.00',
+                'current_price': '450.00',
+                'category': 'art',
+                'ends_at': (timezone.now() + timezone.timedelta(days=10)).isoformat(),
+            },
+            {
+                'title': 'Classic Car',
+                'description': 'Well-maintained classic car with low mileage. Reliable daily driver.',
+                'starting_price': '5000.00',
+                'current_price': '6500.00',
+                'category': 'vehicles',
+                'ends_at': (timezone.now() + timezone.timedelta(days=14)).isoformat(),
+            }
+        ]
+        
+        # Create sample auctions
+        for auction_data in sample_auctions:
+            auction = AuctionItem.objects.create(
+                title=auction_data['title'],
+                description=auction_data['description'],
+                starting_price=Decimal(auction_data['starting_price']),
+                current_price=Decimal(auction_data['current_price']),
+                ends_at=parse_datetime(auction_data['ends_at']),
+                category=auction_data['category'],
+                owner=user,
+            )
+        
+        return JsonResponse({
+            'message': f'Created {len(sample_auctions)} sample auctions',
+            'count': len(sample_auctions)
+        }, status=201)
+        
+    except Exception as e:
+        return JsonResponse({'error': f'Failed to create sample auctions: {str(e)}'}, status=500)
+    
 def health(request: HttpRequest) -> HttpResponse:
     """
     Health endpoint
     """
     return HttpResponse("OK")
+
+
+@csrf_exempt
+def search_auctions(request: HttpRequest) -> JsonResponse:
+    """
+    GET /api/auctions/search?q=keyword&min_price=100&max_price=1000&status=active
+    Search auctions with filters
+    """
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    # Get query parameters
+    query = request.GET.get('q', '').strip()
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    status = request.GET.get('status', 'active')
+    category = request.GET.get('category', '')
+    owner = request.GET.get('owner', '')
+
+    # Start with all auction items
+    auctions = AuctionItem.objects.select_related('owner').all()
+
+    # Filter by search query (case-insensitive search on title and description)
+    if query:
+        auctions = auctions.filter(
+            models.Q(title__icontains=query) | 
+            models.Q(description__icontains=query)
+        )
+
+    # Filter by category
+    if category:
+        auctions = auctions.filter(category__iexact=category)
+
+    # Filter by owner
+    if owner:
+        auctions = auctions.filter(owner__username=owner)
+
+    # Filter by price range
+    if min_price:
+        try:
+            min_price_decimal = Decimal(min_price)
+            auctions = auctions.filter(current_price__gte=min_price_decimal)
+        except (ValueError, InvalidOperation):
+            return JsonResponse({'error': 'Invalid min_price value'}, status=400)
+
+    if max_price:
+        try:
+            max_price_decimal = Decimal(max_price)
+            auctions = auctions.filter(current_price__lte=max_price_decimal)
+        except (ValueError, InvalidOperation):
+            return JsonResponse({'error': 'Invalid max_price value'}, status=400)
+
+    # Filter by status
+    if status == 'active':
+        auctions = auctions.filter(ends_at__gt=timezone.now())
+    elif status == 'ended':
+        auctions = auctions.filter(ends_at__lte=timezone.now())
+    elif status == 'ending_soon':
+        # Ending in the next 24 hours
+        auctions = auctions.filter(
+            ends_at__gt=timezone.now(),
+            ends_at__lte=timezone.now() + timezone.timedelta(hours=24)
+        )
+
+    # Order by relevance (for now, order by end time, then created time)
+    if query:
+        # If there's a search query, prioritize exact title matches
+        auctions = auctions.annotate(
+            title_match=models.Case(
+                models.When(title__iexact=query, then=models.Value(0)),
+                models.When(title__istartswith=query, then=models.Value(1)),
+                default=models.Value(2),
+                output_field=models.IntegerField(),
+            )
+        ).order_by('title_match', '-ends_at', '-created_at')
+    else:
+        auctions = auctions.order_by('-ends_at', '-created_at')
+
+    # Prepare response data
+    auction_data = []
+    for auction in auctions:
+        # Get bid count
+        bid_count = auction.bids.count()
+        
+        # Calculate time left
+        time_left = ""
+        if auction.ends_at > timezone.now():
+            time_delta = auction.ends_at - timezone.now()
+            days = time_delta.days
+            hours, remainder = divmod(time_delta.seconds, 3600)
+            minutes = remainder // 60
+            
+            if days > 0:
+                time_left = f"{days}d {hours}h"
+            elif hours > 0:
+                time_left = f"{hours}h {minutes}m"
+            else:
+                time_left = f"{minutes}m"
+        else:
+            time_left = "Ended"
+
+        auction_data.append({
+            'id': auction.id,
+            'title': auction.title,
+            'description': auction.description,
+            'image': auction.image.url if auction.image else None,
+            'starting_price': float(auction.starting_price),
+            'current_price': float(auction.current_price),
+            'bid_count': bid_count,
+            'time_left': time_left,
+            'ends_at': auction.ends_at.isoformat(),
+            'category': auction.category,
+            'owner': {
+                'id': auction.owner.id,
+                'username': auction.owner.username,
+                'first_name': auction.owner.first_name,
+                'last_name': auction.owner.last_name,
+            }
+        })
+
+    return JsonResponse({
+        'auctions': auction_data,
+        'count': len(auction_data),
+        'query': query,
+        'filters': {
+            'min_price': min_price,
+            'max_price': max_price,
+            'status': status,
+            'category': category
+        }
+    })
 
 def spa(request: HttpRequest) -> HttpResponse:
     """

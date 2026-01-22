@@ -24,5 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path("", spa),
-    re_path(r"^(?!api/|admin/|health).*", spa)
+    path('', spa),
+    re_path(r"^(?!api/|admin/).*", spa),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

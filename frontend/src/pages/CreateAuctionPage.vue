@@ -5,23 +5,39 @@
     <main class="main-content">
       <div class="page-container">
         <div class="page-header">
-          <h1 class="page-title">Create Auction</h1>
-          <p class="page-description">List a new item for auction</p>
+          <h1 class="page-title">{{ isEditMode ? 'Edit Auction' : 'Create Auction' }}</h1>
+          <p class="page-description">{{ isEditMode ? 'Update your auction details' : 'List a new item for auction' }}</p>
         </div>
 
-        <form class="auction-form" @submit.prevent="handleSubmit">
+        <form class="auction-form" @submit.prevent="handleSubmit" v-if="!loading">
           <!-- item details -->
           <div class="form-section">
             <h2 class="section-title">Item Details</h2>
             
             <div class="form-group">
               <label for="title" class="form-label">Title <span class="required">*</span></label>
-              <input id="title" v-model="formData.title" type="text" class="form-input" placeholder="Enter item title" />
+              <input 
+                id="title" 
+                v-model="formData.title" 
+                type="text" 
+                class="form-input" 
+                :class="{ error: errors.title }"
+                placeholder="Enter item title" 
+              />
+              <span v-if="errors.title" class="error-message">{{ errors.title }}</span>
             </div>
 
             <div class="form-group">
               <label for="description" class="form-label">Description <span class="required">*</span></label>
-              <textarea id="description" v-model="formData.description" class="form-textarea" rows="4" placeholder="Describe your item in detail"></textarea>
+              <textarea 
+                id="description" 
+                v-model="formData.description" 
+                class="form-textarea"
+                :class="{ error: errors.description }"
+                rows="4" 
+                placeholder="Describe your item in detail"
+              ></textarea>
+              <span v-if="errors.description" class="error-message">{{ errors.description }}</span>
             </div>
 
             <div class="form-row">
@@ -29,13 +45,44 @@
                 <label for="startingPrice" class="form-label">Starting Price <span class="required">*</span></label>
                 <div class="input-with-prefix">
                   <span class="input-prefix">£</span>
-                  <input id="startingPrice" v-model="formData.startingPrice" type="number" class="form-input with-prefix" placeholder="0.00" />
+                  <input 
+                    id="startingPrice" 
+                    v-model="formData.startingPrice" 
+                    type="number" 
+                    class="form-input with-prefix"
+                    :class="{ error: errors.startingPrice }"
+                    placeholder="0.00" 
+                  />
                 </div>
+                <span v-if="errors.startingPrice" class="error-message">{{ errors.startingPrice }}</span>
               </div>
 
               <div class="form-group">
                 <label for="endDate" class="form-label">End Date & Time <span class="required">*</span></label>
-                <input id="endDate" v-model="formData.endDate" type="datetime-local" class="form-input" />
+                <input 
+                  id="endDate" 
+                  v-model="formData.endDate" 
+                  type="datetime-local" 
+                  class="form-input"
+                  :class="{ error: errors.endDate }"
+                />
+                <span v-if="errors.endDate" class="error-message">{{ errors.endDate }}</span>
+              </div>
+
+              <div class="form-group">
+                <label for="category" class="form-label">Category</label>
+                <select 
+                  id="category" 
+                  v-model="formData.category" 
+                  class="form-input"
+                >
+                  <option value="electronics">Electronics</option>
+                  <option value="fashion">Fashion</option>
+                  <option value="home">Home</option>
+                  <option value="sports">Sports</option>
+                  <option value="art">Art</option>
+                  <option value="vehicles">Vehicles</option>
+                </select>
               </div>
             </div>
           </div>
@@ -43,21 +90,42 @@
           <!-- image upload -->
           <div class="form-section">
             <h2 class="section-title">Item Image</h2>
-            <div class="image-upload-area">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                <circle cx="9" cy="9" r="2"/>
-                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-              </svg>
-              <p class="upload-text">Drag and drop an image here, or click to browse</p>
-              <p class="upload-hint">PNG, JPG up to 10MB</p>
+            <div class="image-upload-area" @click="fileInput?.click()">
+              <input 
+                ref="fileInput"
+                type="file" 
+                accept="image/*" 
+                @change="handleFileSelect"
+                style="display: none"
+              />
+              
+              <div v-if="imagePreview" class="image-preview">
+                <img :src="imagePreview" alt="Preview" />
+                <button type="button" class="remove-image" @click.stop="removeImage">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              
+              <div v-else class="upload-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                  <circle cx="9" cy="9" r="2"/>
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                </svg>
+                <p class="upload-text">Drag and drop an image here, or click to browse</p>
+                <p class="upload-hint">PNG, JPG up to 10MB</p>
+              </div>
             </div>
+            <span v-if="errors.image" class="error-message">{{ errors.image }}</span>
           </div>
 
           <!-- form actions -->
           <div class="form-actions">
             <router-link to="/" class="cancel-button">Cancel</router-link>
-            <button type="submit" class="submit-button">
+            <button type="submit" class="submit-button" :disabled="isSubmitting">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/>
                 <path d="m16 16 6-6"/>
@@ -65,29 +133,238 @@
                 <path d="m9 7 8 8"/>
                 <path d="m21 11-8-8"/>
               </svg>
-              Create Auction
+              {{ isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Auction' : 'Create Auction') }}
             </button>
           </div>
+          
+          <!-- General error message -->
+          <div v-if="errors.general" class="general-error">
+            {{ errors.general }}
+          </div>
         </form>
+        
+        <!-- Loading state -->
+        <div v-if="loading" class="loading-state">
+          <p>Loading auction details...</p>
+        </div>
       </div>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import Navbar from '../components/Navbar.vue'
+
+const router = useRouter()
+const route = useRoute()
+
+// Check if we're in edit mode
+const isEditMode = computed(() => route.name === 'edit-auction')
+const auctionId = computed(() => route.params.id as string)
 
 const formData = reactive({
   title: '',
   description: '',
   startingPrice: '',
-  endDate: ''
+  endDate: '',
+  category: 'electronics'
 })
 
-const handleSubmit = () => {
-  console.log('Form submitted:', formData)
+const errors = ref<Record<string, string>>({})
+const isSubmitting = ref(false)
+const selectedFile = ref<File | null>(null)
+const imagePreview = ref<string>('')
+const fileInput = ref<HTMLInputElement | null>(null)
+const loading = ref(false)
+
+const validateForm = (): boolean => {
+  const newErrors: Record<string, string> = {}
+  
+  if (!formData.title.trim()) {
+    newErrors.title = 'Title is required'
+  } else if (formData.title.length < 3) {
+    newErrors.title = 'Title must be at least 3 characters'
+  }
+  
+  if (!formData.description.trim()) {
+    newErrors.description = 'Description is required'
+  } else if (formData.description.length < 10) {
+    newErrors.description = 'Description must be at least 10 characters'
+  }
+  
+  if (!formData.startingPrice) {
+    newErrors.startingPrice = 'Starting price is required'
+  } else if (parseFloat(formData.startingPrice) <= 0) {
+    newErrors.startingPrice = 'Starting price must be greater than 0'
+  }
+  
+  if (!formData.endDate) {
+    newErrors.endDate = 'End date is required'
+  } else {
+    const endDate = new Date(formData.endDate)
+    const now = new Date()
+    if (endDate <= now) {
+      newErrors.endDate = 'End date must be in the future'
+    }
+  }
+  
+  errors.value = newErrors
+  return Object.keys(newErrors).length === 0
 }
+
+const handleFileSelect = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (file) {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      errors.value.image = 'Please select an image file'
+      return
+    }
+    
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      errors.value.image = 'Image size must be less than 10MB'
+      return
+    }
+    
+    selectedFile.value = file
+    errors.value.image = ''
+    
+    // Create preview
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      imagePreview.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const removeImage = () => {
+  selectedFile.value = null
+  imagePreview.value = ''
+  errors.value.image = ''
+  // Clear the file input
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
+const handleSubmit = async () => {
+  if (!validateForm()) {
+    return
+  }
+  
+  isSubmitting.value = true
+  
+  try {
+    let response: Response
+    let data: any
+    
+    if (isEditMode.value) {
+      // Edit mode - send JSON data
+      const jsonData = {
+        title: formData.title,
+        description: formData.description,
+        starting_price: formData.startingPrice,
+        end_date: new Date(formData.endDate).toISOString(),
+        category: formData.category
+      }
+      
+      response = await fetch(`/api/auctions/${auctionId.value}/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
+        credentials: 'same-origin'
+      })
+      
+      data = await response.json()
+    } else {
+      // Create mode - send FormData (for file upload)
+      const submitData = new FormData()
+      submitData.append('title', formData.title)
+      submitData.append('description', formData.description)
+      submitData.append('starting_price', formData.startingPrice)
+      submitData.append('end_date', new Date(formData.endDate).toISOString())
+      submitData.append('category', formData.category)
+      
+      if (selectedFile.value) {
+        submitData.append('image', selectedFile.value)
+      }
+      
+      response = await fetch('/api/auctions/create/', {
+        method: 'POST',
+        body: submitData,
+        credentials: 'same-origin'
+      })
+      
+      data = await response.json()
+    }
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        errors.value.general = `You must be logged in to ${isEditMode.value ? 'edit' : 'create'} an auction. Please <router-link to="/login" class="error-link">sign in</router-link> first.`
+      } else if (data.error) {
+        errors.value.general = data.error
+      } else {
+        errors.value.general = `Failed to ${isEditMode.value ? 'update' : 'create'} auction`
+      }
+      return
+    }
+    
+    // Success - redirect based on mode
+    if (isEditMode.value) {
+      router.push('/auctions')
+    } else {
+      router.push(`/auction/${data.auction.id}`)
+    }
+    
+  } catch (err) {
+    errors.value.general = 'Network error. Please try again.'
+    console.error(`${isEditMode.value ? 'Update' : 'Create'} auction error:`, err)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+// Load existing auction data if in edit mode
+const loadAuctionData = async () => {
+  if (!isEditMode.value) return
+  
+  try {
+    loading.value = true
+    const response = await fetch(`/api/auctions/${auctionId.value}/`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch auction details')
+    }
+    
+    const data = await response.json()
+    const auction = data.item
+    
+    // Populate form with existing data
+    formData.title = auction.title
+    formData.description = auction.description
+    formData.startingPrice = auction.starting_price.toString()
+    formData.endDate = new Date(auction.ends_at).toISOString().slice(0, 16)
+    formData.category = auction.category || 'electronics'
+    imagePreview.value = auction.image || ''
+    
+  } catch (err) {
+    errors.value.general = 'Failed to load auction data'
+    console.error('Error loading auction:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadAuctionData()
+})
 </script>
 
 <style scoped>
@@ -287,5 +564,90 @@ const handleSubmit = () => {
 .submit-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+}
+
+.submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Error styles */
+.error-message {
+  display: block;
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.form-input.error,
+.form-textarea.error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.general-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+/* Error link styles */
+.error-link {
+  color: #ea580c;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.error-link:hover {
+  color: #c2410c;
+}
+
+/* Image preview styles */
+.image-preview {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-image {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.remove-image:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
 }
 </style>
