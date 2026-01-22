@@ -84,6 +84,29 @@
         </div>
       </div>
     </main>
+    
+    <!-- Delete confirmation modal -->
+    <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>Delete Auction</h3>
+          <button @click="closeDeleteModal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete <strong>"{{ auctionToDelete?.title }}"</strong>? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button @click="closeDeleteModal" class="modal-button modal-cancel">Cancel</button>
+          <button 
+            @click="confirmDelete" 
+            class="modal-button modal-delete"
+            :disabled="deletingAuction !== null"
+          >
+            {{ deletingAuction ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -120,6 +143,8 @@ const auctions = ref<Auction[]>([])
 const loading = ref(true)
 const error = ref('')
 const deletingAuction = ref<number | null>(null)
+const showDeleteModal = ref(false)
+const auctionToDelete = ref<Auction | null>(null)
 
 const router = useRouter()
 
@@ -165,15 +190,23 @@ const handleEdit = (auction: Auction) => {
   router.push(`/edit/${auction.id}`)
 }
 
-const handleDelete = async (auction: Auction) => {
-  if (!confirm(`Are you sure you want to delete "${auction.title}"? This action cannot be undone.`)) {
-    return
-  }
+const handleDelete = (auction: Auction) => {
+  auctionToDelete.value = auction
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  auctionToDelete.value = null
+}
+
+const confirmDelete = async () => {
+  if (!auctionToDelete.value) return
   
   try {
-    deletingAuction.value = auction.id
+    deletingAuction.value = auctionToDelete.value.id
     
-    const response = await fetch(`/api/auctions/${auction.id}/`, {
+    const response = await fetch(`/api/auctions/${auctionToDelete.value.id}/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -186,7 +219,10 @@ const handleDelete = async (auction: Auction) => {
     }
     
     // Remove auction from list
-    auctions.value = auctions.value.filter(a => a.id !== auction.id)
+    auctions.value = auctions.value.filter(a => a.id !== auctionToDelete.value!.id)
+    
+    // Close modal
+    closeDeleteModal()
     
   } catch (err) {
     alert(err instanceof Error ? err.message : 'Failed to delete auction')
@@ -438,6 +474,120 @@ onMounted(() => {
 
 .retry-button:hover {
   background: #c2410c;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.modal-button {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.modal-cancel {
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.modal-cancel:hover {
+  background: #f3f4f6;
+}
+
+.modal-delete {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.modal-delete:hover {
+  background: #b91c1c;
+}
+
+.modal-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 640px) {

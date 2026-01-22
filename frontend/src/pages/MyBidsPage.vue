@@ -16,11 +16,40 @@
           <button :class="['tab', { active: activeTab === 'lost' }]" @click="activeTab = 'lost'">{{ t('bids.lost') }}</button>
         </div>
 
+        <!-- Rebid Message -->
+        <div v-if="rebidMessage" :class="['rebid-message', rebidMessageType]">
+          {{ rebidMessage }}
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="isLoading" class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading your bids...</p>
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="error" class="error-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>{{ error }}</p>
+          <button class="retry-btn" @click="fetchUserBids">Try Again</button>
+        </div>
+
         <!-- bids list -->
-        <div class="bids-list">
+        <div v-else class="bids-list">
           <div v-for="bid in filteredBids" :key="bid.id" class="bid-card">
             <div class="bid-image">
-              <img :src="bid.image" :alt="bid.title" />
+              <img v-if="bid.image" :src="bid.image" :alt="bid.title" />
+              <div v-else class="no-image">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                  <circle cx="9" cy="9" r="2"/>
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                </svg>
+              </div>
             </div>
             <div class="bid-details">
               <h3 class="bid-title">{{ bid.title }}</h3>
@@ -32,9 +61,36 @@
                 <span :class="['bid-status', bid.status]">{{ bid.statusText }}</span>
                 <span class="bid-time">{{ bid.timeLeft }}</span>
               </div>
+              
+              <!-- Rebid Form -->
+              <div v-if="rebidItemId === bid.id" class="rebid-form">
+                <div class="rebid-input-group">
+                  <span class="currency-symbol">£</span>
+                  <input
+                    type="number"
+                    v-model="rebidAmount"
+                    :min="parseFloat(bid.currentBid) + 1"
+                    :placeholder="`Min: £${(parseFloat(bid.currentBid) + 1).toLocaleString()}`"
+                    class="rebid-input"
+                    :disabled="isSubmittingRebid"
+                  />
+                </div>
+                <div class="rebid-form-actions">
+                  <button @click="closeRebidForm" class="cancel-btn" :disabled="isSubmittingRebid">Cancel</button>
+                  <button @click="submitRebid(bid.id, bid.currentBid)" class="submit-rebid-btn" :disabled="isSubmittingRebid || !rebidAmount">
+                    {{ isSubmittingRebid ? 'Placing...' : 'Place Bid' }}
+                  </button>
+                </div>
+              </div>
             </div>
             <div class="bid-actions">
-              <button v-if="bid.status === 'outbid'" class="rebid-button">{{ t('bids.rebid') }}</button>
+              <button 
+                v-if="bid.status === 'outbid' && rebidItemId !== bid.id" 
+                class="rebid-button"
+                @click="openRebidForm(bid.id, bid.currentBid)"
+              >
+                {{ t('bids.rebid') }}
+              </button>
               <router-link :to="`/auction/${bid.id}`" class="view-button">{{ t('common.view') }}</router-link>
             </div>
           </div>
@@ -56,21 +112,141 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Navbar from '../components/Navbar.vue'
 import { useI18nStore } from '../stores/i18n'
 
 const { t } = useI18n()
 const i18nStore = useI18nStore()
-const activeTab = ref('active')
 
-const bids = ref([
-  { id: 1, title: 'Vintage Camera Collection', image: '/placeholder.svg?height=80&width=80', yourBid: 32000, currentBid: 35000, status: 'outbid', statusText: 'Outbid', timeLeft: '1d 12h left' },
-  { id: 2, title: 'Apple Watch Series 6', image: '/placeholder.svg?height=80&width=80', yourBid: 45000, currentBid: 45000, status: 'winning', statusText: 'Winning', timeLeft: '2d 5h left' },
-  { id: 3, title: 'Rare Pokemon Cards', image: '/placeholder.svg?height=80&width=80', yourBid: 125000, currentBid: 125000, status: 'won', statusText: 'Won', timeLeft: 'Ended' },
-  { id: 4, title: 'Gaming Console Bundle', image: '/placeholder.svg?height=80&width=80', yourBid: 52000, currentBid: 58000, status: 'lost', statusText: 'Lost', timeLeft: 'Ended' }
-])
+interface Bid {
+  id: number
+  bid_id: number
+  title: string
+  image: string | null
+  yourBid: string
+  currentBid: string
+  status: 'winning' | 'outbid' | 'won' | 'lost'
+  statusText: string
+  timeLeft: string
+  endsAt: string
+  isActive: boolean
+}
+
+const API_BASE_URL = 'http://localhost:8000/api'
+
+const activeTab = ref('active')
+const bids = ref<Bid[]>([])
+const isLoading = ref(true)
+const error = ref<string | null>(null)
+
+const rebidItemId = ref<number | null>(null)
+const rebidAmount = ref<number | null>(null)
+const isSubmittingRebid = ref(false)
+const rebidMessage = ref<string | null>(null)
+const rebidMessageType = ref<'success' | 'error'>('success')
+
+async function fetchUserBids(): Promise<void> {
+  isLoading.value = true
+  error.value = null
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/user/bids/`, {
+      credentials: 'include'
+    })
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        error.value = 'Please sign in to view your bids'
+      } else {
+        error.value = 'Failed to load bids'
+      }
+      return
+    }
+
+    const data = await response.json()
+    bids.value = data.bids
+  } catch (err) {
+    error.value = 'Could not connect to the server'
+    console.error(err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+function getCookie(name: string): string | null {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null
+  return null
+}
+
+async function submitRebid(itemId: number, currentBid: string): Promise<void> {
+  if (!rebidAmount.value) return
+
+  if (rebidAmount.value <= parseFloat(currentBid)) {
+    showRebidMessage(`Bid must be greater than £${parseFloat(currentBid).toLocaleString()}`, 'error')
+    return
+  }
+
+  isSubmittingRebid.value = true
+  rebidMessage.value = null
+
+  try {
+    const csrfToken = getCookie('csrftoken')
+    const response = await fetch(`${API_BASE_URL}/bids/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken || ''
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        item_id: itemId,
+        bid_amount: rebidAmount.value
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      showRebidMessage(data.error || 'Failed to place bid', 'error')
+      return
+    }
+
+    showRebidMessage('Bid placed successfully!', 'success')
+    rebidItemId.value = null
+    rebidAmount.value = null
+    
+    // Refresh bids to get updated data
+    await fetchUserBids()
+  } catch (err) {
+    showRebidMessage('Could not connect to the server', 'error')
+    console.error(err)
+  } finally {
+    isSubmittingRebid.value = false
+  }
+}
+
+function showRebidMessage(message: string, type: 'success' | 'error'): void {
+  rebidMessage.value = message
+  rebidMessageType.value = type
+  setTimeout(() => {
+    rebidMessage.value = null
+  }, 5000)
+}
+
+function openRebidForm(itemId: number, currentBid: string): void {
+  rebidItemId.value = itemId
+  rebidAmount.value = Math.ceil(parseFloat(currentBid) + 1)
+  rebidMessage.value = null
+}
+
+function closeRebidForm(): void {
+  rebidItemId.value = null
+  rebidAmount.value = null
+}
 
 const filteredBids = computed(() => {
   if (activeTab.value === 'active') return bids.value.filter(b => b.status === 'winning' || b.status === 'outbid')
@@ -79,7 +255,11 @@ const filteredBids = computed(() => {
   return bids.value
 })
 
-const formatPrice = (price: number): string => i18nStore.formatPrice(price)
+const formatPrice = (price: string | number): string => i18nStore.formatPrice(price)
+
+onMounted(() => {
+  fetchUserBids()
+})
 </script>
 
 <style scoped>
@@ -290,6 +470,169 @@ const formatPrice = (price: number): string => i18nStore.formatPrice(price)
 
 .empty-state svg {
   margin-bottom: 1rem;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  color: #6b7280;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #ea580c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.error-state svg {
+  margin-bottom: 1rem;
+  color: #ef4444;
+}
+
+.retry-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #ea580c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.retry-btn:hover {
+  background: #dc4c07;
+}
+
+.no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+.rebid-message {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.rebid-message.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.rebid-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.rebid-form {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.rebid-input-group {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.rebid-input-group .currency-symbol {
+  padding: 0 0.5rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.rebid-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.rebid-input:disabled {
+  opacity: 0.6;
+}
+
+.rebid-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.cancel-btn {
+  padding: 0.375rem 0.75rem;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.cancel-btn:hover {
+  background: #f3f4f6;
+}
+
+.submit-rebid-btn {
+  padding: 0.375rem 0.75rem;
+  background: #ea580c;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.submit-rebid-btn:hover:not(:disabled) {
+  background: #dc4c07;
+}
+
+.submit-rebid-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @media (max-width: 640px) {

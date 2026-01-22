@@ -9,6 +9,9 @@ wheel==0.45.1
 whitenoise==6.9.0
 django-cors-headers>=4.0.0
 Pillow
+django-allauth[socialaccount]>=0.57.0
+django-ratelimit>=4.1.0
+python-dotenv>=1.0.0
 
 # development and quality checks
 mypy==1.10.1
