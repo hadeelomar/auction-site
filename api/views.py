@@ -14,6 +14,7 @@ import logging
 # Rate limiting is handled inline with graceful fallback
 
 from api.models import User, AuctionItem, Bid, Question, Reply
+from notifications.models import Notification
 from api.forms import CustomAuthenticationForm, CustomUserCreationForm
 
 import json
@@ -1218,6 +1219,50 @@ def api_signup(request):
         for field, field_errors in form.errors.items():
             errors[field] = field_errors
         return JsonResponse({'success': False, 'errors': errors})
+
+
+# Notification Views
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def notifications(request):
+    """Get notifications for the current user"""
+    notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-timestamp')
+    
+    notification_data = []
+    for notification in notifications:
+        notification_data.append({
+            'id': notification.id,
+            'type': notification.type,
+            'message': notification.message,
+            'is_read': notification.is_read,
+            'timestamp': notification.timestamp.isoformat(),
+        })
+    
+    return Response(notification_data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_notification_read(request, notification_id):
+    """Mark a notification as read"""
+    try:
+        notification = Notification.objects.get(id=notification_id, user=request.user)
+        notification.is_read = True
+        notification.save()
+        return Response({'success': True})
+    except Notification.DoesNotExist:
+        return Response({'error': 'Notification not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_all_notifications_read(request):
+    """Mark all notifications as read for current user"""
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    return Response({'success': True})
 
 def spa(request: HttpRequest) -> HttpResponse:
     """

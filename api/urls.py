@@ -43,4 +43,7 @@ urlpatterns = [
     path("i18n/language/", i18n.set_language, name="set-language"),
     path("i18n/currency/", i18n.set_currency, name="set-currency"),
     path("i18n/locale/", i18n.get_locale_data, name="locale-data"),
+    path("notifications/", views.notifications, name="notifications"),
+    path("notifications/<int:notification_id>/mark-read/", views.mark_notification_read, name="mark-notification-read"),
+    path("notifications/mark-all-read/", views.mark_all_notifications_read, name="mark-all-notifications-read"),
 ]

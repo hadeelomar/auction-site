@@ -36,6 +36,9 @@
         <LanguageSelector />
 
         <template v-if="authStore.isAuthenticated">
+          <!-- notification bell -->
+          <NotificationBell :unread-count="unreadNotificationCount" />
+          
           <!-- create auction -->
           <router-link to="/create" class="create-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -120,14 +123,15 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../stores/auth'
 import LanguageSelector from './LanguageSelector.vue'
+import NotificationBell from './NotificationBell.vue'
 
 const { t } = useI18n()
 
 const router = useRouter()
 const authStore = useAuthStore()
-
 const searchQuery = ref('')
 const showDropdown = ref(false)
+const unreadNotificationCount = ref(0)
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import date
 from typing import Optional
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -183,3 +184,25 @@ class Reply(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.reply_text[:50]}"
+
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('outbid', 'Outbid'),
+        ('question_answered', 'Question Answered'),
+        ('auction_ending', 'Auction Ending'),
+        ('auction_won', 'Auction Won'),
+        ('auction_lost', 'Auction Lost'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_type_display()}"
