@@ -1,0 +1,111 @@
+{
+  "common": {
+    "home": "Startseite",
+    "login": "Anmelden",
+    "signup": "Registrieren",
+    "logout": "Abmelden",
+    "search": "Suchen",
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "view": "Ansehen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "submit": "Absenden"
+  },
+  "nav": {
+    "browse": "Auktionen durchsuchen",
+    "myAuctions": "Meine Auktionen",
+    "myBids": "Meine Gebote",
+    "createAuction": "Auktion erstellen",
+    "profile": "Profil"
+  },
+  "auction": {
+    "title": "Auktion",
+    "description": "Beschreibung",
+    "startingPrice": "Startpreis",
+    "currentPrice": "Aktueller Preis",
+    "timeLeft": "Verbleibende Zeit",
+    "endDate": "Enddatum",
+    "placeBid": "Gebot abgeben",
+    "bidAmount": "Gebotsbetrag",
+    "bidHistory": "Gebotshistorie",
+    "noBids": "Noch keine Gebote",
+    "wonBy": "Gewonnen von",
+    "ended": "Beendet",
+    "active": "Aktiv"
+  },
+  "bids": {
+    "yourBid": "Ihr Gebot",
+    "currentBid": "Aktuelles Gebot",
+    "winning": "Führend",
+    "outbid": "Überboten",
+    "won": "Gewonnen",
+    "lost": "Verloren",
+    "rebid": "Erneut bieten",
+    "activeBids": "Aktive Gebote"
+  },
+  "auth": {
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "forgotPassword": "Passwort vergessen?",
+    "noAccount": "Noch kein Konto?",
+    "hasAccount": "Bereits ein Konto?",
+    "signInWith": "Anmelden mit"
+  },
+  "qna": {
+    "title": "Fragen und Antworten",
+    "askQuestion": "Frage stellen",
+    "reply": "Antworten",
+    "noQuestions": "Noch keine Fragen. Stellen Sie die erste Frage!",
+    "signInToAsk": "Bitte melden Sie sich an, um eine Frage zu stellen."
+  },
+  "settings": {
+    "language": "Sprache",
+    "currency": "Währung",
+    "preferences": "Einstellungen"
+  },
+  "browse": {
+    "heroTitle": "Finden Sie tolle Angebote",
+    "heroSubtitle": "Bieten Sie auf einzigartige Artikel von Verkäufern weltweit",
+    "topCategories": "Top-Kategorien",
+    "featuredAuctions": "Empfohlene Auktionen",
+    "endingSoon": "Endet bald",
+    "seeAll": "Alle anzeigen",
+    "bids": "Gebote",
+    "endsIn": "Endet in"
+  },
+  "categories": {
+    "electronics": "Elektronik",
+    "fashion": "Mode",
+    "home": "Haus & Garten",
+    "sports": "Sport",
+    "art": "Kunst",
+    "vehicles": "Fahrzeuge"
+  },
+  "detail": {
+    "backToAuctions": "Zurück zu Auktionen",
+    "tryAgain": "Erneut versuchen",
+    "noImage": "Kein Bild verfügbar",
+    "seller": "Verkäufer:",
+    "listed": "Eingestellt:",
+    "ends": "Endet:",
+    "auctionEnded": "Diese Auktion ist beendet",
+    "cannotBidOwn": "Sie können nicht auf Ihre eigene Auktion bieten",
+    "highestBidder": "Sie sind der Höchstbietende!",
+    "placingBid": "Gebot wird abgegeben...",
+    "enterAmount": "Geben Sie einen Betrag größer als",
+    "posting": "Wird gepostet...",
+    "postReply": "Antwort posten",
+    "askPlaceholder": "Stellen Sie eine Frage zu diesem Artikel...",
+    "replyPlaceholder": "Schreiben Sie eine Antwort...",
+    "loadingQuestions": "Fragen werden geladen..."
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "common": {
+    "home": "Ana Sayfa",
+    "login": "Giriş Yap",
+    "signup": "Kayıt Ol",
+    "logout": "Çıkış Yap",
+    "search": "Ara",
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "success": "Başarılı",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "view": "Görüntüle",
+    "back": "Geri",
+    "next": "İleri",
+    "submit": "Gönder"
+  },
+  "nav": {
+    "browse": "Açık Artırmalara Göz At",
+    "myAuctions": "Açık Artırmalarım",
+    "myBids": "Tekliflerim",
+    "createAuction": "Açık Artırma Oluştur",
+    "profile": "Profil"
+  },
+  "auction": {
+    "title": "Açık Artırma",
+    "description": "Açıklama",
+    "startingPrice": "Başlangıç Fiyatı",
+    "currentPrice": "Güncel Fiyat",
+    "timeLeft": "Kalan Süre",
+    "endDate": "Bitiş Tarihi",
+    "placeBid": "Teklif Ver",
+    "bidAmount": "Teklif Tutarı",
+    "bidHistory": "Teklif Geçmişi",
+    "noBids": "Henüz teklif yok",
+    "wonBy": "Kazanan",
+    "ended": "Sona Erdi",
+    "active": "Aktif"
+  },
+  "bids": {
+    "yourBid": "Teklifiniz",
+    "currentBid": "Güncel Teklif",
+    "winning": "Kazanıyor",
+    "outbid": "Geçildi",
+    "won": "Kazandı",
+    "lost": "Kaybetti",
+    "rebid": "Yeniden Teklif Ver",
+    "activeBids": "Aktif Teklifler"
+  },
+  "auth": {
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifreyi Onayla",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "forgotPassword": "Şifrenizi mi unuttunuz?",
+    "noAccount": "Hesabınız yok mu?",
+    "hasAccount": "Zaten hesabınız var mı?",
+    "signInWith": "İle giriş yap"
+  },
+  "qna": {
+    "title": "Sorular ve Cevaplar",
+    "askQuestion": "Soru Sor",
+    "reply": "Yanıtla",
+    "noQuestions": "Henüz soru yok. İlk soran siz olun!",
+    "signInToAsk": "Soru sormak için lütfen sign in yapın."
+  },
+  "settings": {
+    "language": "Dil",
+    "currency": "Para Birimi",
+    "preferences": "Tercihler"
+  },
+  "browse": {
+    "heroTitle": "Harika Fırsatlar Bulun",
+    "heroSubtitle": "Dünyanın dört bir yanındaki satıcılardan benzersiz ürünlere teklif verin",
+    "topCategories": "Popüler Kategoriler",
+    "featuredAuctions": "Öne Çıkan Açık Artırmalar",
+    "endingSoon": "Yakında Bitiyor",
+    "seeAll": "Tümünü Gör",
+    "bids": "teklif",
+    "endsIn": "Bitiyor"
+  },
+  "categories": {
+    "electronics": "Elektronik",
+    "fashion": "Moda",
+    "home": "Ev",
+    "sports": "Spor",
+    "art": "Sanat",
+    "vehicles": "Araçlar"
+  },
+  "detail": {
+    "backToAuctions": "Açık Artırmalara Dön",
+    "tryAgain": "Tekrar Dene",
+    "noImage": "Görsel Yok",
+    "seller": "Satıcı:",
+    "listed": "Listelendi:",
+    "ends": "Bitiş:",
+    "auctionEnded": "Bu açık artırma sona erdi",
+    "cannotBidOwn": "Kendi açık artırmanıza teklif veremezsiniz",
+    "highestBidder": "En yüksek teklifi siz verdiniz!",
+    "placingBid": "Teklif veriliyor...",
+    "enterAmount": "Şu miktardan fazla girin",
+    "posting": "Gönderiliyor...",
+    "postReply": "Yanıt Gönder",
+    "askPlaceholder": "Bu ürün hakkında soru sorun...",
+    "replyPlaceholder": "Yanıt yazın...",
+    "loadingQuestions": "Sorular yükleniyor..."
+  }
+}

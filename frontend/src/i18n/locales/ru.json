@@ -1,0 +1,111 @@
+{
+  "common": {
+    "home": "Главная",
+    "login": "Войти",
+    "signup": "Регистрация",
+    "logout": "Выйти",
+    "search": "Поиск",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "view": "Просмотр",
+    "back": "Назад",
+    "next": "Далее",
+    "submit": "Отправить"
+  },
+  "nav": {
+    "browse": "Обзор аукционов",
+    "myAuctions": "Мои аукционы",
+    "myBids": "Мои ставки",
+    "createAuction": "Создать аукцион",
+    "profile": "Профиль"
+  },
+  "auction": {
+    "title": "Аукцион",
+    "description": "Описание",
+    "startingPrice": "Начальная цена",
+    "currentPrice": "Текущая цена",
+    "timeLeft": "Осталось времени",
+    "endDate": "Дата окончания",
+    "placeBid": "Сделать ставку",
+    "bidAmount": "Сумма ставки",
+    "bidHistory": "История ставок",
+    "noBids": "Пока нет ставок",
+    "wonBy": "Победитель",
+    "ended": "Завершён",
+    "active": "Активный"
+  },
+  "bids": {
+    "yourBid": "Ваша ставка",
+    "currentBid": "Текущая ставка",
+    "winning": "Лидируете",
+    "outbid": "Перебит",
+    "won": "Выиграли",
+    "lost": "Проиграли",
+    "rebid": "Повторить ставку",
+    "activeBids": "Активные ставки"
+  },
+  "auth": {
+    "email": "Эл. почта",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "forgotPassword": "Забыли пароль?",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "signInWith": "Войти через"
+  },
+  "qna": {
+    "title": "Вопросы и ответы",
+    "askQuestion": "Задать вопрос",
+    "reply": "Ответить",
+    "noQuestions": "Пока нет вопросов. Будьте первым!",
+    "signInToAsk": "Пожалуйста sign in чтобы задать вопрос."
+  },
+  "settings": {
+    "language": "Язык",
+    "currency": "Валюта",
+    "preferences": "Настройки"
+  },
+  "browse": {
+    "heroTitle": "Найдите выгодные предложения",
+    "heroSubtitle": "Делайте ставки на уникальные товары со всего мира",
+    "topCategories": "Популярные категории",
+    "featuredAuctions": "Рекомендуемые аукционы",
+    "endingSoon": "Скоро завершаются",
+    "seeAll": "Смотреть все",
+    "bids": "ставок",
+    "endsIn": "Завершается через"
+  },
+  "categories": {
+    "electronics": "Электроника",
+    "fashion": "Мода",
+    "home": "Дом",
+    "sports": "Спорт",
+    "art": "Искусство",
+    "vehicles": "Транспорт"
+  },
+  "detail": {
+    "backToAuctions": "К списку аукционов",
+    "tryAgain": "Попробовать снова",
+    "noImage": "Изображение недоступно",
+    "seller": "Продавец:",
+    "listed": "Размещено:",
+    "ends": "Окончание:",
+    "auctionEnded": "Этот аукцион завершён",
+    "cannotBidOwn": "Нельзя делать ставки на свой аукцион",
+    "highestBidder": "Вы лидируете!",
+    "placingBid": "Размещение ставки...",
+    "enterAmount": "Введите сумму больше",
+    "posting": "Публикация...",
+    "postReply": "Опубликовать ответ",
+    "askPlaceholder": "Задайте вопрос о товаре...",
+    "replyPlaceholder": "Напишите ответ...",
+    "loadingQuestions": "Загрузка вопросов..."
+  }
+}

@@ -58,7 +58,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import Navbar from '../components/Navbar.vue'
+import { useI18nStore } from '../stores/i18n'
 
+const i18nStore = useI18nStore()
 const activeTab = ref('active')
 
 const bids = ref([
@@ -75,7 +77,7 @@ const filteredBids = computed(() => {
   return bids.value
 })
 
-const formatPrice = (price: number): string => '£' + price.toLocaleString()
+const formatPrice = (price: number): string => i18nStore.formatPrice(price)
 </script>
 
 <style scoped>

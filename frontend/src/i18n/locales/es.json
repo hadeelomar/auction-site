@@ -1,0 +1,111 @@
+{
+  "common": {
+    "home": "Inicio",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar sesión",
+    "search": "Buscar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "submit": "Enviar"
+  },
+  "nav": {
+    "browse": "Explorar subastas",
+    "myAuctions": "Mis subastas",
+    "myBids": "Mis ofertas",
+    "createAuction": "Crear subasta",
+    "profile": "Perfil"
+  },
+  "auction": {
+    "title": "Subasta",
+    "description": "Descripción",
+    "startingPrice": "Precio inicial",
+    "currentPrice": "Precio actual",
+    "timeLeft": "Tiempo restante",
+    "endDate": "Fecha de fin",
+    "placeBid": "Hacer oferta",
+    "bidAmount": "Monto de la oferta",
+    "bidHistory": "Historial de ofertas",
+    "noBids": "Aún no hay ofertas",
+    "wonBy": "Ganado por",
+    "ended": "Finalizado",
+    "active": "Activo"
+  },
+  "bids": {
+    "yourBid": "Tu oferta",
+    "currentBid": "Oferta actual",
+    "winning": "Ganando",
+    "outbid": "Superado",
+    "won": "Ganado",
+    "lost": "Perdido",
+    "rebid": "Volver a ofertar",
+    "activeBids": "Ofertas activas"
+  },
+  "auth": {
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "signInWith": "Iniciar sesión con"
+  },
+  "qna": {
+    "title": "Preguntas y respuestas",
+    "askQuestion": "Hacer una pregunta",
+    "reply": "Responder",
+    "noQuestions": "Aún no hay preguntas. ¡Sé el primero en preguntar!",
+    "signInToAsk": "Por favor inicia sesión para hacer una pregunta."
+  },
+  "settings": {
+    "language": "Idioma",
+    "currency": "Moneda",
+    "preferences": "Preferencias"
+  },
+  "browse": {
+    "heroTitle": "Encuentra ofertas increíbles",
+    "heroSubtitle": "Oferta por artículos únicos de vendedores de todo el mundo",
+    "topCategories": "Categorías principales",
+    "featuredAuctions": "Subastas destacadas",
+    "endingSoon": "Terminan pronto",
+    "seeAll": "Ver todo",
+    "bids": "ofertas",
+    "endsIn": "Termina en"
+  },
+  "categories": {
+    "electronics": "Electrónica",
+    "fashion": "Moda",
+    "home": "Hogar",
+    "sports": "Deportes",
+    "art": "Arte",
+    "vehicles": "Vehículos"
+  },
+  "detail": {
+    "backToAuctions": "Volver a subastas",
+    "tryAgain": "Intentar de nuevo",
+    "noImage": "Sin imagen disponible",
+    "seller": "Vendedor:",
+    "listed": "Publicado:",
+    "ends": "Termina:",
+    "auctionEnded": "Esta subasta ha terminado",
+    "cannotBidOwn": "No puedes ofertar en tu propia subasta",
+    "highestBidder": "¡Eres el mejor postor!",
+    "placingBid": "Realizando oferta...",
+    "enterAmount": "Ingresa un monto mayor a",
+    "posting": "Publicando...",
+    "postReply": "Publicar respuesta",
+    "askPlaceholder": "Haz una pregunta sobre este artículo...",
+    "replyPlaceholder": "Escribe una respuesta...",
+    "loadingQuestions": "Cargando preguntas..."
+  }
+}

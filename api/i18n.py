@@ -164,8 +164,8 @@ def set_language(request: HttpRequest) -> JsonResponse:
     # Activate the language
     translation.activate(language)
 
-    # Set language in session
-    request.session[translation.LANGUAGE_SESSION_KEY] = language
+    # Set language in session using Django's standard key
+    request.session['_language'] = language
 
     response = JsonResponse({
         'message': 'Language updated',
@@ -173,11 +173,11 @@ def set_language(request: HttpRequest) -> JsonResponse:
         'isRTL': language in RTL_LANGUAGES
     })
 
-    # Also set cookie
+    # Also set cookie for persistence
     response.set_cookie(
-        settings.LANGUAGE_COOKIE_NAME,
+        'django_language',
         language,
-        max_age=settings.LANGUAGE_COOKIE_AGE
+        max_age=31536000  # 1 year
     )
 
     return response

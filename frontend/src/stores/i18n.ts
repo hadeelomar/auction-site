@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import i18n from '../i18n'
 
 export interface Language {
   code: string
@@ -87,6 +88,11 @@ export const useI18nStore = defineStore('i18n', () => {
         const data = await response.json()
         currentLanguage.value = data.language
         isRTL.value = data.isRTL
+        
+        // Update vue-i18n locale
+        if (i18n.global.locale) {
+          (i18n.global.locale as any).value = langCode
+        }
         
         // Update document direction
         document.documentElement.dir = isRTL.value ? 'rtl' : 'ltr'

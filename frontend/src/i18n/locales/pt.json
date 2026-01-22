@@ -1,0 +1,111 @@
+{
+  "common": {
+    "home": "Início",
+    "login": "Entrar",
+    "signup": "Cadastrar",
+    "logout": "Sair",
+    "search": "Pesquisar",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "view": "Ver",
+    "back": "Voltar",
+    "next": "Próximo",
+    "submit": "Enviar"
+  },
+  "nav": {
+    "browse": "Explorar Leilões",
+    "myAuctions": "Meus Leilões",
+    "myBids": "Meus Lances",
+    "createAuction": "Criar Leilão",
+    "profile": "Perfil"
+  },
+  "auction": {
+    "title": "Leilão",
+    "description": "Descrição",
+    "startingPrice": "Preço Inicial",
+    "currentPrice": "Preço Atual",
+    "timeLeft": "Tempo Restante",
+    "endDate": "Data de Término",
+    "placeBid": "Fazer Lance",
+    "bidAmount": "Valor do Lance",
+    "bidHistory": "Histórico de Lances",
+    "noBids": "Ainda não há lances",
+    "wonBy": "Arrematado por",
+    "ended": "Encerrado",
+    "active": "Ativo"
+  },
+  "bids": {
+    "yourBid": "Seu Lance",
+    "currentBid": "Lance Atual",
+    "winning": "Vencendo",
+    "outbid": "Superado",
+    "won": "Ganhou",
+    "lost": "Perdeu",
+    "rebid": "Fazer Novo Lance",
+    "activeBids": "Lances Ativos"
+  },
+  "auth": {
+    "email": "E-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "forgotPassword": "Esqueceu a senha?",
+    "noAccount": "Não tem uma conta?",
+    "hasAccount": "Já tem uma conta?",
+    "signInWith": "Entrar com"
+  },
+  "qna": {
+    "title": "Perguntas e Respostas",
+    "askQuestion": "Fazer Pergunta",
+    "reply": "Responder",
+    "noQuestions": "Ainda não há perguntas. Seja o primeiro a perguntar!",
+    "signInToAsk": "Por favor sign in para fazer uma pergunta."
+  },
+  "settings": {
+    "language": "Idioma",
+    "currency": "Moeda",
+    "preferences": "Preferências"
+  },
+  "browse": {
+    "heroTitle": "Encontre Ofertas Incríveis",
+    "heroSubtitle": "Faça lances em itens únicos de vendedores ao redor do mundo",
+    "topCategories": "Categorias Populares",
+    "featuredAuctions": "Leilões em Destaque",
+    "endingSoon": "Terminando em Breve",
+    "seeAll": "Ver Tudo",
+    "bids": "lances",
+    "endsIn": "Termina em"
+  },
+  "categories": {
+    "electronics": "Eletrônicos",
+    "fashion": "Moda",
+    "home": "Casa",
+    "sports": "Esportes",
+    "art": "Arte",
+    "vehicles": "Veículos"
+  },
+  "detail": {
+    "backToAuctions": "Voltar aos Leilões",
+    "tryAgain": "Tentar Novamente",
+    "noImage": "Sem Imagem Disponível",
+    "seller": "Vendedor:",
+    "listed": "Publicado:",
+    "ends": "Termina:",
+    "auctionEnded": "Este leilão foi encerrado",
+    "cannotBidOwn": "Você não pode dar lances no seu próprio leilão",
+    "highestBidder": "Você é o maior lance!",
+    "placingBid": "Fazendo lance...",
+    "enterAmount": "Digite um valor maior que",
+    "posting": "Publicando...",
+    "postReply": "Publicar Resposta",
+    "askPlaceholder": "Faça uma pergunta sobre este item...",
+    "replyPlaceholder": "Escreva uma resposta...",
+    "loadingQuestions": "Carregando perguntas..."
+  }
+}

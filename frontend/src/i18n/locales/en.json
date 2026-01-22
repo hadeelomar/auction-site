@@ -71,5 +71,41 @@
     "language": "Language",
     "currency": "Currency",
     "preferences": "Preferences"
+  },
+  "browse": {
+    "heroTitle": "Find Amazing Deals",
+    "heroSubtitle": "Bid on unique items from sellers around the world",
+    "topCategories": "Top Categories",
+    "featuredAuctions": "Featured Auctions",
+    "endingSoon": "Ending Soon",
+    "seeAll": "See All",
+    "bids": "bids",
+    "endsIn": "Ends in"
+  },
+  "categories": {
+    "electronics": "Electronics",
+    "fashion": "Fashion",
+    "home": "Home",
+    "sports": "Sports",
+    "art": "Art",
+    "vehicles": "Vehicles"
+  },
+  "detail": {
+    "backToAuctions": "Back to Auctions",
+    "tryAgain": "Try Again",
+    "noImage": "No Image Available",
+    "seller": "Seller:",
+    "listed": "Listed:",
+    "ends": "Ends:",
+    "auctionEnded": "This auction has ended",
+    "cannotBidOwn": "You cannot bid on your own auction",
+    "highestBidder": "You are the highest bidder!",
+    "placingBid": "Placing Bid...",
+    "enterAmount": "Enter an amount greater than",
+    "posting": "Posting...",
+    "postReply": "Post Reply",
+    "askPlaceholder": "Ask a question about this item...",
+    "replyPlaceholder": "Write a reply...",
+    "loadingQuestions": "Loading questions..."
   }
 }

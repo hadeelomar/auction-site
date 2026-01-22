@@ -71,5 +71,41 @@
     "language": "اللغة",
     "currency": "العملة",
     "preferences": "التفضيلات"
+  },
+  "browse": {
+    "heroTitle": "اعثر على صفقات مذهلة",
+    "heroSubtitle": "قدم عروضك على منتجات فريدة من بائعين حول العالم",
+    "topCategories": "أهم الفئات",
+    "featuredAuctions": "المزادات المميزة",
+    "endingSoon": "تنتهي قريباً",
+    "seeAll": "عرض الكل",
+    "bids": "عروض",
+    "endsIn": "ينتهي في"
+  },
+  "categories": {
+    "electronics": "إلكترونيات",
+    "fashion": "أزياء",
+    "home": "المنزل",
+    "sports": "رياضة",
+    "art": "فن",
+    "vehicles": "مركبات"
+  },
+  "detail": {
+    "backToAuctions": "العودة للمزادات",
+    "tryAgain": "حاول مرة أخرى",
+    "noImage": "لا توجد صورة",
+    "seller": "البائع:",
+    "listed": "تاريخ النشر:",
+    "ends": "ينتهي:",
+    "auctionEnded": "انتهى هذا المزاد",
+    "cannotBidOwn": "لا يمكنك المزايدة على مزادك الخاص",
+    "highestBidder": "أنت صاحب أعلى عرض!",
+    "placingBid": "جاري تقديم العرض...",
+    "enterAmount": "أدخل مبلغاً أكبر من",
+    "posting": "جاري النشر...",
+    "postReply": "نشر الرد",
+    "askPlaceholder": "اطرح سؤالاً حول هذا المنتج...",
+    "replyPlaceholder": "اكتب رداً...",
+    "loadingQuestions": "جاري تحميل الأسئلة..."
   }
 }

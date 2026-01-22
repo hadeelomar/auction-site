@@ -7,15 +7,15 @@
       <!-- Hero Section -->
       <section class="hero-section">
         <div class="hero-content">
-          <h1 class="hero-title">Find Amazing Deals</h1>
-          <p class="hero-subtitle">Bid on unique items from sellers around the world</p>
+          <h1 class="hero-title">{{ t('browse.heroTitle') }}</h1>
+          <p class="hero-subtitle">{{ t('browse.heroSubtitle') }}</p>
         </div>
       </section>
 
       <section class="categories-section">
         <div class="section-header">
-          <h2 class="section-title">Top Categories</h2>
-          <button class="see-all-btn">See All</button>
+          <h2 class="section-title">{{ t('browse.topCategories') }}</h2>
+          <button class="see-all-btn">{{ t('browse.seeAll') }}</button>
         </div>
         <div class="categories-grid">
           <div 
@@ -62,7 +62,7 @@
                 <circle cx="17" cy="17" r="2"/>
               </svg>
             </div>
-            <span class="category-name">{{ category.name }}</span>
+            <span class="category-name">{{ t('categories.' + category.key) }}</span>
           </div>
         </div>
       </section>
@@ -70,8 +70,8 @@
       <!-- Featured Auctions -->
       <section class="auctions-section">
         <div class="section-header">
-          <h2 class="section-title">Featured Auctions</h2>
-          <button class="see-all-btn">See All</button>
+          <h2 class="section-title">{{ t('browse.featuredAuctions') }}</h2>
+          <button class="see-all-btn">{{ t('browse.seeAll') }}</button>
         </div>
         
         <!-- Loading state -->
@@ -116,7 +116,7 @@
                 <span v-if="auction.starting_price > auction.current_price" class="original-price">{{ formatPrice(auction.starting_price) }}</span>
               </div>
               <div class="auction-meta">
-                <span class="bids-count">{{ auction.bid_count }} bids</span>
+                <span class="bids-count">{{ auction.bid_count }} {{ t('browse.bids') }}</span>
                 <span class="time-left">{{ auction.time_left }}</span>
               </div>
             </div>
@@ -127,8 +127,8 @@
       <!-- Ending Soon -->
       <section class="auctions-section">
         <div class="section-header">
-          <h2 class="section-title">Ending Soon</h2>
-          <button class="see-all-btn">See All</button>
+          <h2 class="section-title">{{ t('browse.endingSoon') }}</h2>
+          <button class="see-all-btn">{{ t('browse.seeAll') }}</button>
         </div>
         <div class="auctions-grid">
           <router-link 
@@ -139,7 +139,7 @@
           >
             <div class="auction-image">
               <img :src="auction.image || '/placeholder.svg?height=200&width=200'" :alt="auction.title" />
-              <span class="ending-badge">Ends in {{ auction.time_left }}</span>
+              <span class="ending-badge">{{ t('browse.endsIn') }} {{ auction.time_left }}</span>
             </div>
             <div class="auction-details">
               <h3 class="auction-title">{{ auction.title }}</h3>
@@ -147,7 +147,7 @@
                 <span class="current-price">{{ formatPrice(auction.current_price) }}</span>
               </div>
               <div class="auction-meta">
-                <span class="bids-count">{{ auction.bid_count }} bids</span>
+                <span class="bids-count">{{ auction.bid_count }} {{ t('browse.bids') }}</span>
               </div>
             </div>
           </router-link>
@@ -168,7 +168,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Navbar from '../components/Navbar.vue'
+import { useI18nStore } from '../stores/i18n'
+
+const { t } = useI18n()
+const i18nStore = useI18nStore()
 
 interface Auction {
   id: number
@@ -192,12 +197,12 @@ interface Auction {
 const route = useRoute()
 
 const categories = ref([
-  { name: 'Electronics' },
-  { name: 'Fashion' },
-  { name: 'Home' },
-  { name: 'Sports' },
-  { name: 'Art' },
-  { name: 'Vehicles' }
+  { name: 'Electronics', key: 'electronics' },
+  { name: 'Fashion', key: 'fashion' },
+  { name: 'Home', key: 'home' },
+  { name: 'Sports', key: 'sports' },
+  { name: 'Art', key: 'art' },
+  { name: 'Vehicles', key: 'vehicles' }
 ])
 
 const auctions = ref<Auction[]>([])
@@ -231,7 +236,7 @@ const filteredAuctions = computed(() => {
 })
 
 const formatPrice = (price: number): string => {
-  return '£' + price.toLocaleString()
+  return i18nStore.formatPrice(price)
 }
 
 const fetchAuctions = async () => {

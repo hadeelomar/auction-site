@@ -1,0 +1,111 @@
+{
+  "common": {
+    "home": "Accueil",
+    "login": "Connexion",
+    "signup": "Inscription",
+    "logout": "Déconnexion",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Soumettre"
+  },
+  "nav": {
+    "browse": "Parcourir les enchères",
+    "myAuctions": "Mes enchères",
+    "myBids": "Mes offres",
+    "createAuction": "Créer une enchère",
+    "profile": "Profil"
+  },
+  "auction": {
+    "title": "Enchère",
+    "description": "Description",
+    "startingPrice": "Prix de départ",
+    "currentPrice": "Prix actuel",
+    "timeLeft": "Temps restant",
+    "endDate": "Date de fin",
+    "placeBid": "Placer une offre",
+    "bidAmount": "Montant de l'offre",
+    "bidHistory": "Historique des offres",
+    "noBids": "Aucune offre pour le moment",
+    "wonBy": "Remporté par",
+    "ended": "Terminé",
+    "active": "Actif"
+  },
+  "bids": {
+    "yourBid": "Votre offre",
+    "currentBid": "Offre actuelle",
+    "winning": "En tête",
+    "outbid": "Surenchéri",
+    "won": "Gagné",
+    "lost": "Perdu",
+    "rebid": "Réenchérir",
+    "activeBids": "Offres actives"
+  },
+  "auth": {
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "hasAccount": "Vous avez déjà un compte ?",
+    "signInWith": "Se connecter avec"
+  },
+  "qna": {
+    "title": "Questions et réponses",
+    "askQuestion": "Poser une question",
+    "reply": "Répondre",
+    "noQuestions": "Aucune question pour le moment. Soyez le premier à poser une question !",
+    "signInToAsk": "Veuillez vous connecter pour poser une question."
+  },
+  "settings": {
+    "language": "Langue",
+    "currency": "Devise",
+    "preferences": "Préférences"
+  },
+  "browse": {
+    "heroTitle": "Trouvez des offres incroyables",
+    "heroSubtitle": "Enchérissez sur des articles uniques de vendeurs du monde entier",
+    "topCategories": "Catégories populaires",
+    "featuredAuctions": "Enchères en vedette",
+    "endingSoon": "Se termine bientôt",
+    "seeAll": "Voir tout",
+    "bids": "offres",
+    "endsIn": "Se termine dans"
+  },
+  "categories": {
+    "electronics": "Électronique",
+    "fashion": "Mode",
+    "home": "Maison",
+    "sports": "Sports",
+    "art": "Art",
+    "vehicles": "Véhicules"
+  },
+  "detail": {
+    "backToAuctions": "Retour aux enchères",
+    "tryAgain": "Réessayer",
+    "noImage": "Aucune image disponible",
+    "seller": "Vendeur :",
+    "listed": "Publié :",
+    "ends": "Se termine :",
+    "auctionEnded": "Cette enchère est terminée",
+    "cannotBidOwn": "Vous ne pouvez pas enchérir sur votre propre enchère",
+    "highestBidder": "Vous êtes le plus offrant !",
+    "placingBid": "Enchère en cours...",
+    "enterAmount": "Entrez un montant supérieur à",
+    "posting": "Publication...",
+    "postReply": "Publier la réponse",
+    "askPlaceholder": "Posez une question sur cet article...",
+    "replyPlaceholder": "Écrivez une réponse...",
+    "loadingQuestions": "Chargement des questions..."
+  }
+}
