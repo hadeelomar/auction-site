@@ -18,30 +18,57 @@
           </router-link>
         </div>
 
+        <!-- Loading state -->
+        <div v-if="loading" class="loading-state">
+          <p>Loading your auctions...</p>
+        </div>
+        
+        <!-- Error state -->
+        <div v-else-if="error" class="error-state">
+          <p>{{ error }}</p>
+          <button @click="fetchMyAuctions" class="retry-button">Retry</button>
+        </div>
+        
         <!-- auctions list -->
-        <div class="auctions-list">
+        <div v-else class="auctions-list">
           <div v-for="auction in auctions" :key="auction.id" class="auction-card">
             <div class="auction-image">
-              <img :src="auction.image" :alt="auction.title" />
+              <img :src="auction.image || '/placeholder.svg?height=80&width=80'" :alt="auction.title" />
             </div>
             <div class="auction-details">
               <h3 class="auction-title">{{ auction.title }}</h3>
               <div class="auction-stats">
                 <span class="stat">
-                  <strong>{{ formatPrice(auction.currentBid) }}</strong> current bid
+                  <strong>{{ formatPrice(auction.current_price) }}</strong> current bid
                 </span>
                 <span class="stat">
-                  <strong>{{ auction.bidsCount }}</strong> bids
+                  <strong>{{ auction.bid_count }}</strong> bids
                 </span>
               </div>
               <div class="auction-meta">
-                <span :class="['auction-status', auction.status]">{{ auction.statusText }}</span>
-                <span class="auction-time">{{ auction.timeLeft }}</span>
+                <span :class="['auction-status', auction.ends_at > new Date().toISOString() ? 'active' : 'ended']">
+                  {{ auction.ends_at > new Date().toISOString() ? 'Active' : 'Ended' }}
+                </span>
+                <span class="auction-time">{{ auction.time_left }}</span>
               </div>
             </div>
             <div class="auction-actions">
-              <button class="edit-button">Edit</button>
-              <button class="delete-button">Delete</button>
+              <button 
+                @click="handleEdit(auction)" 
+                class="edit-button"
+                :disabled="auction.bid_count > 0"
+                :title="auction.bid_count > 0 ? 'Cannot edit auction with bids' : 'Edit auction'"
+              >
+                Edit
+              </button>
+              <button 
+                @click="handleDelete(auction)" 
+                class="delete-button"
+                :disabled="deletingAuction === auction.id || auction.bid_count > 0"
+                :title="auction.bid_count > 0 ? 'Cannot delete auction with bids' : 'Delete auction'"
+              >
+                {{ deletingAuction === auction.id ? 'Deleting...' : 'Delete' }}
+              </button>
             </div>
           </div>
 
@@ -61,16 +88,111 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Navbar from '../components/Navbar.vue'
 
-const auctions = ref([
-  { id: 1, title: 'Vintage Camera Collection', image: '/placeholder.svg?height=80&width=80', currentBid: 32000, bidsCount: 18, status: 'active', statusText: 'Active', timeLeft: '1d 12h left' },
-  { id: 2, title: 'Antique Wooden Table', image: '/placeholder.svg?height=80&width=80', currentBid: 75000, bidsCount: 8, status: 'active', statusText: 'Active', timeLeft: '4d 18h left' },
-  { id: 3, title: 'Rare Vinyl Records', image: '/placeholder.svg?height=80&width=80', currentBid: 15000, bidsCount: 25, status: 'ended', statusText: 'Ended', timeLeft: 'Sold' }
-])
+interface Auction {
+  id: number
+  title: string
+  description: string
+  image: string | null
+  starting_price: number
+  current_price: number
+  bid_count: number
+  time_left: string
+  ends_at: string
+  category: string
+  owner: {
+    id: number
+    username: string
+    first_name: string
+    last_name: string
+  }
+}
+
+const auctions = ref<Auction[]>([])
+const loading = ref(true)
+const error = ref('')
+const deletingAuction = ref<number | null>(null)
+
+const router = useRouter()
 
 const formatPrice = (price: number): string => '£' + price.toLocaleString()
+
+const fetchMyAuctions = async () => {
+  try {
+    loading.value = true
+    error.value = ''
+    
+    // Get current user info first
+    const userResponse = await fetch('/api/auth/user/')
+    if (!userResponse.ok) {
+      throw new Error('Failed to get user info')
+    }
+    
+    const userData = await userResponse.json()
+    if (!userData.is_authenticated) {
+      // User not logged in, keep empty state
+      auctions.value = []
+      return
+    }
+    
+    // Fetch auctions for this user
+    const response = await fetch(`/api/auctions/search/?owner=${userData.username}`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch auctions')
+    }
+    
+    const data = await response.json()
+    auctions.value = data.auctions
+    
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to load auctions'
+    console.error('Error fetching my auctions:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleEdit = (auction: Auction) => {
+  // Navigate to edit page with auction ID
+  router.push(`/edit/${auction.id}`)
+}
+
+const handleDelete = async (auction: Auction) => {
+  if (!confirm(`Are you sure you want to delete "${auction.title}"? This action cannot be undone.`)) {
+    return
+  }
+  
+  try {
+    deletingAuction.value = auction.id
+    
+    const response = await fetch(`/api/auctions/${auction.id}/`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to delete auction')
+    }
+    
+    // Remove auction from list
+    auctions.value = auctions.value.filter(a => a.id !== auction.id)
+    
+  } catch (err) {
+    alert(err instanceof Error ? err.message : 'Failed to delete auction')
+  } finally {
+    deletingAuction.value = null
+  }
+}
+
+onMounted(() => {
+  fetchMyAuctions()
+})
 </script>
 
 <style scoped>
@@ -232,6 +354,11 @@ const formatPrice = (price: number): string => '£' + price.toLocaleString()
   transition: all 0.2s;
 }
 
+.edit-button:disabled, .delete-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .edit-button {
   color: #374151;
   background: #ffffff;
@@ -278,6 +405,34 @@ const formatPrice = (price: number): string => '£' + price.toLocaleString()
   background: linear-gradient(135deg, #ea580c, #f97316);
   border-radius: 10px;
   text-decoration: none;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6b7280;
+  font-size: 1.125rem;
+}
+
+.error-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #dc2626;
+}
+
+.retry-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #ea580c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.retry-button:hover {
+  background: #c2410c;
 }
 
 @media (max-width: 640px) {

@@ -32,6 +32,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/edit/:id",
+      name: "edit-auction",
+      component: () => import("../pages/CreateAuctionPage.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/bids",
       name: "my-bids",
       component: () => import("../pages/MyBidsPage.vue"),

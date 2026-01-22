@@ -3,6 +3,7 @@
     <Navbar />
     
     <main class="main-content">
+      <div class="page-container">
       <!-- Hero Section -->
       <section class="hero-section">
         <div class="hero-content">
@@ -11,14 +12,19 @@
         </div>
       </section>
 
-      <!-- Updated categories with full-width spacing, light grey circles, and darker grey SVG icons -->
       <section class="categories-section">
         <div class="section-header">
           <h2 class="section-title">Top Categories</h2>
           <button class="see-all-btn">See All</button>
         </div>
         <div class="categories-grid">
-          <div v-for="category in categories" :key="category.name" class="category-card">
+          <div 
+            v-for="category in categories" 
+            :key="category.name" 
+            class="category-card"
+            :class="{ active: selectedCategory === category.name }"
+            @click="handleCategoryClick(category.name)"
+          >
             <div class="category-icon">
               <!-- Electronics -->
               <svg v-if="category.name === 'Electronics'" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -67,7 +73,25 @@
           <h2 class="section-title">Featured Auctions</h2>
           <button class="see-all-btn">See All</button>
         </div>
-        <div class="auctions-grid">
+        
+        <!-- Loading state -->
+        <div v-if="loading" class="loading-state">
+          <p>Loading auctions...</p>
+        </div>
+        
+        <!-- Error state -->
+        <div v-else-if="error" class="error-state">
+          <p>{{ error }}</p>
+          <button @click="fetchAuctions" class="retry-button">Retry</button>
+        </div>
+        
+        <!-- Empty state -->
+        <div v-else-if="filteredAuctions.length === 0" class="empty-state">
+          <p>{{ searchQuery || selectedCategory ? 'No auctions found matching your criteria.' : 'No active auctions available.' }}</p>
+        </div>
+        
+        <!-- Auctions grid -->
+        <div v-else class="auctions-grid">
           <router-link 
             v-for="auction in filteredAuctions" 
             :key="auction.id" 
@@ -75,8 +99,10 @@
             class="auction-card"
           >
             <div class="auction-image">
-              <img :src="auction.image" :alt="auction.title" />
-              <span v-if="auction.discount" class="discount-badge">{{ auction.discount }}% OFF</span>
+              <img :src="auction.image || '/placeholder.svg?height=200&width=200'" :alt="auction.title" />
+              <span v-if="auction.starting_price > auction.current_price" class="discount-badge">
+                {{ Math.round((1 - auction.current_price / auction.starting_price) * 100) }}% OFF
+              </span>
               <button class="favorite-btn" @click.prevent>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -86,12 +112,12 @@
             <div class="auction-details">
               <h3 class="auction-title">{{ auction.title }}</h3>
               <div class="auction-price">
-                <span class="current-price">{{ formatPrice(auction.currentPrice) }}</span>
-                <span v-if="auction.originalPrice" class="original-price">{{ formatPrice(auction.originalPrice) }}</span>
+                <span class="current-price">{{ formatPrice(auction.current_price) }}</span>
+                <span v-if="auction.starting_price > auction.current_price" class="original-price">{{ formatPrice(auction.starting_price) }}</span>
               </div>
               <div class="auction-meta">
-                <span class="bids-count">{{ auction.bids }} bids</span>
-                <span class="time-left">{{ auction.timeLeft }}</span>
+                <span class="bids-count">{{ auction.bid_count }} bids</span>
+                <span class="time-left">{{ auction.time_left }}</span>
               </div>
             </div>
           </router-link>
@@ -112,21 +138,22 @@
             class="auction-card"
           >
             <div class="auction-image">
-              <img :src="auction.image" :alt="auction.title" />
-              <span class="ending-badge">Ends in {{ auction.timeLeft }}</span>
+              <img :src="auction.image || '/placeholder.svg?height=200&width=200'" :alt="auction.title" />
+              <span class="ending-badge">Ends in {{ auction.time_left }}</span>
             </div>
             <div class="auction-details">
               <h3 class="auction-title">{{ auction.title }}</h3>
               <div class="auction-price">
-                <span class="current-price">{{ formatPrice(auction.currentPrice) }}</span>
+                <span class="current-price">{{ formatPrice(auction.current_price) }}</span>
               </div>
               <div class="auction-meta">
-                <span class="bids-count">{{ auction.bids }} bids</span>
+                <span class="bids-count">{{ auction.bid_count }} bids</span>
               </div>
             </div>
           </router-link>
         </div>
       </section>
+      </div>
     </main>
 
     <!-- Footer -->
@@ -139,9 +166,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from '../components/Navbar.vue'
+
+interface Auction {
+  id: number
+  title: string
+  description: string
+  image: string | null
+  starting_price: number
+  current_price: number
+  bid_count: number
+  time_left: string
+  ends_at: string
+  category: string
+  owner: {
+    id: number
+    username: string
+    first_name: string
+    last_name: string
+  }
+}
 
 const route = useRoute()
 
@@ -154,133 +200,95 @@ const categories = ref([
   { name: 'Vehicles' }
 ])
 
-const auctions = ref([
-  {
-    id: 1,
-    title: 'Apple Watch Series 6',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 45000,
-    originalPrice: 55000,
-    discount: 18,
-    bids: 24,
-    timeLeft: '2d 5h'
-  },
-  {
-    id: 2,
-    title: 'Vintage Camera Collection',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 32000,
-    bids: 18,
-    timeLeft: '1d 12h'
-  },
-  {
-    id: 3,
-    title: 'Nike Air Force 1',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 12500,
-    originalPrice: 15000,
-    discount: 17,
-    bids: 45,
-    timeLeft: '3d 8h'
-  },
-  {
-    id: 4,
-    title: 'MacBook Pro M3',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 180000,
-    bids: 12,
-    timeLeft: '5d 2h'
-  },
-  {
-    id: 5,
-    title: 'Antique Wooden Table',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 75000,
-    bids: 8,
-    timeLeft: '4d 18h'
-  },
-  {
-    id: 6,
-    title: 'Sony Headphones WH-1000XM5',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 28000,
-    originalPrice: 35000,
-    discount: 20,
-    bids: 31,
-    timeLeft: '2d 1h'
-  },
-  {
-    id: 7,
-    title: 'Designer Handbag',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 95000,
-    bids: 15,
-    timeLeft: '6d 4h'
-  },
-  {
-    id: 8,
-    title: 'Gaming Console Bundle',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 55000,
-    bids: 52,
-    timeLeft: '1d 6h'
-  }
-])
-
-const endingSoon = ref([
-  {
-    id: 9,
-    title: 'Rare Pokemon Cards',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 125000,
-    bids: 89,
-    timeLeft: '2h 30m'
-  },
-  {
-    id: 10,
-    title: 'Signed Football Jersey',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 42000,
-    bids: 34,
-    timeLeft: '4h 15m'
-  },
-  {
-    id: 11,
-    title: 'Vintage Rolex Watch',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 450000,
-    bids: 23,
-    timeLeft: '1h 45m'
-  },
-  {
-    id: 12,
-    title: 'Limited Edition Sneakers',
-    image: '/placeholder.svg?height=200&width=200',
-    currentPrice: 38000,
-    bids: 67,
-    timeLeft: '3h 20m'
-  }
-])
+const auctions = ref<Auction[]>([])
+const endingSoon = ref<Auction[]>([])
+const loading = ref(true)
+const error = ref('')
+const selectedCategory = ref('')
 
 const searchQuery = computed(() => route.query.search as string || '')
 
 const filteredAuctions = computed(() => {
-  if (!searchQuery.value) return auctions.value
-  const query = searchQuery.value.toLowerCase()
-  return auctions.value.filter(auction => 
-    auction.title.toLowerCase().includes(query)
-  )
+  let filtered = auctions.value
+  
+  // Filter by search query
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(auction => 
+      auction.title.toLowerCase().includes(query) ||
+      auction.description.toLowerCase().includes(query)
+    )
+  }
+  
+  // Filter by category
+  if (selectedCategory.value) {
+    filtered = filtered.filter(auction => 
+      auction.category?.toLowerCase() === selectedCategory.value.toLowerCase()
+    )
+  }
+  
+  return filtered
 })
 
 const formatPrice = (price: number): string => {
   return '£' + price.toLocaleString()
 }
+
+const fetchAuctions = async () => {
+  try {
+    loading.value = true
+    error.value = ''
+    
+    // Fetch all active auctions from search endpoint
+    const response = await fetch('/api/auctions/search/?status=active')
+    if (!response.ok) {
+      throw new Error('Failed to fetch auctions')
+    }
+    
+    const data = await response.json()
+    auctions.value = data.auctions
+    
+    // Get ending soon auctions (next 24 hours)
+    const endingSoonResponse = await fetch('/api/auctions/search/?status=ending_soon')
+    if (endingSoonResponse.ok) {
+      const endingSoonData = await endingSoonResponse.json()
+      endingSoon.value = endingSoonData.auctions
+    }
+    
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to load auctions'
+    console.error('Error fetching auctions:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleCategoryClick = (category: string) => {
+  if (selectedCategory.value === category) {
+    selectedCategory.value = ''
+  } else {
+    selectedCategory.value = category
+  }
+}
+
+onMounted(() => {
+  fetchAuctions()
+})
 </script>
 
 <style scoped>
 .browse-page {
   min-height: 100vh;
   background: #f9fafb;
+}
+
+.page-container {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .main-content {
@@ -307,6 +315,7 @@ const formatPrice = (price: number): string => {
 .hero-subtitle {
   font-size: 1.125rem;
   color: #6b7280;
+  margin-bottom: 0;
 }
 
 .categories-section,
@@ -341,7 +350,6 @@ const formatPrice = (price: number): string => {
   color: #c2410c;
 }
 
-/* Updated categories grid to be centered with bigger circles */
 .categories-grid {
   display: flex;
   justify-content: space-between;
@@ -363,7 +371,6 @@ const formatPrice = (price: number): string => {
   color: #374151;
 }
 
-/* Category icons as larger circles with light grey background */
 .category-icon {
   display: flex;
   align-items: center;
@@ -513,6 +520,47 @@ const formatPrice = (price: number): string => {
   text-align: center;
   color: #9ca3af;
   font-size: 0.875rem;
+}
+
+/* Error state styles */
+.error-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #dc2626;
+}
+
+.retry-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #ea580c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.retry-button:hover {
+  background: #c2410c;
+}
+
+/* Empty state styles */
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6b7280;
+  font-size: 1.125rem;
+}
+
+/* Active category style */
+.category-card.active .category-icon {
+  background: #ea580c;
+  color: white;
+}
+
+.category-card.active .category-name {
+  color: #ea580c;
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {
