@@ -226,6 +226,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_ADAPTER = 'api.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'api.adapters.CustomSocialAccountAdapter'
+SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip intermediate "Sign in via Google" page
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
