@@ -1,0 +1,75 @@
+{
+  "common": {
+    "home": "الرئيسية",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "search": "بحث",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجاح",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "back": "رجوع",
+    "next": "التالي",
+    "submit": "إرسال"
+  },
+  "nav": {
+    "browse": "تصفح المزادات",
+    "myAuctions": "مزاداتي",
+    "myBids": "عروضي",
+    "createAuction": "إنشاء مزاد",
+    "profile": "الملف الشخصي"
+  },
+  "auction": {
+    "title": "المزاد",
+    "description": "الوصف",
+    "startingPrice": "سعر البداية",
+    "currentPrice": "السعر الحالي",
+    "timeLeft": "الوقت المتبقي",
+    "endDate": "تاريخ الانتهاء",
+    "placeBid": "تقديم عرض",
+    "bidAmount": "مبلغ العرض",
+    "bidHistory": "سجل العروض",
+    "noBids": "لا توجد عروض بعد",
+    "wonBy": "فاز به",
+    "ended": "انتهى",
+    "active": "نشط"
+  },
+  "bids": {
+    "yourBid": "عرضك",
+    "currentBid": "العرض الحالي",
+    "winning": "رابح",
+    "outbid": "تم تجاوزك",
+    "won": "فزت",
+    "lost": "خسرت",
+    "rebid": "إعادة العرض",
+    "activeBids": "العروض النشطة"
+  },
+  "auth": {
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "signInWith": "تسجيل الدخول باستخدام"
+  },
+  "qna": {
+    "title": "الأسئلة والأجوبة",
+    "askQuestion": "اطرح سؤالاً",
+    "reply": "رد",
+    "noQuestions": "لا توجد أسئلة بعد. كن أول من يسأل!",
+    "signInToAsk": "يرجى تسجيل الدخول لطرح سؤال."
+  },
+  "settings": {
+    "language": "اللغة",
+    "currency": "العملة",
+    "preferences": "التفضيلات"
+  }
+}

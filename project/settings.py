@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -120,13 +121,43 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/stable/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
+
+# Supported languages (10+ including RTL languages)
+LANGUAGES = [
+    ('en', 'English'),
+    ('ar', 'العربية'),  # Arabic (RTL)
+    ('he', 'עברית'),  # Hebrew (RTL)
+    ('zh-hans', '简体中文'),  # Chinese Simplified
+    ('zh-hant', '繁體中文'),  # Chinese Traditional
+    ('es', 'Español'),  # Spanish
+    ('fr', 'Français'),  # French
+    ('de', 'Deutsch'),  # German
+    ('ja', '日本語'),  # Japanese
+    ('ko', '한국어'),  # Korean
+    ('pt', 'Português'),  # Portuguese
+    ('ru', 'Русский'),  # Russian
+    ('hi', 'हिन्दी'),  # Hindi
+    ('tr', 'Türkçe'),  # Turkish
+]
+
+# RTL languages
+RTL_LANGUAGES = ['ar', 'he']
+
+# Locale paths for translation files
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+# Language cookie settings
+LANGUAGE_COOKIE_NAME = 'django_language'
+LANGUAGE_COOKIE_AGE = 31536000  # 1 year
 
 
 # Static files (CSS, JavaScript, Images)

@@ -16,6 +16,7 @@ Including another URLconf
 
 from django.urls import path
 from api import views
+from api import i18n
 
 app_name = 'api'
 
@@ -34,4 +35,11 @@ urlpatterns = [
     path("bids/", views.place_bid, name="place-bid"),
     path("questions/", views.questions, name="questions"),
     path("questions/<int:question_id>/reply/", views.question_reply, name="question-reply"),
+    # i18n endpoints
+    path("i18n/languages/", i18n.get_supported_languages, name="languages"),
+    path("i18n/currencies/", i18n.get_supported_currencies, name="currencies"),
+    path("i18n/convert/", i18n.convert_currency, name="convert-currency"),
+    path("i18n/language/", i18n.set_language, name="set-language"),
+    path("i18n/currency/", i18n.set_currency, name="set-currency"),
+    path("i18n/locale/", i18n.get_locale_data, name="locale-data"),
 ]

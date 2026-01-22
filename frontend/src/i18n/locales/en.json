@@ -1,0 +1,75 @@
+{
+  "common": {
+    "home": "Home",
+    "login": "Sign In",
+    "signup": "Sign Up",
+    "logout": "Sign Out",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit"
+  },
+  "nav": {
+    "browse": "Browse Auctions",
+    "myAuctions": "My Auctions",
+    "myBids": "My Bids",
+    "createAuction": "Create Auction",
+    "profile": "Profile"
+  },
+  "auction": {
+    "title": "Auction",
+    "description": "Description",
+    "startingPrice": "Starting Price",
+    "currentPrice": "Current Price",
+    "timeLeft": "Time Left",
+    "endDate": "End Date",
+    "placeBid": "Place Bid",
+    "bidAmount": "Bid Amount",
+    "bidHistory": "Bid History",
+    "noBids": "No bids yet",
+    "wonBy": "Won by",
+    "ended": "Ended",
+    "active": "Active"
+  },
+  "bids": {
+    "yourBid": "Your Bid",
+    "currentBid": "Current Bid",
+    "winning": "Winning",
+    "outbid": "Outbid",
+    "won": "Won",
+    "lost": "Lost",
+    "rebid": "Rebid",
+    "activeBids": "Active Bids"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signInWith": "Sign in with"
+  },
+  "qna": {
+    "title": "Questions & Answers",
+    "askQuestion": "Ask Question",
+    "reply": "Reply",
+    "noQuestions": "No questions yet. Be the first to ask!",
+    "signInToAsk": "Please sign in to ask a question."
+  },
+  "settings": {
+    "language": "Language",
+    "currency": "Currency",
+    "preferences": "Preferences"
+  }
+}

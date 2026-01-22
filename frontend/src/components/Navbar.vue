@@ -32,6 +32,9 @@
 
       <!-- right side - actions -->
       <div class="navbar-actions">
+        <!-- language/currency selector -->
+        <LanguageSelector />
+
         <template v-if="authStore.isAuthenticated">
           <!-- create auction -->
           <router-link to="/create" class="create-button">
@@ -115,6 +118,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import LanguageSelector from './LanguageSelector.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
