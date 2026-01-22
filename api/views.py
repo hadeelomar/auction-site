@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db import models
+# Rate limiting is handled inline with graceful fallback
 
 from api.models import User, AuctionItem, Bid, Question, Reply
 from api.forms import CustomAuthenticationForm, CustomUserCreationForm
@@ -92,10 +93,20 @@ def signup(request: HttpRequest) -> JsonResponse:
 @csrf_exempt
 def login(request: HttpRequest) -> JsonResponse:
     """
-    User login endpoint.
+    User login endpoint with rate limiting (5 attempts per minute).
     """
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    # Check rate limiting (fail gracefully if cache issues)
+    try:
+        from django_ratelimit.core import is_ratelimited
+        if is_ratelimited(request, group='api_login', key='ip', rate='5/m', method='POST', increment=True):
+            return JsonResponse({
+                'error': 'Too many login attempts. Please wait a minute before trying again.'
+            }, status=429)
+    except Exception:
+        pass  # Continue without rate limiting if there's an issue
 
     try:
         data = json.loads(request.body)
@@ -1095,7 +1106,17 @@ def search_auctions(request: HttpRequest) -> JsonResponse:
 
 # Django Auth Views
 def login_view(request):
-    """Django login view with the same styling as Vue component"""
+    """Django login view"""
+    # Check rate limiting (fail gracefully if cache issues)
+    try:
+        from django_ratelimit.core import is_ratelimited
+        if is_ratelimited(request, group='login', key='ip', rate='5/m', method='POST', increment=True):
+            messages.error(request, 'Too many login attempts. Please wait a minute before trying again.')
+            form = CustomAuthenticationForm()
+            return render(request, 'auth/login.html', {'form': form})
+    except Exception:
+        pass  # Continue without rate limiting if there's an issue
+    
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
