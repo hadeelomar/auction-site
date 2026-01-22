@@ -10,6 +10,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db import models
+from django_ratelimit.decorators import ratelimit
+from django_ratelimit.exceptions import Ratelimited
 
 from api.models import User, AuctionItem, Bid, Question, Reply
 from api.forms import CustomAuthenticationForm, CustomUserCreationForm
@@ -90,12 +92,19 @@ def signup(request: HttpRequest) -> JsonResponse:
 
 
 @csrf_exempt
+@ratelimit(key='ip', rate='5/m', method='POST', block=False)
 def login(request: HttpRequest) -> JsonResponse:
     """
-    User login endpoint.
+    User login endpoint with rate limiting (5 attempts per minute).
     """
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    # Check if rate limited
+    if getattr(request, 'limited', False):
+        return JsonResponse({
+            'error': 'Too many login attempts. Please wait a minute before trying again.'
+        }, status=429)
 
     try:
         data = json.loads(request.body)
@@ -1007,8 +1016,15 @@ def search_auctions(request: HttpRequest) -> JsonResponse:
 
 
 # Django Auth Views
+@ratelimit(key='ip', rate='5/m', method='POST', block=False)
 def login_view(request):
-    """Django login view with the same styling as Vue component"""
+    """Django login view with rate limiting (5 attempts per minute)"""
+    # Check if rate limited
+    if getattr(request, 'limited', False):
+        messages.error(request, 'Too many login attempts. Please wait a minute before trying again.')
+        form = CustomAuthenticationForm()
+        return render(request, 'auth/login.html', {'form': form})
+    
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():

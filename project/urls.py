@@ -22,8 +22,9 @@ from api.views import health, spa, login_view, signup_view
 urlpatterns = [
     path('login/', login_view, name='login'),
     path('signup/', signup_view, name='signup'),
+    path('accounts/', include('allauth.urls')),
     path('health', health),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
-    re_path(r"^(?!api/|admin/|static/).*", spa),
+    re_path(r"^(?!api/|admin/|static/|accounts/).*", spa),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
