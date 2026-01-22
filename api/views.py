@@ -204,11 +204,15 @@ def update_profile(request: HttpRequest) -> JsonResponse:
         user.email = email
         user.username = email
 
+    # Handle date_of_birth - allow clearing by sending empty string
     if date_of_birth:
         dob = parse_date(date_of_birth)  # expects "YYYY-MM-DD"
         if not dob:
             return JsonResponse({'error': 'Invalid date_of_birth format'}, status=400)
         user.date_of_birth = dob
+    elif 'date_of_birth' in request.POST:
+        # Explicitly clear date_of_birth if empty string sent
+        user.date_of_birth = None
 
 
     if current_password and new_password:

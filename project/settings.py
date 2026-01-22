@@ -231,8 +231,8 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_ADAPTER = 'api.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'api.adapters.CustomSocialAccountAdapter'
 SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip intermediate "Sign in via Google" page
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'http://localhost:5173/'
+LOGOUT_REDIRECT_URL = 'http://localhost:5173/'
 
 # Google OAuth settings (credentials loaded from environment variables)
 SOCIALACCOUNT_PROVIDERS = {

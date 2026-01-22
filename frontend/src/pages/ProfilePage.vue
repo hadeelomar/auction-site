@@ -10,7 +10,7 @@
           <p class="profile-subtitle">Manage your account information</p>
         </div>
 
-        <form @submit.prevent="handleSubmit" class="profile-form">
+        <form @submit.prevent="handleSubmit" class="profile-form" novalidate>
           <!-- avatar upload -->
           <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.1s">
             <h2 class="section-title">Profile Picture</h2>
@@ -264,7 +264,7 @@ const handleSubmit = async () => {
     formDataToSend.append('first_name', formData.firstName)
     formDataToSend.append('last_name', formData.lastName)
     formDataToSend.append('email', formData.email)
-    if (formData.dateOfBirth) formDataToSend.append('date_of_birth', formData.dateOfBirth)
+    formDataToSend.append('date_of_birth', formData.dateOfBirth || '')
     if (formData.currentPassword) formDataToSend.append('current_password', formData.currentPassword)
     if (formData.newPassword) formDataToSend.append('new_password', formData.newPassword)
     if (croppedBlob.value) formDataToSend.append('profile_image', croppedBlob.value, 'profile.jpg')
