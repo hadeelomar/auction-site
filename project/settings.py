@@ -12,11 +12,15 @@ https://docs.djangoproject.com/en/stable/ref/settings/
 
 from . import database
 import os
+from dotenv import load_dotenv
 
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -230,7 +234,7 @@ SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip intermediate "Sign in via Google" page
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Google OAuth settings (set these in environment variables)
+# Google OAuth settings (credentials loaded from environment variables)
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
