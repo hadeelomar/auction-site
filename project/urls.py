@@ -17,13 +17,15 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.conf import settings
-from api.views import health, spa, login_view, signup_view
+from api.views import health, spa, login_view, signup_view, database_health, application_health
 
 urlpatterns = [
     path('login/', login_view, name='login'),
     path('signup/', signup_view, name='signup'),
     path('accounts/', include('allauth.urls')),
     path('health', health),
+    path('health/database', database_health, name='database_health'),
+    path('health/application', application_health, name='application_health'),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     re_path(r"^(?!api/|admin/|static/|accounts/).*", spa),
