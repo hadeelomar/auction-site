@@ -47,31 +47,31 @@ class Command(BaseCommand):
         )
 
     def create_test_users(self) -> List[User]:
-        """Create 5 test users with realistic data"""
+        """Create test users with specified names"""
         users_data = [
             {
-                'username': 'john.doe@example.com',
-                'email': 'john.doe@example.com',
-                'first_name': 'John',
-                'last_name': 'Doe',
+                'username': 'milad.elaydi@example.com',
+                'email': 'milad.elaydi@example.com',
+                'first_name': 'Milad',
+                'last_name': 'Elaydi',
                 'password': 'testpass123',
                 'date_of_birth': '1990-05-15'
             },
             {
-                'username': 'jane.smith@example.com',
-                'email': 'jane.smith@example.com',
-                'first_name': 'Jane',
-                'last_name': 'Smith',
+                'username': 'hadeel.omar@example.com',
+                'email': 'hadeel.omar@example.com',
+                'first_name': 'Hadeel',
+                'last_name': 'Omar',
                 'password': 'testpass123',
-                'date_of_birth': '1985-08-22'
+                'date_of_birth': '1992-08-22'
             },
             {
-                'username': 'mike.wilson@example.com',
-                'email': 'mike.wilson@example.com',
-                'first_name': 'Mike',
-                'last_name': 'Wilson',
+                'username': 'omar.algazlan@example.com',
+                'email': 'omar.algazlan@example.com',
+                'first_name': 'Omar',
+                'last_name': 'Algazlan',
                 'password': 'testpass123',
-                'date_of_birth': '1992-12-03'
+                'date_of_birth': '1988-12-03'
             },
             {
                 'username': 'sarah.jones@example.com',
@@ -79,7 +79,7 @@ class Command(BaseCommand):
                 'first_name': 'Sarah',
                 'last_name': 'Jones',
                 'password': 'testpass123',
-                'date_of_birth': '1988-03-17'
+                'date_of_birth': '1995-03-17'
             },
             {
                 'username': 'alex.brown@example.com',
@@ -87,7 +87,7 @@ class Command(BaseCommand):
                 'first_name': 'Alex',
                 'last_name': 'Brown',
                 'password': 'testpass123',
-                'date_of_birth': '1995-07-09'
+                'date_of_birth': '1987-07-09'
             }
         ]
         
@@ -105,7 +105,7 @@ class Command(BaseCommand):
         return users
 
     def create_test_auctions(self, users: List[User]) -> List[AuctionItem]:
-        """Create diverse auction items"""
+        """Create diverse auction items with internet images"""
         auction_data = [
             {
                 'title': 'Vintage Leica M3 Camera',
@@ -113,7 +113,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('2500.00'),
                 'category': 'electronics',
                 'owner': users[0],
-                'days_ahead': 7
+                'days_ahead': 7,
+                'image_url': 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&h=600&fit=crop'
             },
             {
                 'title': 'Designer Leather Handbag',
@@ -121,7 +122,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('450.00'),
                 'category': 'fashion',
                 'owner': users[1],
-                'days_ahead': 5
+                'days_ahead': 5,
+                'image_url': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&h=600&fit=crop'
             },
             {
                 'title': 'Mid-Century Modern Coffee Table',
@@ -129,7 +131,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('350.00'),
                 'category': 'home',
                 'owner': users[2],
-                'days_ahead': 10
+                'days_ahead': 10,
+                'image_url': 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800&h=600&fit=crop'
             },
             {
                 'title': 'Professional Tennis Racket Set',
@@ -137,7 +140,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('180.00'),
                 'category': 'sports',
                 'owner': users[3],
-                'days_ahead': 3
+                'days_ahead': 3,
+                'image_url': 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800&h=600&fit=crop'
             },
             {
                 'title': 'Abstract Oil Painting',
@@ -145,7 +149,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('800.00'),
                 'category': 'art',
                 'owner': users[4],
-                'days_ahead': 14
+                'days_ahead': 14,
+                'image_url': 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop'
             },
             {
                 'title': 'Classic Motorcycle Parts',
@@ -153,7 +158,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('550.00'),
                 'category': 'vehicles',
                 'owner': users[0],
-                'days_ahead': 8
+                'days_ahead': 8,
+                'image_url': 'https://images.unsplash.com/photo-1558981285-6f0c94958bb6?w=800&h=600&fit=crop'
             },
             {
                 'title': 'Wireless Noise-Cancelling Headphones',
@@ -161,7 +167,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('200.00'),
                 'category': 'electronics',
                 'owner': users[1],
-                'days_ahead': 4
+                'days_ahead': 4,
+                'image_url': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop'
             },
             {
                 'title': 'Vintage Vinyl Record Collection',
@@ -169,7 +176,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('300.00'),
                 'category': 'electronics',
                 'owner': users[2],
-                'days_ahead': 12
+                'days_ahead': 12,
+                'image_url': 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&h=600&fit=crop'
             },
             {
                 'title': 'Designer Sunglasses Collection',
@@ -177,7 +185,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('150.00'),
                 'category': 'fashion',
                 'owner': users[3],
-                'days_ahead': 6
+                'days_ahead': 6,
+                'image_url': 'https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=800&h=600&fit=crop'
             },
             {
                 'title': 'Antique Pocket Watch',
@@ -185,7 +194,8 @@ class Command(BaseCommand):
                 'starting_price': Decimal('600.00'),
                 'category': 'art',
                 'owner': users[4],
-                'days_ahead': 9
+                'days_ahead': 9,
+                'image_url': 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=600&fit=crop'
             }
         ]
         
@@ -200,7 +210,8 @@ class Command(BaseCommand):
                 current_price=data['starting_price'],
                 ends_at=end_time,
                 category=data['category'],
-                owner=data['owner']
+                owner=data['owner'],
+                image_url=data.get('image_url', '')
             )
             auctions.append(auction)
         
