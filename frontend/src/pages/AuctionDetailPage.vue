@@ -9,13 +9,13 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m15 18-6-6 6-6"/>
           </svg>
-          Back to Auctions
+          {{ t('detail.backToAuctions') }}
         </button>
 
         <!-- Loading State -->
         <div v-if="isLoading" class="loading-state">
           <div class="loading-spinner"></div>
-          <p>Loading auction details...</p>
+          <p>{{ t('common.loading') }}</p>
         </div>
 
         <!-- Error State -->
@@ -26,7 +26,7 @@
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <p>{{ error }}</p>
-          <button class="retry-btn" @click="fetchAuction">Try Again</button>
+          <button class="retry-btn" @click="fetchAuction">{{ t('detail.tryAgain') }}</button>
         </div>
 
         <!-- Auction Details -->
@@ -47,7 +47,7 @@
                     <circle cx="9" cy="9" r="2"/>
                     <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
                   </svg>
-                  <span>No Image Available</span>
+                  <span>{{ t('detail.noImage') }}</span>
                 </div>
               </div>
             </div>
@@ -57,7 +57,7 @@
               <div class="auction-header">
                 <h1 class="auction-title">{{ auction.title }}</h1>
                 <span :class="['status-badge', auction.is_active ? 'active' : 'ended']">
-                  {{ auction.is_active ? 'Active' : 'Ended' }}
+                  {{ auction.is_active ? t('auction.active') : t('auction.ended') }}
                 </span>
               </div>
 
@@ -65,11 +65,11 @@
 
               <div class="price-section">
                 <div class="price-item">
-                  <span class="price-label">Starting Price</span>
+                  <span class="price-label">{{ t('auction.startingPrice') }}</span>
                   <span class="price-value">{{ formatPrice(auction.starting_price) }}</span>
                 </div>
                 <div class="price-item current">
-                  <span class="price-label">Current Price</span>
+                  <span class="price-label">{{ t('auction.currentPrice') }}</span>
                   <span class="price-value highlight">{{ formatPrice(auction.current_price) }}</span>
                 </div>
               </div>
@@ -80,7 +80,7 @@
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
                     <circle cx="12" cy="7" r="4"/>
                   </svg>
-                  <span class="meta-label">Seller:</span>
+                  <span class="meta-label">{{ t('detail.seller') }}</span>
                   <span class="meta-value">{{ ownerName }}</span>
                 </div>
                 <div class="meta-item">
@@ -90,7 +90,7 @@
                     <line x1="8" x2="8" y1="2" y2="6"/>
                     <line x1="3" x2="21" y1="10" y2="10"/>
                   </svg>
-                  <span class="meta-label">Listed:</span>
+                  <span class="meta-label">{{ t('detail.listed') }}</span>
                   <span class="meta-value">{{ formatDate(auction.created_at) }}</span>
                 </div>
                 <div class="meta-item">
@@ -98,14 +98,14 @@
                     <circle cx="12" cy="12" r="10"/>
                     <polyline points="12 6 12 12 16 14"/>
                   </svg>
-                  <span class="meta-label">Ends:</span>
+                  <span class="meta-label">{{ t('detail.ends') }}</span>
                   <span class="meta-value">{{ formatDate(auction.ends_at) }}</span>
                 </div>
               </div>
 
               <!-- Bidding Section -->
               <div class="bidding-section">
-                <h3>Place a Bid</h3>
+                <h3>{{ t('auction.placeBid') }}</h3>
                 
                 <!-- Success/Error Messages -->
                 <div v-if="bidMessage" :class="['bid-message', bidMessageType]">
@@ -118,7 +118,7 @@
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
                   </svg>
-                  <span>This auction has ended</span>
+                  <span>{{ t('detail.auctionEnded') }}</span>
                 </div>
 
                 <div v-else-if="isOwnAuction" class="bid-disabled">
@@ -126,7 +126,7 @@
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
                   </svg>
-                  <span>You cannot bid on your own auction</span>
+                  <span>{{ t('detail.cannotBidOwn') }}</span>
                 </div>
 
                 <div v-else-if="isHighestBidder" class="bid-disabled winning">
@@ -134,13 +134,13 @@
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                     <polyline points="22 4 12 14.01 9 11.01"/>
                   </svg>
-                  <span>You are the highest bidder!</span>
+                  <span>{{ t('detail.highestBidder') }}</span>
                 </div>
 
                 <!-- Bid Form -->
                 <form v-else @submit.prevent="submitBid" class="bid-form">
                   <div class="bid-input-group">
-                    <span class="currency-symbol">£</span>
+                    <span class="currency-symbol">{{ i18nStore.currentCurrencySymbol }}</span>
                     <input
                       v-model="bidAmount"
                       type="number"
@@ -157,8 +157,8 @@
                     class="bid-btn"
                     :disabled="isSubmittingBid || !isValidBid"
                   >
-                    <span v-if="isSubmittingBid">Placing Bid...</span>
-                    <span v-else>Place Bid</span>
+                    <span v-if="isSubmittingBid">{{ t('detail.placingBid') }}</span>
+                    <span v-else>{{ t('auction.placeBid') }}</span>
                   </button>
                 </form>
 
@@ -169,7 +169,7 @@
 
               <!-- Bid History -->
               <div v-if="bids.length > 0" class="bid-history">
-                <h3>Bid History</h3>
+                <h3>{{ t('auction.bidHistory') }}</h3>
                 <div class="bid-list">
                   <div v-for="bid in bids" :key="bid.id" class="bid-item">
                     <div class="bid-info">
@@ -185,7 +185,7 @@
 
           <!-- Q&A Section -->
           <div class="qa-section">
-            <h2>Questions & Answers</h2>
+            <h2>{{ t('qna.title') }}</h2>
             
             <!-- Ask Question Form -->
             <div v-if="authStore.isAuthenticated" class="ask-question-form">
@@ -195,7 +195,7 @@
               <form @submit.prevent="submitQuestion">
                 <textarea
                   v-model="newQuestionText"
-                  placeholder="Ask a question about this item..."
+                  :placeholder="t('detail.askPlaceholder')"
                   class="question-input"
                   :disabled="isSubmittingQuestion"
                   rows="3"
@@ -205,19 +205,19 @@
                   class="submit-question-btn"
                   :disabled="isSubmittingQuestion || !newQuestionText.trim()"
                 >
-                  <span v-if="isSubmittingQuestion">Posting...</span>
-                  <span v-else>Ask Question</span>
+                  <span v-if="isSubmittingQuestion">{{ t('detail.posting') }}</span>
+                  <span v-else>{{ t('qna.askQuestion') }}</span>
                 </button>
               </form>
             </div>
             <div v-else class="login-prompt">
-              <p>Please <router-link to="/login">sign in</router-link> to ask a question.</p>
+              <p>{{ t('qna.signInToAsk').split('sign in')[0] }}<router-link to="/login">{{ t('common.login').toLowerCase() }}</router-link>{{ t('qna.signInToAsk').split('sign in')[1] || ' to ask a question.' }}</p>
             </div>
 
             <!-- Loading State -->
             <div v-if="isLoadingQuestions" class="qa-loading">
               <div class="loading-spinner-small"></div>
-              <span>Loading questions...</span>
+              <span>{{ t('detail.loadingQuestions') }}</span>
             </div>
 
             <!-- Questions List -->
@@ -247,12 +247,12 @@
                     @click="replyingToQuestionId = question.id"
                     class="reply-toggle-btn"
                   >
-                    Reply
+                    {{ t('qna.reply') }}
                   </button>
                   <div v-else class="reply-form">
                     <textarea
                       v-model="replyText"
-                      placeholder="Write a reply..."
+                      :placeholder="t('detail.replyPlaceholder')"
                       class="reply-input"
                       :disabled="isSubmittingReply"
                       rows="2"
@@ -263,7 +263,7 @@
                         @click="replyingToQuestionId = null; replyText = ''"
                         class="cancel-reply-btn"
                       >
-                        Cancel
+                        {{ t('common.cancel') }}
                       </button>
                       <button 
                         type="button"
@@ -271,8 +271,8 @@
                         class="submit-reply-btn"
                         :disabled="isSubmittingReply || !replyText.trim()"
                       >
-                        <span v-if="isSubmittingReply">Posting...</span>
-                        <span v-else>Post Reply</span>
+                        <span v-if="isSubmittingReply">{{ t('detail.posting') }}</span>
+                        <span v-else>{{ t('detail.postReply') }}</span>
                       </button>
                     </div>
                   </div>
@@ -285,7 +285,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
-              <p>No questions yet. Be the first to ask!</p>
+              <p>{{ t('qna.noQuestions') }}</p>
             </div>
           </div>
         </div>
@@ -297,8 +297,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Navbar from '../components/Navbar.vue'
 import { useAuthStore } from '../stores/auth'
+import { useI18nStore } from '../stores/i18n'
+
+const { t } = useI18n()
+const i18nStore = useI18nStore()
 
 interface AuctionOwner {
   id: number
@@ -416,7 +421,7 @@ const isValidBid = computed(() => {
 })
 
 function formatPrice(price: string): string {
-  return '£' + parseFloat(price).toFixed(2)
+  return i18nStore.formatPrice(parseFloat(price))
 }
 
 function formatDate(dateString: string): string {

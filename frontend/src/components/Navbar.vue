@@ -24,7 +24,7 @@
         <input 
           type="text" 
           v-model="searchQuery"
-          placeholder="Search for items..."
+          :placeholder="t('common.searchPlaceholder')"
           class="search-input"
           @keyup.enter="handleSearch"
         />
@@ -32,6 +32,9 @@
 
       <!-- right side - actions -->
       <div class="navbar-actions">
+        <!-- language/currency selector -->
+        <LanguageSelector />
+
         <template v-if="authStore.isAuthenticated">
           <!-- create auction -->
           <router-link to="/create" class="create-button">
@@ -39,7 +42,7 @@
               <path d="M5 12h14"/>
               <path d="M12 5v14"/>
             </svg>
-            <span>Sell Item</span>
+            <span>{{ t('nav.createAuction') }}</span>
           </router-link>
 
           <!-- my bids -->
@@ -51,7 +54,7 @@
               <path d="m9 7 8 8"/>
               <path d="m21 11-8-8"/>
             </svg>
-            <span class="nav-link-text">My Bids</span>
+            <span class="nav-link-text">{{ t('nav.myBids') }}</span>
           </router-link>
 
           <!-- profile dropdown -->
@@ -79,7 +82,7 @@
                   <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
-                Profile Settings
+                {{ t('nav.profile') }}
               </router-link>
               <router-link to="/auctions" class="dropdown-item" @click="showDropdown = false">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -87,7 +90,7 @@
                   <path d="m3.3 7 8.7 5 8.7-5"/>
                   <path d="M12 22V12"/>
                 </svg>
-                My Auctions
+                {{ t('nav.myAuctions') }}
               </router-link>
               <div class="dropdown-divider"></div>
               <button class="dropdown-item logout" @click="handleLogout">
@@ -96,15 +99,15 @@
                   <polyline points="16 17 21 12 16 7"/>
                   <line x1="21" x2="9" y1="12" y2="12"/>
                 </svg>
-                Sign Out
+                {{ t('common.logout') }}
               </button>
             </div>
           </div>
         </template>
 
         <template v-else>
-          <a href="http://localhost:8000/login/" class="login-button">Sign In</a>
-          <a href="http://localhost:8000/signup/" class="signup-button">Sign Up</a>
+          <a href="http://localhost:8000/login/" class="login-button">{{ t('common.login') }}</a>
+          <a href="http://localhost:8000/signup/" class="signup-button">{{ t('common.signup') }}</a>
         </template>
       </div>
     </div>
@@ -114,7 +117,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../stores/auth'
+import LanguageSelector from './LanguageSelector.vue'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const authStore = useAuthStore()

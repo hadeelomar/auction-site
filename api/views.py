@@ -1037,7 +1037,7 @@ def search_auctions(request: HttpRequest) -> JsonResponse:
 
     # Order by relevance (for now, order by end time, then created time)
     if query:
-        # If there's a search query, prioritize exact title matches
+        # If there's a search query, prioritise exact title matches
         auctions = auctions.annotate(
             title_match=models.Case(
                 models.When(title__iexact=query, then=models.Value(0)),

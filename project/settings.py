@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -134,16 +135,46 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
+# Internationalisation
 # https://docs.djangoproject.com/en/stable/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
+
+# Supported languages (10+ including RTL languages)
+LANGUAGES = [
+    ('en', 'English'),
+    ('ar', 'العربية'),  # Arabic (RTL)
+    ('he', 'עברית'),  # Hebrew (RTL)
+    ('zh-hans', '简体中文'),  # Chinese Simplified
+    ('zh-hant', '繁體中文'),  # Chinese Traditional
+    ('es', 'Español'),  # Spanish
+    ('fr', 'Français'),  # French
+    ('de', 'Deutsch'),  # German
+    ('ja', '日本語'),  # Japanese
+    ('ko', '한국어'),  # Korean
+    ('pt', 'Português'),  # Portuguese
+    ('ru', 'Русский'),  # Russian
+    ('hi', 'हिन्दी'),  # Hindi
+    ('tr', 'Türkçe'),  # Turkish
+]
+
+# RTL languages
+RTL_LANGUAGES = ['ar', 'he']
+
+# Locale paths for translation files
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+# Language cookie settings
+LANGUAGE_COOKIE_NAME = 'django_language'
+LANGUAGE_COOKIE_AGE = 31536000  # 1 year
 
 
 # Static files (CSS, JavaScript, Images)
@@ -223,16 +254,16 @@ EMAIL_SUBJECT_PREFIX = '[Auction Site] '
 # Email templates directory
 TEMPLATES[0]['DIRS'].append(os.path.join(BASE_DIR, 'templates'))
 
-# Django Allauth configuration (updated for allauth 0.60+)
+# Django Allauth configuration
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_ADAPTER = 'api.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'api.adapters.CustomSocialAccountAdapter'
-SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip intermediate "Sign in via Google" page
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+SOCIALACCOUNT_LOGIN_ON_GET = True
+LOGIN_REDIRECT_URL = 'http://localhost:5173/'
+LOGOUT_REDIRECT_URL = 'http://localhost:5173/'
 
 # Google OAuth settings (credentials loaded from environment variables)
 SOCIALACCOUNT_PROVIDERS = {
