@@ -66,7 +66,9 @@
     "title": "質問と回答",
     "askQuestion": "質問する",
     "reply": "返信",
-    "noQuestions": "まだ質問がありません。最初の質問をしましょう！",
+    "postReply": "返信を投稿",
+    "replyPlaceholder": "返信を書いてください...",
+    "noQuestions": "まだ質問がありません。最初に質問してください！",
     "signInToAsk": "質問するにはログインしてください。"
   },
   "settings": {
@@ -115,14 +117,16 @@
     "noBidsYet": "このカテゴリにはまだ入札がありません"
   },
   "myAuctions": {
-    "title": "マイオークション",
-    "description": "作成したオークションを管理",
-    "newAuction": "新規オークション",
+    "title": "私のオークション",
+    "description": "オークション出品を管理",
     "loading": "オークションを読み込み中...",
-    "currentBid": "現在の入札",
-    "noAuctions": "まだオークションを作成していません",
+    "noAuctions": "まだオークションを作成していません。",
     "createFirst": "最初のオークションを作成",
-    "deleting": "削除中..."
+    "newAuction": "オークション作成",
+    "currentBid": "現在の入札",
+    "deleting": "削除中...",
+    "activeAuctions": "アクティブなオークション",
+    "endedAuctions": "終了したオークション"
   },
   "createAuction": {
     "createAuction": "オークション作成",

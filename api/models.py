@@ -1,6 +1,3 @@
-# Notification models are defined in api/models.py
-# This app contains notification-specific views and utilities
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import date
@@ -23,6 +20,27 @@ class User(AbstractUser):
 
     date_of_birth = models.DateField(
         null=True, blank=True, help_text="User's date of birth"
+    )
+
+    preferred_currency = models.CharField(
+        max_length=3,
+        default='USD',
+        choices=[
+            ('USD', 'US Dollar'),
+            ('EUR', 'Euro'),
+            ('GBP', 'British Pound'),
+            ('JPY', 'Japanese Yen'),
+            ('CNY', 'Chinese Yuan'),
+            ('INR', 'Indian Rupee'),
+            ('KRW', 'South Korean Won'),
+            ('TRY', 'Turkish Lira'),
+            ('RUB', 'Russian Ruble'),
+            ('BRL', 'Brazilian Real'),
+            ('MXN', 'Mexican Peso'),
+            ('CAD', 'Canadian Dollar'),
+            ('AUD', 'Australian Dollar'),
+        ],
+        help_text="User's preferred currency for display"
     )
 
     class Meta:
@@ -50,6 +68,35 @@ class User(AbstractUser):
             )
         return None
 
+    def format_currency(self, amount: float) -> str:
+        """
+        Format amount according to user's preferred currency
+        """
+        currency_symbols = {
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'JPY': '¥',
+            'CNY': '¥',
+            'INR': '₹',
+            'KRW': '₩',
+            'TRY': '₺',
+            'RUB': '₽',
+            'BRL': 'R$',
+            'MXN': '$',
+            'CAD': 'C$',
+            'AUD': 'A$',
+        }
+        
+        symbol = currency_symbols.get(self.preferred_currency, '$')
+        
+        # Format with 2 decimal places for most currencies
+        if self.preferred_currency in ['JPY', 'KRW']:
+            # No decimal places for these currencies
+            return f"{symbol}{int(amount):,}"
+        else:
+            return f"{symbol}{amount:,.2f}"
+
 
 class AuctionItem(models.Model):
     """
@@ -69,7 +116,6 @@ class AuctionItem(models.Model):
     STATUS_CHOICES = [
         ('active', 'Active'),
         ('closed', 'Closed'),
-        ('cancelled', 'Cancelled'),
     ]
 
     title = models.CharField(max_length=150)
@@ -82,25 +128,23 @@ class AuctionItem(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='electronics')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
     
+    # Fields for auction closing
     winner = models.ForeignKey(
         User, 
         on_delete=models.SET_NULL, 
         null=True, 
-        blank=True, 
-        related_name="won_auctions",
-        help_text="Winner of the auction (set when auction closes)"
+        blank=True,
+        related_name="won_auctions"
     )
     winning_bid_amount = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
         null=True, 
-        blank=True,
-        help_text="Final winning bid amount"
+        blank=True
     )
     closed_at = models.DateTimeField(
         null=True, 
-        blank=True,
-        help_text="When the auction was closed"
+        blank=True
     )
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="items")
@@ -116,7 +160,6 @@ class AuctionItem(models.Model):
             models.Index(fields=['-created_at']),
             models.Index(fields=['-ends_at']),
             models.Index(fields=['status']),
-            models.Index(fields=['winner']),
         ]
 
     def __str__(self):
@@ -124,12 +167,12 @@ class AuctionItem(models.Model):
 
     @property
     def end_datetime(self):
-        """Alias for ends_at to match the management command"""
+        """Alias for ends_at to match management command expectations"""
         return self.ends_at
 
     @property
     def seller(self):
-        """Alias for owner to match the email templates"""
+        """Alias for owner to match management command expectations"""
         return self.owner
 
 
@@ -196,9 +239,11 @@ class Notification(models.Model):
         ('auction_ending', 'Auction Ending'),
         ('auction_won', 'Auction Won'),
         ('auction_lost', 'Auction Lost'),
+        ('new_bid', 'New Bid'),
+        ('new_question', 'New Question'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
     type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
@@ -206,6 +251,11 @@ class Notification(models.Model):
     
     class Meta:
         ordering = ['-timestamp']
+        db_table = "notifications"
+        indexes = [
+            models.Index(fields=['user', 'is_read']),
+            models.Index(fields=['-timestamp']),
+        ]
     
     def __str__(self):
         return f"{self.user.username} - {self.get_type_display()}"

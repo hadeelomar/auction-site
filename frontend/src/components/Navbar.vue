@@ -37,8 +37,6 @@
 
         <template v-if="authStore.isAuthenticated">
           <!-- notification bell -->
-          <NotificationBell :unread-count="unreadNotificationCount" />
-          
           <!-- create auction -->
           <router-link to="/create" class="create-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -59,6 +57,9 @@
             </svg>
             <span class="nav-link-text">{{ t('nav.myBids') }}</span>
           </router-link>
+
+          <!-- notifications -->
+          <NotificationBell :unread-count="unreadNotificationCount" class="nav-link" />
 
           <!-- profile dropdown -->
           <div class="profile-dropdown" @click="showDropdown = !showDropdown">
@@ -118,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../stores/auth'
@@ -144,6 +145,43 @@ const handleLogout = async () => {
   showDropdown.value = false
   router.push('/')
 }
+
+const fetchUnreadCount = async () => {
+  try {
+    const response = await fetch('/api/notifications/')
+    if (response.ok) {
+      const data = await response.json()
+      unreadNotificationCount.value = data.unread_count
+    }
+  } catch (error) {
+    console.error('Error fetching notifications:', error)
+  }
+}
+
+// Listen for notification updates from NotificationBell
+const handleNotificationUpdate = (event: Event) => {
+  const customEvent = event as CustomEvent
+  unreadNotificationCount.value = customEvent.detail.unreadCount
+}
+
+// Fetch notifications on mount and periodically
+let notificationInterval: number
+
+onMounted(() => {
+  fetchUnreadCount()
+  // Poll for new notifications every 30 seconds
+  notificationInterval = setInterval(fetchUnreadCount, 30000)
+  
+  // Listen for notification updates from NotificationBell
+  window.addEventListener('notifications-updated', handleNotificationUpdate)
+})
+
+onUnmounted(() => {
+  if (notificationInterval) {
+    clearInterval(notificationInterval)
+  }
+  window.removeEventListener('notifications-updated', handleNotificationUpdate)
+})
 </script>
 
 <style scoped>

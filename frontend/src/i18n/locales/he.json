@@ -66,8 +66,12 @@
     "title": "שאלות ותשובות",
     "askQuestion": "שאל שאלה",
     "reply": "השב",
+    "postReply": "פרסם תשובה",
+    "replyPlaceholder": "כתוב את תשובתך...",
     "noQuestions": "אין עדיין שאלות. היה הראשון לשאול!",
-    "signInToAsk": "אנא sign in כדי לשאול שאלה."
+    "signInToAsk": "אנא התחבר כדי לשאול שאלה.",
+    "askPlaceholder": "שאל שאלה על פריט זה...",
+    "loadingQuestions": "טוען שאלות..."
   },
   "settings": {
     "language": "שפה",
@@ -115,14 +119,16 @@
     "noBidsYet": "אין עדיין הצעות בקטגוריה זו"
   },
   "myAuctions": {
-    "title": "המכירות שלי",
-    "description": "נהל את המכירות שיצרת",
-    "newAuction": "מכירה חדשה",
-    "loading": "טוען את המכירות שלך...",
+    "title": "המכרזים שלי",
+    "description": "נהל את רשימות המכרזים שלך",
+    "loading": "טוען את המכרזים שלך...",
+    "noAuctions": "עדיין לא יצרת מכרזים.",
+    "createFirst": "צור את המכרז הראשון שלך",
+    "newAuction": "צור מכרז",
     "currentBid": "הצעה נוכחית",
-    "noAuctions": "עדיין לא יצרת מכירות",
-    "createFirst": "צור את המכירה הראשונה שלך",
-    "deleting": "מוחק..."
+    "deleting": "מוחק...",
+    "activeAuctions": "מכרזים פעילים",
+    "endedAuctions": "מכרזים שהסתיימו"
   },
   "createAuction": {
     "createAuction": "צור מכירה",

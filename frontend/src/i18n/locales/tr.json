@@ -66,8 +66,10 @@
     "title": "Sorular ve Cevaplar",
     "askQuestion": "Soru Sor",
     "reply": "Yanıtla",
-    "noQuestions": "Henüz soru yok. İlk soran siz olun!",
-    "signInToAsk": "Soru sormak için lütfen sign in yapın."
+    "postReply": "Yanıtı Gönder",
+    "replyPlaceholder": "Yanıtınızı yazın...",
+    "noQuestions": "Henüz soru yok. İlk soruyu siz sorun!",
+    "signInToAsk": "Soru sormak için lütfen giriş yapın."
   },
   "settings": {
     "language": "Dil",
@@ -117,16 +119,15 @@
   "myAuctions": {
     "title": "Açık Artırmalarım",
     "description": "Oluşturduğunuz açık artırmaları yönetin",
-    "newAuction": "Yeni Açık Artırma",
     "loading": "Açık artırmalarınız yükleniyor...",
-    "currentBid": "mevcut teklif",
-    "noAuctions": "Henüz açık artırma oluşturmadınız",
+    "noAuctions": "Henüz açık artırma oluşturmadınız.",
     "createFirst": "İlk açık artırmanızı oluşturun",
-    "deleting": "Siliniyor..."
-  },
-  "createAuction": {
-    "createAuction": "Açık Artırma Oluştur",
+    "newAuction": "Açık Artırma Oluştur",
     "editAuction": "Açık Artırma Düzenle",
+    "currentBid": "mevcut teklif",
+    "deleting": "Siliniyor...",
+    "activeAuctions": "Aktif Açık Artırmalar",
+    "endedAuctions": "Biten Açık Artırmalar",
     "createDescription": "Yeni bir ürünü açık artırmaya koyun",
     "updateDescription": "Açık artırma ayrıntılarınızı güncelleyin",
     "itemDetails": "Ürün Ayrıntıları",

@@ -13,8 +13,7 @@ from django.db import models, connection
 import logging
 # Rate limiting is handled inline with graceful fallback
 
-from api.models import User, AuctionItem, Bid, Question, Reply
-from notifications.models import Notification
+from api.models import User, AuctionItem, Bid, Question, Reply, Notification
 from api.forms import CustomAuthenticationForm, CustomUserCreationForm
 
 import json
@@ -511,6 +510,23 @@ def place_bid(request: HttpRequest) -> JsonResponse:
         is_winning=True
     )
 
+    # Find previous highest bidder to send outbid notification
+    previous_bids = Bid.objects.filter(item=item).exclude(user=request.user).order_by('-bid_amount')
+    if previous_bids.exists():
+        previous_highest_bidder = previous_bids.first().user
+        Notification.objects.create(
+            user=previous_highest_bidder,
+            type='outbid',
+            message=f'You have been outbid on "{item.title}". New bid: ${bid_amount:.2f}',
+        )
+
+    # Send notification to auction owner about new bid
+    Notification.objects.create(
+        user=item.owner,
+        type='new_bid',
+        message=f'New bid of ${bid_amount:.2f} placed on your auction "{item.title}"',
+    )
+
     item.current_price = bid_amount
     item.save()
 
@@ -570,10 +586,10 @@ def user_bids(request: HttpRequest) -> JsonResponse:
         
         # Determine bid status
         auction_ended = item.ends_at <= now
-        is_winning_bid = user_bid.is_winning
         
         if auction_ended:
-            if is_winning_bid:
+            # For ended auctions, check if user is the winner
+            if hasattr(item, 'winner') and item.winner and item.winner.id == request.user.id:
                 status = 'won'
                 status_text = 'Won'
             else:
@@ -581,6 +597,8 @@ def user_bids(request: HttpRequest) -> JsonResponse:
                 status_text = 'Lost'
             time_left = 'Ended'
         else:
+            # For active auctions, check if user's bid is currently winning
+            is_winning_bid = user_bid.is_winning
             if is_winning_bid:
                 status = 'winning'
                 status_text = 'Winning'
@@ -710,6 +728,13 @@ def questions(request: HttpRequest) -> JsonResponse:
             question_text=question_text
         )
 
+        # Send notification to auction owner about new question
+        Notification.objects.create(
+            user=item.owner,
+            type='new_question',
+            message=f'New question posted on your auction "{item.title}": "{question_text[:100]}..."',
+        )
+
         return JsonResponse({
             "message": "Question created successfully",
             "question": {
@@ -759,6 +784,13 @@ def question_reply(request: HttpRequest, question_id: int) -> JsonResponse:
         question=question,
         user=request.user,
         reply_text=reply_text
+    )
+
+    # Send notification to the person who asked the question
+    Notification.objects.create(
+        user=question.user,
+        type='question_answered',
+        message=f'Your question on "{question.item.title}" has been answered: "{reply_text[:100]}..."',
     )
 
     return JsonResponse({
@@ -1365,3 +1397,114 @@ def application_health(request: HttpRequest) -> JsonResponse:
     status_code = 200 if health_data["status"] == "healthy" else 503
     
     return JsonResponse(health_data, status=status_code)
+
+
+@csrf_exempt
+def notifications(request: HttpRequest) -> JsonResponse:
+    """
+    GET /api/notifications/
+    Get all notifications for the current user
+    """
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        notifications = Notification.objects.filter(user=request.user).order_by('-timestamp')
+        
+        notification_data = []
+        for notification in notifications:
+            notification_data.append({
+                'id': notification.id,
+                'type': notification.get_type_display(),
+                'message': notification.message,
+                'is_read': notification.is_read,
+                'timestamp': notification.timestamp.isoformat(),
+            })
+        
+        return JsonResponse({
+            'notifications': notification_data,
+            'unread_count': notifications.filter(is_read=False).count()
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def mark_notification_read(request: HttpRequest, notification_id: int) -> JsonResponse:
+    """
+    POST /api/notifications/<id>/mark-read/
+    Mark a specific notification as read
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        notification = Notification.objects.get(id=notification_id, user=request.user)
+        notification.is_read = True
+        notification.save()
+        
+        return JsonResponse({'success': True})
+        
+    except Notification.DoesNotExist:
+        return JsonResponse({'error': 'Notification not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def mark_all_notifications_read(request: HttpRequest) -> JsonResponse:
+    """
+    POST /api/notifications/mark-all-read/
+    Mark all notifications for the current user as read
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+        
+        return JsonResponse({'success': True})
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def set_currency(request: HttpRequest) -> JsonResponse:
+    """
+    POST /api/i18n/currency/
+    Set user's preferred currency
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        data = json.loads(request.body)
+        currency = data.get('currency', 'USD')
+        
+        # Validate currency code
+        valid_currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'KRW', 'TRY', 'RUB', 'BRL', 'MXN', 'CAD', 'AUD']
+        if currency not in valid_currencies:
+            return JsonResponse({'error': 'Invalid currency'}, status=400)
+        
+        # Update user's preferred currency
+        request.user.preferred_currency = currency
+        request.user.save()
+        
+        return JsonResponse({'currency': currency})
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

@@ -66,8 +66,12 @@
     "title": "질문과 답변",
     "askQuestion": "질문하기",
     "reply": "답변",
-    "noQuestions": "아직 질문이 없습니다. 첫 번째로 질문해 보세요!",
-    "signInToAsk": "질문하려면 sign in 해주세요."
+    "postReply": "답변 게시",
+    "replyPlaceholder": "답변을 작성하세요...",
+    "noQuestions": "아직 질문이 없습니다. 첫 번째 질문을 해보세요!",
+    "signInToAsk": "질문하려면 로그인해주세요.",
+    "askPlaceholder": "이 상품에 대해 질문하세요...",
+    "loadingQuestions": "질문 로딩 중..."
   },
   "settings": {
     "language": "언어",
@@ -116,13 +120,15 @@
   },
   "myAuctions": {
     "title": "내 경매",
-    "description": "생성한 경매를 관리",
-    "newAuction": "새 경매",
+    "description": "경매 목록을 관리하세요",
     "loading": "경매를 로딩 중...",
+    "noAuctions": "아직 경매를 만들지 않았습니다.",
+    "createFirst": "첫 경매를 만들어보세요",
+    "newAuction": "경매 만들기",
     "currentBid": "현재 입찰",
-    "noAuctions": "아직 경매를 생성하지 않았습니다",
-    "createFirst": "첫 경매를 만드세요",
-    "deleting": "삭제 중..."
+    "deleting": "삭제 중...",
+    "activeAuctions": "진행 중인 경매",
+    "endedAuctions": "종료된 경매"
   },
   "createAuction": {
     "createAuction": "경매 생성",

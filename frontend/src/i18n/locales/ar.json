@@ -66,6 +66,8 @@
     "title": "الأسئلة والأجوبة",
     "askQuestion": "اطرح سؤالاً",
     "reply": "رد",
+    "postReply": "نشر الرد",
+    "replyPlaceholder": "اكتب ردك...",
     "noQuestions": "لا توجد أسئلة بعد. كن أول من يسأل!",
     "signInToAsk": "يرجى تسجيل الدخول لطرح سؤال."
   },
@@ -116,13 +118,15 @@
   },
   "myAuctions": {
     "title": "مزاداتي",
-    "description": "إدارة المزادات التي أنشأتها",
-    "newAuction": "مزاد جديد",
+    "description": "إدارة قوائم المزادات الخاصة بك",
     "loading": "جاري تحميل مزاداتك...",
-    "currentBid": "العرض الحالي",
-    "noAuctions": "لم تقم بإنشاء أي مزادات بعد",
-    "createFirst": "أنشئ مزادك الأول",
-    "deleting": "جاري الحذف..."
+    "noAuctions": "لم تقم بإنشاء أي مزادات بعد.",
+    "createFirst": "أنشئ أول مزاد لك",
+    "newAuction": "إنشاء مزاد",
+    "currentBid": "المزايدة الحالية",
+    "deleting": "جاري الحذف...",
+    "activeAuctions": "المزادات النشطة",
+    "endedAuctions": "المزادات المنتهية"
   },
   "createAuction": {
     "createAuction": "إنشاء مزاد",

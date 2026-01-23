@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'rest_framework',
     'api',
-    'notifications',
 ]
 
 SITE_ID = 1

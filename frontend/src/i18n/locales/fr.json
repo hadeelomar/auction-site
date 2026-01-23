@@ -66,7 +66,9 @@
     "title": "Questions et réponses",
     "askQuestion": "Poser une question",
     "reply": "Répondre",
-    "noQuestions": "Aucune question pour le moment. Soyez le premier à poser une question !",
+    "postReply": "Publier la réponse",
+    "replyPlaceholder": "Écrivez votre réponse...",
+    "noQuestions": "Pas encore de questions. Soyez le premier à poser une question!",
     "signInToAsk": "Veuillez vous connecter pour poser une question."
   },
   "settings": {
@@ -117,12 +119,14 @@
   "myAuctions": {
     "title": "Mes Ventes",
     "description": "Gérez les ventes que vous avez créées",
-    "newAuction": "Nouvelle Vente",
     "loading": "Chargement de vos ventes...",
     "currentBid": "enchère actuelle",
     "noAuctions": "Vous n'avez pas encore créé de vente",
     "createFirst": "Créez votre première vente",
-    "deleting": "Suppression..."
+    "deleting": "Suppression...",
+    "newAuction": "Nouvelle Vente",
+    "activeAuctions": "Ventes Actives",
+    "endedAuctions": "Ventes Terminées"
   },
   "createAuction": {
     "createAuction": "Créer une Vente",

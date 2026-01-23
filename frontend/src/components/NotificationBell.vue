@@ -1,12 +1,8 @@
 <template>
   <div class="notification-bell" @click="toggleDropdown" :class="{ 'has-notifications': unreadCount > 0 }">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 8A6 6 0 0 0-6 6"/>
-      <path d="M18 21a2 2 0 0-2-2"/>
-      <path d="M13.5 18l-4-4"/>
-      <path d="m3 12h5v3"/>
-      <path d="M3 7v4a1 1 0 1-1 1"/>
-      <path d="m3 16v-2"/>
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
     </svg>
     <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount }}</span>
     
@@ -17,6 +13,13 @@
         <button @click="markAllRead" class="mark-all-read">Mark all as read</button>
       </div>
       <div class="notification-list">
+        <div v-if="notifications.length === 0" class="no-notifications">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <p>No notifications yet</p>
+        </div>
         <div 
           v-for="notification in notifications" 
           :key="notification.id"
@@ -82,9 +85,15 @@ const markAllRead = async () => {
     })
     
     if (response.ok) {
+      // Mark all notifications as read locally
       notifications.value.forEach(notification => {
         notification.is_read = true
       })
+      // Update the unread count in navbar
+      const event = new CustomEvent('notifications-updated', { 
+        detail: { unreadCount: 0 } 
+      })
+      window.dispatchEvent(event)
     }
   } catch (error) {
     console.error('Error marking all notifications as read:', error)
@@ -96,7 +105,7 @@ const fetchNotifications = async () => {
     const response = await fetch('/api/notifications/')
     if (response.ok) {
       const data = await response.json()
-      notifications.value = data
+      notifications.value = data.notifications || []
     }
   } catch (error) {
     console.error('Error fetching notifications:', error)
@@ -149,7 +158,17 @@ onMounted(() => {
 .notification-bell {
   position: relative;
   cursor: pointer;
-  padding: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  transition: color 0.2s;
+  text-decoration: none;
+}
+
+.notification-bell:hover {
+  color: #111827;
 }
 
 .has-notifications {
@@ -218,6 +237,25 @@ onMounted(() => {
 .notification-list {
   max-height: 300px;
   overflow-y: auto;
+}
+
+.no-notifications {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #9ca3af;
+}
+
+.no-notifications svg {
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+.no-notifications p {
+  margin: 0;
+  font-size: 14px;
 }
 
 .notification-item {

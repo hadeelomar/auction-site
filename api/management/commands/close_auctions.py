@@ -155,11 +155,23 @@ class Command(BaseCommand):
         winner = highest_bid.user
         winning_amount = highest_bid.bid_amount
         
-        # Prepare email data
-        email_data = {
+        # Prepare email data for winner (using winner's currency)
+        winner_email_data = {
             'auction': auction,
             'winner': winner,
-            'winning_bid': highest_bid,
+            'winning_bid': winner.format_currency(winning_amount),
+            'starting_price': winner.format_currency(auction.starting_price),
+            'winning_amount': winning_amount,
+            'seller': auction.owner,
+            'site_url': getattr(settings, 'SITE_URL', 'http://localhost:8000'),
+        }
+        
+        # Prepare email data for seller (using seller's currency)
+        seller_email_data = {
+            'auction': auction,
+            'winner': winner,
+            'winning_bid': auction.owner.format_currency(winning_amount),
+            'starting_price': auction.owner.format_currency(auction.starting_price),
             'winning_amount': winning_amount,
             'seller': auction.owner,
             'site_url': getattr(settings, 'SITE_URL', 'http://localhost:8000'),
@@ -171,10 +183,10 @@ class Command(BaseCommand):
         try:
             if not dry_run:
                 # Send email to winner
-                winner_sent = self.send_winner_email(email_recipient, email_data)
+                winner_sent = self.send_winner_email(email_recipient, winner_email_data)
                 
                 # Also notify seller
-                seller_sent = self.send_seller_notification(auction.owner.email, email_data)
+                seller_sent = self.send_seller_notification(auction.owner.email, seller_email_data)
                 
                 if winner_sent and seller_sent:
                     result['email_sent'] = True
@@ -188,6 +200,24 @@ class Command(BaseCommand):
                     result['closed'] = True
                     result['winner'] = winner
                     result['winning_bid'] = highest_bid
+                    
+                    # Create in-app notifications
+                    # Winner notification
+                    from api.models import Notification
+                    Notification.objects.create(
+                        user=winner,
+                        type='auction_won',
+                        message=f'🎉 Congratulations! You won the auction for "{auction.title}" with a bid of ${winning_amount:.2f}',
+                    )
+                    
+                    # Notify all other bidders that they lost
+                    other_bidders = Bid.objects.filter(item=auction).exclude(user=winner).values_list('user', flat=True).distinct()
+                    for bidder_id in other_bidders:
+                        Notification.objects.create(
+                            user_id=bidder_id,
+                            type='auction_lost',
+                            message=f'The auction "{auction.title}" has ended. The winning bid was ${winning_amount:.2f}',
+                        )
                 else:
                     result['error'] = True
             else:
