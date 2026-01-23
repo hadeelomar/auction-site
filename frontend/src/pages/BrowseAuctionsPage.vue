@@ -426,10 +426,11 @@ onMounted(() => {
 }
 
 .hero-title {
-  font-size: 2.5rem;
-  font-weight: 650;
-  color: #111827;
-  margin-bottom: 0.5rem;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ea580c;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 .hero-subtitle {
@@ -695,13 +696,14 @@ onMounted(() => {
   }
 
   .hero-section {
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1rem;
+    margin: 1rem 0;
   }
 
   .hero-content {
     flex-direction: column;
     text-align: center;
-    gap: 2rem;
+    gap: 1rem;
   }
 
   .hero-text {
@@ -713,7 +715,7 @@ onMounted(() => {
   .hero-desert {
     position: relative;
     width: 100%;
-    height: 180px;
+    height: 120px;
     order: 1;
   }
 

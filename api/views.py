@@ -22,6 +22,7 @@ from typing import Dict, Any
 from decimal import Decimal, InvalidOperation
 from django.db.models import Count, Q, F
 from datetime import timedelta
+import os
 
 
 @ensure_csrf_cookie
@@ -220,6 +221,7 @@ def update_profile(request: HttpRequest) -> JsonResponse:
         user.set_password(new_password)
 
     if 'profile_image' in request.FILES:
+        from .utils.image_utils import create_profile_image
         image = request.FILES['profile_image']
 
         if image.size > 5 * 1024 * 1024:
@@ -229,13 +231,21 @@ def update_profile(request: HttpRequest) -> JsonResponse:
         if image.content_type not in allowed_types:
             return JsonResponse({'error': 'Invalid image type'}, status=400)
 
+        # Delete old profile image if exists
         if user.profile_image:
             try:
-                user.profile_image.delete(save=False)
+                old_path = os.path.join(settings.BASE_DIR, 'media', str(user.profile_image))
+                if os.path.exists(old_path):
+                    os.remove(old_path)
             except Exception:
                 pass
 
-        user.profile_image = image
+        # Process and save new profile image
+        result = create_profile_image(image)
+        if result['success']:
+            user.profile_image.name = result['path']
+        else:
+            return JsonResponse({'error': f'Image processing failed: {result["error"]}'}, status=400)
 
     user.save()
 
