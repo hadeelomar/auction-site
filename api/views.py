@@ -29,7 +29,6 @@ def get_csrf_token(request: HttpRequest) -> JsonResponse:
     return JsonResponse({'detail': 'CSRF cookie set'})
 
 
-@csrf_exempt
 def signup(request: HttpRequest) -> JsonResponse:
     """
     User registration endpoint.
@@ -91,7 +90,6 @@ def signup(request: HttpRequest) -> JsonResponse:
 
 
 
-@csrf_exempt
 def login(request: HttpRequest) -> JsonResponse:
     """
     User login endpoint with rate limiting (5 attempts per minute).
@@ -137,7 +135,6 @@ def login(request: HttpRequest) -> JsonResponse:
     return JsonResponse({'error': 'Invalid credentials'}, status=401)
 
 
-@csrf_exempt
 def logout(request: HttpRequest) -> JsonResponse:
     """
     User logout endpoint.
@@ -282,7 +279,6 @@ def auction_item_to_dict(request: HttpRequest, item: AuctionItem) -> Dict[str, A
     }
 
 
-@csrf_exempt
 def auctions(request: HttpRequest) -> JsonResponse:
     """
     GET  /api/auctions -> list ACTIVE auctions
@@ -359,7 +355,6 @@ def auctions(request: HttpRequest) -> JsonResponse:
     }, status=201)
 
 
-@csrf_exempt
 def auction_detail(request: HttpRequest, item_id: int) -> JsonResponse:
     """
     GET /api/auctions/<id> - Get auction details
@@ -452,7 +447,6 @@ def auction_detail(request: HttpRequest, item_id: int) -> JsonResponse:
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
-@csrf_exempt
 def place_bid(request: HttpRequest) -> JsonResponse:
     """
     POST /api/bids
@@ -618,7 +612,6 @@ def user_bids(request: HttpRequest) -> JsonResponse:
     return JsonResponse({'bids': bids_list}, status=200)
 
 
-@csrf_exempt
 def questions(request: HttpRequest) -> JsonResponse:
     """
     GET  /api/questions?item_id=X -> list questions for an item (paginated, with nested replies)
@@ -728,7 +721,6 @@ def questions(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
-@csrf_exempt
 def question_reply(request: HttpRequest, question_id: int) -> JsonResponse:
     """
     POST /api/questions/:id/reply -> add a reply to a question
@@ -776,7 +768,6 @@ def question_reply(request: HttpRequest, question_id: int) -> JsonResponse:
     }, status=201)
 
 
-@csrf_exempt
 def create_auction(request: HttpRequest) -> JsonResponse:
     """
     POST /api/auctions/create/ -> Create a new auction item
@@ -874,7 +865,6 @@ def create_auction(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'error': f'Failed to create auction: {str(e)}'}, status=500)
 
 
-@csrf_exempt
 def create_sample_auctions(request: HttpRequest) -> JsonResponse:
     """
     Create sample auction items for testing
@@ -974,7 +964,6 @@ def health(request: HttpRequest) -> HttpResponse:
     return HttpResponse("OK")
 
 
-@csrf_exempt
 def search_auctions(request: HttpRequest) -> JsonResponse:
     """
     GET /api/auctions/search?q=keyword&min_price=100&max_price=1000&status=active
@@ -1168,7 +1157,6 @@ class CustomLogoutView(LogoutView):
     """Custom logout view"""
     next_page = 'http://localhost:5173/login'
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_login(request):
     """API endpoint for login (for AJAX requests)"""
@@ -1194,7 +1182,6 @@ def api_login(request):
     else:
         return JsonResponse({'success': False, 'error': 'Invalid email or password'})
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_signup(request):
     """API endpoint for signup (for AJAX requests)"""

@@ -140,7 +140,6 @@ def convert_currency(request: HttpRequest) -> JsonResponse:
     })
 
 
-@csrf_exempt
 def set_language(request: HttpRequest) -> JsonResponse:
     """
     POST /api/i18n/language
@@ -221,7 +220,6 @@ def get_locale_data(request: HttpRequest) -> JsonResponse:
     })
 
 
-@csrf_exempt
 def set_currency(request: HttpRequest) -> JsonResponse:
     """
     POST /api/i18n/currency
