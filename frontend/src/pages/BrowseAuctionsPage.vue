@@ -7,15 +7,26 @@
       <!-- Hero Section -->
       <section class="hero-section">
         <div class="hero-content">
-          <h1 class="hero-title">{{ t('browse.heroTitle') }}</h1>
-          <p class="hero-subtitle">{{ t('browse.heroSubtitle') }}</p>
+          <div class="hero-desert">
+            <div class="desert-box desert-box-1"></div>
+            <div class="desert-box desert-box-2"></div>
+            <div class="desert-box desert-box-3"></div>
+            <div class="desert-box desert-box-4"></div>
+            <div class="desert-circle desert-circle-1"></div>
+            <div class="desert-circle desert-circle-2"></div>
+            <div class="desert-line desert-line-1"></div>
+            <div class="desert-line desert-line-2"></div>
+          </div>
+          <div class="hero-text">
+            <h1 class="hero-title">{{ t('browse.heroTitle') }}</h1>
+            <p class="hero-subtitle">{{ t('browse.heroSubtitle') }}</p>
+          </div>
         </div>
       </section>
 
       <section class="categories-section">
         <div class="section-header">
           <h2 class="section-title">{{ t('browse.topCategories') }}</h2>
-          <button class="see-all-btn">{{ t('browse.seeAll') }}</button>
         </div>
         <div class="categories-grid">
           <div 
@@ -67,11 +78,10 @@
         </div>
       </section>
 
-      <!-- Featured Auctions -->
+      <!-- Auctions -->
       <section class="auctions-section">
         <div class="section-header">
-          <h2 class="section-title">{{ t('browse.featuredAuctions') }}</h2>
-          <button class="see-all-btn">{{ t('browse.seeAll') }}</button>
+          <h2 class="section-title">{{ t('browse.auctions') }}</h2>
         </div>
         
         <!-- Loading state -->
@@ -124,35 +134,6 @@
         </div>
       </section>
 
-      <!-- Ending Soon -->
-      <section class="auctions-section">
-        <div class="section-header">
-          <h2 class="section-title">{{ t('browse.endingSoon') }}</h2>
-          <button class="see-all-btn">{{ t('browse.seeAll') }}</button>
-        </div>
-        <div class="auctions-grid">
-          <router-link 
-            v-for="auction in endingSoon" 
-            :key="auction.id" 
-            :to="`/auction/${auction.id}`"
-            class="auction-card"
-          >
-            <div class="auction-image">
-              <img :src="auction.image || '/placeholder.svg?height=200&width=200'" :alt="auction.title" />
-              <span class="ending-badge">{{ t('browse.endsIn') }} {{ auction.time_left }}</span>
-            </div>
-            <div class="auction-details">
-              <h3 class="auction-title">{{ auction.title }}</h3>
-              <div class="auction-price">
-                <span class="current-price">{{ formatPrice(auction.current_price) }}</span>
-              </div>
-              <div class="auction-meta">
-                <span class="bids-count">{{ auction.bid_count }} {{ t('browse.bids') }}</span>
-              </div>
-            </div>
-          </router-link>
-        </div>
-      </section>
       </div>
     </main>
 
@@ -307,7 +288,141 @@ onMounted(() => {
   border-radius: 20px;
   padding: 3rem;
   margin: 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  gap: 3rem;
+}
+
+.hero-desert {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-text {
+  position: relative;
+  z-index: 3;
   text-align: center;
+  margin-left: 8rem;
+}
+
+/* Subtle desert sand boxes */
+.desert-box {
+  position: absolute;
+  background: linear-gradient(135deg, #fed7aa, #fdba74);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.1);
+}
+
+.desert-box-1 {
+  width: 140px;
+  height: 90px;
+  top: 15%;
+  left: 2%;
+  transform: rotate(-8deg);
+  animation: float 12s ease-in-out infinite;
+}
+
+.desert-box-2 {
+  width: 100px;
+  height: 140px;
+  top: 45%;
+  left: 8%;
+  transform: rotate(12deg);
+  animation: float 15s ease-in-out infinite reverse;
+}
+
+.desert-box-3 {
+  width: 120px;
+  height: 70px;
+  bottom: 20%;
+  left: 4%;
+  transform: rotate(-5deg);
+  animation: float 10s ease-in-out infinite;
+}
+
+.desert-box-4 {
+  width: 80px;
+  height: 80px;
+  top: 30%;
+  left: 15%;
+  transform: rotate(15deg);
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+/* Sand particles */
+.desert-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(254, 215, 170, 0.3), rgba(253, 186, 116, 0.2));
+}
+
+.desert-circle-1 {
+  width: 180px;
+  height: 180px;
+  top: -40px;
+  left: -60px;
+  animation: pulse 14s ease-in-out infinite;
+}
+
+.desert-circle-2 {
+  width: 120px;
+  height: 120px;
+  bottom: -30px;
+  left: 10%;
+  animation: pulse 11s ease-in-out infinite reverse;
+}
+
+/* Sand drift lines */
+.desert-line {
+  position: absolute;
+  background: linear-gradient(90deg, rgba(254, 215, 170, 0.4), rgba(253, 186, 116, 0.2));
+  border-radius: 2px;
+}
+
+.desert-line-1 {
+  width: 250px;
+  height: 2px;
+  top: 25%;
+  left: -80px;
+  transform: rotate(25deg);
+  animation: slide 18s ease-in-out infinite;
+}
+
+.desert-line-2 {
+  width: 180px;
+  height: 2px;
+  bottom: 35%;
+  left: -60px;
+  transform: rotate(-20deg);
+  animation: slide 14s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(-8deg); }
+  50% { transform: translateY(-8px) rotate(-5deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.2; }
+  50% { transform: scale(1.05); opacity: 0.3; }
+}
+
+@keyframes slide {
+  0%, 100% { transform: translateX(0px) rotate(25deg); }
+  50% { transform: translateX(20px) rotate(28deg); }
 }
 
 .hero-title {
@@ -344,7 +459,7 @@ onMounted(() => {
 .see-all-btn {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #ea580c;
+  color: #f97316;
   background: none;
   border: none;
   cursor: pointer;
@@ -352,7 +467,7 @@ onMounted(() => {
 }
 
 .see-all-btn:hover {
-  color: #c2410c;
+  color: #ea580c;
 }
 
 .categories-grid {
@@ -435,7 +550,7 @@ onMounted(() => {
   font-size: 0.75rem;
   font-weight: 600;
   color: #ffffff;
-  background: #ea580c;
+  background: linear-gradient(135deg, #ea580c, #f97316);
   border-radius: 6px;
 }
 
@@ -514,17 +629,23 @@ onMounted(() => {
 }
 
 .footer {
-  background: #111827;
-  padding: 2rem;
-  margin-top: 4rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  padding: 2rem 0;
+  margin-top: auto;
 }
 
 .footer-content {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 2rem;
   text-align: center;
-  color: #9ca3af;
+}
+
+.footer-content p {
+  color: #6b7280;
   font-size: 0.875rem;
+  margin: 0;
 }
 
 /* Error state styles */
@@ -559,7 +680,7 @@ onMounted(() => {
 
 /* Active category style */
 .category-card.active .category-icon {
-  background: #ea580c;
+  background: linear-gradient(135deg, #ea580c, #f97316);
   color: white;
 }
 
@@ -577,26 +698,106 @@ onMounted(() => {
     padding: 2rem 1.5rem;
   }
 
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+
+  .hero-text {
+    text-align: center;
+    order: 2;
+    margin-left: 0;
+  }
+
+  .hero-desert {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    order: 1;
+  }
+
+  .desert-box-1 {
+    width: 70px;
+    height: 45px;
+    top: 5%;
+    left: 5%;
+  }
+
+  .desert-box-2 {
+    width: 50px;
+    height: 70px;
+    top: 35%;
+    left: 20%;
+  }
+
+  .desert-box-3 {
+    width: 60px;
+    height: 35px;
+    bottom: 15%;
+    left: 10%;
+  }
+
+  .desert-box-4 {
+    width: 40px;
+    height: 40px;
+    top: 50%;
+    left: 35%;
+  }
+
+  .desert-circle-1 {
+    width: 90px;
+    height: 90px;
+    top: 0;
+    left: -20px;
+  }
+
+  .desert-circle-2 {
+    width: 70px;
+    height: 70px;
+    bottom: 0;
+    right: 0;
+  }
+
+  .desert-line-1 {
+    width: 120px;
+    height: 1px;
+    top: 25%;
+    left: -30px;
+  }
+
+  .desert-line-2 {
+    width: 90px;
+    height: 1px;
+    bottom: 25%;
+    left: -20px;
+  }
+
   .hero-title {
     font-size: 1.75rem;
   }
 
-  /* Allow wrapping on mobile but still spread out */
   .categories-grid {
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
     gap: 1.5rem;
     padding: 0;
+    max-width: 320px;
+    margin: 0 auto;
   }
 
   .category-icon {
-    width: 64px;
-    height: 64px;
+    width: 90px;
+    height: 90px;
   }
 
   .category-icon svg {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .category-name {
+    font-size: 0.9rem;
   }
 
   .auctions-grid {

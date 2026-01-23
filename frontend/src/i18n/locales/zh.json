@@ -75,13 +75,11 @@
     "preferences": "偏好设置"
   },
   "browse": {
-    "heroTitle": "发现超值优惠",
-    "heroSubtitle": "竞拍来自世界各地卖家的独特商品",
+    "heroTitle": "找到超值优惠",
+    "heroSubtitle": "来自世界各地的卖家为您提供独特商品",
     "topCategories": "热门分类",
-    "featuredAuctions": "精选拍卖",
-    "endingSoon": "即将结束",
-    "seeAll": "查看全部",
-    "bids": "次出价",
+    "auctions": "拍卖",
+    "bids": "出价",
     "endsIn": "结束于"
   },
   "categories": {
@@ -119,12 +117,44 @@
   "myAuctions": {
     "title": "我的拍卖",
     "description": "管理您创建的拍卖",
-    "newAuction": "新建拍卖",
+    "newAuction": "新拍卖",
     "loading": "正在加载您的拍卖...",
     "currentBid": "当前出价",
     "noAuctions": "您还没有创建任何拍卖",
     "createFirst": "创建您的第一个拍卖",
     "deleting": "删除中..."
+  },
+  "createAuction": {
+    "createAuction": "创建拍卖",
+    "editAuction": "编辑拍卖",
+    "createDescription": "为新商品进行拍卖",
+    "updateDescription": "更新您的拍卖详情",
+    "itemDetails": "商品详情",
+    "title": "标题",
+    "titlePlaceholder": "输入商品标题",
+    "titleRequired": "标题是必需的",
+    "titleMinLength": "标题必须至少3个字符",
+    "description": "描述",
+    "descriptionPlaceholder": "详细描述您的商品",
+    "descriptionRequired": "描述是必需的",
+    "descriptionMinLength": "描述必须至少10个字符",
+    "startingPrice": "起拍价",
+    "startingPriceRequired": "起拍价是必需的",
+    "startingPricePositive": "起拍价必须大于0",
+    "endDate": "结束日期和时间",
+    "endDateRequired": "结束日期是必需的",
+    "endDateFuture": "结束日期必须是未来",
+    "category": "类别",
+    "itemImage": "商品图片",
+    "dragDropText": "拖放图片到此处，或点击浏览",
+    "uploadHint": "PNG、JPG 最大10MB",
+    "selectImageFile": "请选择图片文件",
+    "imageSizeError": "图片大小必须小于10MB",
+    "creating": "创建中...",
+    "updating": "更新中...",
+    "submitCreate": "创建拍卖",
+    "submitUpdate": "更新拍卖",
+    "loading": "正在加载拍卖详情..."
   },
   "footer": {
     "allRightsReserved": "版权所有。"

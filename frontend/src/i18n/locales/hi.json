@@ -75,14 +75,12 @@
     "preferences": "प्राथमिकताएं"
   },
   "browse": {
-    "heroTitle": "अद्भुत सौदे खोजें",
-    "heroSubtitle": "दुनिया भर के विक्रेताओं से अनूठी वस्तुओं पर बोली लगाएं",
-    "topCategories": "शीर्ष श्रेणियाँ",
-    "featuredAuctions": "विशेष नीलामी",
-    "endingSoon": "जल्द समाप्त",
-    "seeAll": "सभी देखें",
-    "bids": "बोलियाँ",
-    "endsIn": "में समाप्त"
+    "heroTitle": "अद्भुत डील्स खोजें",
+    "heroSubtitle": "दुनिया भर के विक्रेताओं से अद्वितीय वस्तुओं पर बोली लगाएं",
+    "topCategories": "शीर्ष श्रेणियां",
+    "auctions": "नीलामी",
+    "bids": "बोली",
+    "endsIn": "में समाप्त होता है"
   },
   "categories": {
     "electronics": "इलेक्ट्रॉनिक्स",
@@ -118,13 +116,45 @@
   },
   "myAuctions": {
     "title": "मेरी नीलामी",
-    "description": "आपके द्वारा बनाई गई नीलामी प्रबंधित करें",
+    "description": "आपके द्वारा बनाई गई नीलामियों का प्रबंधन करें",
     "newAuction": "नई नीलामी",
-    "loading": "आपकी नीलामी लोड हो रही है...",
+    "loading": "आपकी नीलामियां लोड हो रही हैं...",
     "currentBid": "वर्तमान बोली",
     "noAuctions": "आपने अभी तक कोई नीलामी नहीं बनाई है",
     "createFirst": "अपनी पहली नीलामी बनाएं",
     "deleting": "हटा रहे हैं..."
+  },
+  "createAuction": {
+    "createAuction": "नीलामी बनाएं",
+    "editAuction": "नीलामी संपादित करें",
+    "createDescription": "नई वस्तु को नीलामी पर रखें",
+    "updateDescription": "अपने नीलामी विवरण अपडेट करें",
+    "itemDetails": "वस्तु विवरण",
+    "title": "शीर्षक",
+    "titlePlaceholder": "वस्तु शीर्षक दर्ज करें",
+    "titleRequired": "शीर्षक आवश्यक है",
+    "titleMinLength": "शीर्षक कम से कम 3 अक्षरों का होना चाहिए",
+    "description": "विवरण",
+    "descriptionPlaceholder": "अपनी वस्तु का विस्तृत विवरण दें",
+    "descriptionRequired": "विवरण आवश्यक है",
+    "descriptionMinLength": "विवरण कम से कम 10 अक्षरों का होना चाहिए",
+    "startingPrice": "प्रारंभिक मूल्य",
+    "startingPriceRequired": "प्रारंभिक मूल्य आवश्यक है",
+    "startingPricePositive": "प्रारंभिक मूल्य 0 से अधिक होना चाहिए",
+    "endDate": "समाप्ति तिथि और समय",
+    "endDateRequired": "समाप्ति तिथि आवश्यक है",
+    "endDateFuture": "समाप्ति तिथि भविष्य में होनी चाहिए",
+    "category": "श्रेणी",
+    "itemImage": "वस्तु छवि",
+    "dragDropText": "यहां छवि खींचें और छोड़ें, या ब्राउज़ करने के लिए क्लिक करें",
+    "uploadHint": "PNG, JPG अधिकतम 10MB",
+    "selectImageFile": "कृपया छवि फ़ाइल चुनें",
+    "imageSizeError": "छवि का आकार 10MB से कम होना चाहिए",
+    "creating": "बना रहे हैं...",
+    "updating": "अपडेट हो रहा है...",
+    "submitCreate": "नीलामी बनाएं",
+    "submitUpdate": "नीलामी अपडेट करें",
+    "loading": "नीलामी विवरण लोड हो रहे हैं..."
   },
   "footer": {
     "allRightsReserved": "सभी अधिकार सुरक्षित।"

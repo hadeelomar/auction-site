@@ -76,13 +76,11 @@
   },
   "browse": {
     "heroTitle": "Harika Fırsatlar Bulun",
-    "heroSubtitle": "Dünyanın dört bir yanındaki satıcılardan benzersiz ürünlere teklif verin",
+    "heroSubtitle": "Dünyadaki satıcılardan benzersiz ürünler için teklif verin",
     "topCategories": "Popüler Kategoriler",
-    "featuredAuctions": "Öne Çıkan Açık Artırmalar",
-    "endingSoon": "Yakında Bitiyor",
-    "seeAll": "Tümünü Gör",
-    "bids": "teklif",
-    "endsIn": "Bitiyor"
+    "auctions": "Açık Artırmalar",
+    "bids": "teklifler",
+    "endsIn": "süre içinde"
   },
   "categories": {
     "electronics": "Elektronik",
@@ -125,6 +123,38 @@
     "noAuctions": "Henüz açık artırma oluşturmadınız",
     "createFirst": "İlk açık artırmanızı oluşturun",
     "deleting": "Siliniyor..."
+  },
+  "createAuction": {
+    "createAuction": "Açık Artırma Oluştur",
+    "editAuction": "Açık Artırma Düzenle",
+    "createDescription": "Yeni bir ürünü açık artırmaya koyun",
+    "updateDescription": "Açık artırma ayrıntılarınızı güncelleyin",
+    "itemDetails": "Ürün Ayrıntıları",
+    "title": "Başlık",
+    "titlePlaceholder": "Ürün başlığını girin",
+    "titleRequired": "Başlık gereklidir",
+    "titleMinLength": "Başlık en az 3 karakter olmalıdır",
+    "description": "Açıklama",
+    "descriptionPlaceholder": "Ürününüzü detaylı olarak açıklayın",
+    "descriptionRequired": "Açıklama gereklidir",
+    "descriptionMinLength": "Açıklama en az 10 karakter olmalıdır",
+    "startingPrice": "Başlangıç Fiyatı",
+    "startingPriceRequired": "Başlangıç fiyatı gereklidir",
+    "startingPricePositive": "Başlangıç fiyatı 0'dan büyük olmalıdır",
+    "endDate": "Bitiş Tarihi ve Saati",
+    "endDateRequired": "Bitiş tarihi gereklidir",
+    "endDateFuture": "Bitiş tarihi gelecekte olmalıdır",
+    "category": "Kategori",
+    "itemImage": "Ürün Görseli",
+    "dragDropText": "Buraya görseli sürükleyip bırakın veya tıklayarak göz atın",
+    "uploadHint": "PNG, JPG en fazla 10MB",
+    "selectImageFile": "Lütfen bir görsel dosyası seçin",
+    "imageSizeError": "Görsel boyutu 10MB'den az olmalıdır",
+    "creating": "Oluşturuluyor...",
+    "updating": "Güncelleniyor...",
+    "submitCreate": "Açık Artırma Oluştur",
+    "submitUpdate": "Açık Artırma Güncelle",
+    "loading": "Açık artırma ayrıntıları yükleniyor..."
   },
   "footer": {
     "allRightsReserved": "Tüm hakları saklıdır."
