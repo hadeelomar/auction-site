@@ -1,0 +1,38 @@
+🏆 CONGRATULATIONS! YOU WON THE AUCTION! 🏆
+
+Dear {{ winner.get_full_name|default:winner.username }},
+
+Great news! You are the winning bidder for the following auction:
+
+AUCTION DETAILS:
+===============
+Title: {{ auction.title }}
+Description: {{ auction.description|truncatewords:50 }}
+Winning Bid: ${{ winning_amount|floatformat:2 }}
+Auction Ended: {{ auction.ends_at|date:"F j, Y, g:i A" }}
+Seller: {{ seller.get_full_name|default:seller.username }}
+Category: {{ auction.get_category_display|default:auction.category.title }}
+
+WHAT HAPPENS NEXT:
+==================
+The seller will contact you soon to arrange:
+- Payment details
+- Delivery/pickup arrangements
+- Any other necessary logistics
+
+Please ensure your contact information is up to date in your profile.
+
+VIEW THE AUCTION:
+==================
+{{ site_url }}/auctions/{{ auction.id }}
+
+Thank you for participating in the Bido Auction Platform!
+
+If you have any questions, please don't hesitate to contact our support team.
+
+Best regards,
+The Bido Team
+
+---
+This is an automated message. Please do not reply to this email.
+© 2026 Bido. All rights reserved.

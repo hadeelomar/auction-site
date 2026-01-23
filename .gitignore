@@ -301,3 +301,6 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,django
 cookies.txt
+
+# OpenShift deployment configurations (handle directly on platform)
+openshift/
