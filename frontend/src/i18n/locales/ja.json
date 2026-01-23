@@ -127,6 +127,42 @@
     "deleting": "削除中..."
   },
   "footer": {
-    "allRightsReserved": "All rights reserved."
+    "allRightsReserved": "全著作権所有。"
+  },
+  "profile": {
+    "title": "プロフィール設定",
+    "subtitle": "アカウント情報を管理",
+    "profilePicture": "プロフィール写真",
+    "personalInformation": "個人情報",
+    "changePassword": "パスワード変更",
+    "passwordDescription": "パスワードを変更しない場合は空白のままにしてください",
+    "firstName": "名",
+    "lastName": "姓",
+    "dateOfBirth": "生年月日",
+    "currentPassword": "現在のパスワード",
+    "newPassword": "新しいパスワード",
+    "enterCurrentPassword": "現在のパスワードを入力",
+    "enterNewPassword": "新しいパスワードを入力",
+    "saveChanges": "変更を保存",
+    "saving": "保存中...",
+    "reset": "リセット",
+    "required": "必須",
+    "enterFirstName": "名を入力",
+    "enterLastName": "姓を入力",
+    "profileUpdated": "プロフィールが正常に更新されました",
+    "updateFailed": "プロフィールの更新に失敗しました",
+    "updateError": "プロフィールの更新中にエラーが発生しました",
+    "firstNameRequired": "名は必須です",
+    "lastNameRequired": "姓は必須です",
+    "invalidEmail": "無効なメールアドレス",
+    "dateInFuture": "日付は未来にできません",
+    "currentPasswordRequired": "現在のパスワードが必要です",
+    "newPasswordRequired": "新しいパスワードが必要です",
+    "passwordTooShort": "パスワードは6文字以上である必要があります",
+    "avatarUploaded": "アバターがアップロードされました",
+    "uploadAvatar": "アバターをアップロード",
+    "fileFormatHint": "PNG、JPG 最大5MB",
+    "selectImageFile": "画像ファイルを選択してください",
+    "fileSizeError": "ファイルサイズは5MB未満である必要があります"
   }
 }

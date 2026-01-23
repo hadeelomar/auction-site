@@ -127,6 +127,42 @@
     "deleting": "हटा रहे हैं..."
   },
   "footer": {
-    "allRightsReserved": "सर्वाधिकार सुरक्षित।"
+    "allRightsReserved": "सभी अधिकार सुरक्षित।"
+  },
+  "profile": {
+    "title": "प्रोफ़ाइल सेटिंग्स",
+    "subtitle": "अपने खाते की जानकारी प्रबंधित करें",
+    "profilePicture": "प्रोफ़ाइल चित्र",
+    "personalInformation": "व्यक्तिगत जानकारी",
+    "changePassword": "पासवर्ड बदलें",
+    "passwordDescription": "यदि आप पासवर्ड नहीं बदलना चाहते हैं तो खाली छोड़ दें",
+    "firstName": "पहला नाम",
+    "lastName": "अंतिम नाम",
+    "dateOfBirth": "जन्म तिथि",
+    "currentPassword": "वर्तमान पासवर्ड",
+    "newPassword": "नया पासवर्ड",
+    "enterCurrentPassword": "वर्तमान पासवर्ड दर्ज करें",
+    "enterNewPassword": "नया पासवर्ड दर्ज करें",
+    "saveChanges": "परिवर्तन सहेजें",
+    "saving": "सहेज रहे हैं...",
+    "reset": "रीसेट करें",
+    "required": "आवश्यक",
+    "enterFirstName": "पहला नाम दर्ज करें",
+    "enterLastName": "अंतिम नाम दर्ज करें",
+    "profileUpdated": "प्रोफ़ाइल सफलतापूर्वक अपडेट किया गया",
+    "updateFailed": "प्रोफ़ाइल अपडेट करने में असफल",
+    "updateError": "प्रोफ़ाइल अपडेट करते समय त्रुटि हुई",
+    "firstNameRequired": "पहला नाम आवश्यक है",
+    "lastNameRequired": "अंतिम नाम आवश्यक है",
+    "invalidEmail": "अमान्य ईमेल पता",
+    "dateInFuture": "तारीख भविष्य में नहीं हो सकती",
+    "currentPasswordRequired": "वर्तमान पासवर्ड आवश्यक है",
+    "newPasswordRequired": "नया पासवर्ड आवश्यक है",
+    "passwordTooShort": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
+    "avatarUploaded": "अवतार अपलोड हो गया",
+    "uploadAvatar": "अवतार अपलोड करें",
+    "fileFormatHint": "PNG, JPG अधिकतम 5MB",
+    "selectImageFile": "कृपया एक छवि फ़ाइल चुनें",
+    "fileSizeError": "फ़ाइल का आकार 5MB से कम होना चाहिए"
   }
 }

@@ -178,6 +178,11 @@ export const useI18nStore = defineStore('i18n', () => {
       document.documentElement.dir = 'rtl'
     }
     document.documentElement.lang = currentLanguage.value
+    
+    // Update vue-i18n locale to match current language
+    if (i18n.global.locale) {
+      (i18n.global.locale as any).value = currentLanguage.value
+    }
   }
 
   return {

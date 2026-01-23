@@ -6,14 +6,14 @@
       <div class="profile-container">
         <!-- profile header -->
         <div class="profile-header reveal-box" :class="{ 'revealed': isRevealed }">
-          <h1 class="profile-title">Profile Settings</h1>
-          <p class="profile-subtitle">Manage your account information</p>
+          <h1 class="profile-title">{{ t('profile.title') }}</h1>
+          <p class="profile-subtitle">{{ t('profile.subtitle') }}</p>
         </div>
 
         <form @submit.prevent="handleSubmit" class="profile-form">
           <!-- avatar upload -->
           <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.1s">
-            <h2 class="section-title">Profile Picture</h2>
+            <h2 class="section-title">{{ t('profile.profilePicture') }}</h2>
             <div class="avatar-upload-container">
               <div
                 :class="['avatar-preview', { 'dragging': isDragging }]"
@@ -50,8 +50,8 @@
                 </button>
               </div>
               <div class="avatar-info">
-                <p class="avatar-label">{{ previewUrl ? 'Avatar uploaded' : 'Upload avatar' }}</p>
-                <p class="avatar-hint">PNG, JPG up to 5MB</p>
+                <p class="avatar-label">{{ previewUrl ? t('profile.avatarUploaded') : t('profile.uploadAvatar') }}</p>
+                <p class="avatar-hint">{{ t('profile.fileFormatHint') }}</p>
               </div>
               <span v-if="errors.image" class="error-message">{{ errors.image }}</span>
             </div>
@@ -59,29 +59,28 @@
 
           <!-- personal info -->
           <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.2s">
-            <h2 class="section-title">Personal Information</h2>
+            <h2 class="section-title">{{ t('profile.personalInformation') }}</h2>
             
             <div class="form-grid">
               <div class="form-group">
-                <label for="firstName" class="form-label">First Name <span class="required">*</span></label>
-                <input id="firstName" v-model="formData.firstName" type="text" class="form-input" placeholder="Enter first name" />
+                <label for="firstName" class="form-label">{{ t('profile.firstName') }} <span class="required">*</span></label>
+                <input id="firstName" v-model="formData.firstName" type="text" class="form-input" :placeholder="t('profile.enterFirstName')" />
                 <span v-if="errors.firstName" class="error-message">{{ errors.firstName }}</span>
               </div>
 
               <div class="form-group">
-                <label for="lastName" class="form-label">Last Name <span class="required">*</span></label>
-                <input id="lastName" v-model="formData.lastName" type="text" class="form-input" placeholder="Enter last name" />
+                <label for="lastName" class="form-label">{{ t('profile.lastName') }} <span class="required">*</span></label>
+                <input id="lastName" v-model="formData.lastName" type="text" class="form-input" :placeholder="t('profile.enterLastName')" />
                 <span v-if="errors.lastName" class="error-message">{{ errors.lastName }}</span>
               </div>
 
               <div class="form-group">
-                <label for="email" class="form-label">Email <span class="required">*</span></label>
-                <input id="email" v-model="formData.email" type="email" class="form-input" placeholder="Enter your email" />
-                <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
+                <label for="email" class="form-label">{{ t('auth.email') }}</label>
+                <input id="email" v-model="formData.email" type="email" class="form-input" readonly />
               </div>
 
               <div class="form-group">
-                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                <label for="dateOfBirth" class="form-label">{{ t('profile.dateOfBirth') }}</label>
                 <input id="dateOfBirth" v-model="formData.dateOfBirth" type="date" class="form-input" />
                 <span v-if="errors.dateOfBirth" class="error-message">{{ errors.dateOfBirth }}</span>
               </div>
@@ -90,19 +89,19 @@
 
           <!-- password change -->
           <div class="form-section reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.3s">
-            <h2 class="section-title">Change Password</h2>
-            <p class="section-description">Leave blank if you don't want to change your password</p>
+            <h2 class="section-title">{{ t('profile.changePassword') }}</h2>
+            <p class="section-description">{{ t('profile.passwordDescription') }}</p>
             
             <div class="form-grid">
               <div class="form-group">
-                <label for="currentPassword" class="form-label">Current Password</label>
-                <input id="currentPassword" v-model="formData.currentPassword" type="password" class="form-input" placeholder="Enter current password" />
+                <label for="currentPassword" class="form-label">{{ t('profile.currentPassword') }}</label>
+                <input id="currentPassword" v-model="formData.currentPassword" type="password" class="form-input" :placeholder="t('profile.enterCurrentPassword')" />
                 <span v-if="errors.currentPassword" class="error-message">{{ errors.currentPassword }}</span>
               </div>
 
               <div class="form-group">
-                <label for="newPassword" class="form-label">New Password</label>
-                <input id="newPassword" v-model="formData.newPassword" type="password" class="form-input" placeholder="Enter new password" />
+                <label for="newPassword" class="form-label">{{ t('profile.newPassword') }}</label>
+                <input id="newPassword" v-model="formData.newPassword" type="password" class="form-input" :placeholder="t('profile.enterNewPassword')" />
                 <span v-if="errors.newPassword" class="error-message">{{ errors.newPassword }}</span>
               </div>
             </div>
@@ -110,10 +109,10 @@
 
           <!-- form actions -->
           <div class="form-actions reveal-box" :class="{ 'revealed': isRevealed }" style="animation-delay: 0.4s">
-            <button type="button" class="cancel-button" @click="loadUserData">Reset</button>
+            <button type="button" class="cancel-button" @click="loadUserData">{{ t('profile.reset') }}</button>
             <button type="submit" class="save-button" :disabled="isLoading">
-              <span v-if="!isLoading">Save Changes</span>
-              <span v-else>Saving...</span>
+              <span v-if="!isLoading">{{ t('profile.saveChanges') }}</span>
+              <span v-else>{{ t('profile.saving') }}</span>
             </button>
           </div>
         </form>
@@ -139,9 +138,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../stores/auth'
 import Navbar from '../components/Navbar.vue'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -196,8 +197,8 @@ const handleDrop = (e: DragEvent) => {
 
 const processFile = (file: File) => {
   errors.image = ''
-  if (!file.type.startsWith('image/')) { errors.image = 'Please select an image file'; return }
-  if (file.size > 5 * 1024 * 1024) { errors.image = 'File size must be less than 5MB'; return }
+  if (!file.type.startsWith('image/')) { errors.image = t('profile.selectImageFile'); return }
+  if (file.size > 5 * 1024 * 1024) { errors.image = t('profile.fileSizeError'); return }
   selectedFile.value = file
   autoCropImage(file)
 }
@@ -241,16 +242,16 @@ const removeImage = () => {
 const validateForm = (): boolean => {
   let isValid = true
   errors.firstName = ''; errors.lastName = ''; errors.email = ''; errors.dateOfBirth = ''; errors.currentPassword = ''; errors.newPassword = ''
-  if (!formData.firstName.trim()) { errors.firstName = 'First name is required'; isValid = false }
-  if (!formData.lastName.trim()) { errors.lastName = 'Last name is required'; isValid = false }
-  if (!/\S+@\S+\.\S+/.test(formData.email)) { errors.email = 'Invalid email address'; isValid = false }
-  if (formData.dateOfBirth && new Date(formData.dateOfBirth) > new Date()) { errors.dateOfBirth = 'Date cannot be in the future'; isValid = false }
+  if (!formData.firstName.trim()) { errors.firstName = t('profile.firstNameRequired'); isValid = false }
+  if (!formData.lastName.trim()) { errors.lastName = t('profile.lastNameRequired'); isValid = false }
+  if (!/\S+@\S+\.\S+/.test(formData.email)) { errors.email = t('profile.invalidEmail'); isValid = false }
+  if (formData.dateOfBirth && new Date(formData.dateOfBirth) > new Date()) { errors.dateOfBirth = t('profile.dateInFuture'); isValid = false }
   if ((formData.currentPassword || formData.newPassword) && (!formData.currentPassword || !formData.newPassword)) {
-    if (!formData.currentPassword) errors.currentPassword = 'Current password required'
-    if (!formData.newPassword) errors.newPassword = 'New password required'
+    if (!formData.currentPassword) errors.currentPassword = t('profile.currentPasswordRequired')
+    if (!formData.newPassword) errors.newPassword = t('profile.newPasswordRequired')
     isValid = false
   }
-  if (formData.newPassword && formData.newPassword.length < 6) { errors.newPassword = 'Password must be at least 6 characters'; isValid = false }
+  if (formData.newPassword && formData.newPassword.length < 6) { errors.newPassword = t('profile.passwordTooShort'); isValid = false }
   return isValid
 }
 
@@ -278,14 +279,14 @@ const handleSubmit = async () => {
 
     if (response.ok) {
       await authStore.checkAuth()
-      showToast('Profile updated successfully', 'success')
+      showToast(t('profile.profileUpdated'), 'success')
       formData.currentPassword = ''; formData.newPassword = ''
     } else {
       const error = await response.json()
-      showToast(error.error || 'Failed to update profile', 'error')
+      showToast(error.error || t('profile.updateFailed'), 'error')
     }
   } catch (err) {
-    showToast('An error occurred while updating profile', 'error')
+    showToast(t('profile.updateError'), 'error')
   } finally {
     isLoading.value = false
   }
