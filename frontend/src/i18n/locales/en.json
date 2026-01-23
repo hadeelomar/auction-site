@@ -39,7 +39,8 @@
     "noBids": "No bids yet",
     "wonBy": "Won by",
     "ended": "Ended",
-    "active": "Active"
+    "active": "Active",
+    "closed": "Closed"
   },
   "bids": {
     "yourBid": "Your Bid",

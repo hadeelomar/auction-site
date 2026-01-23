@@ -112,10 +112,42 @@ class Command(BaseCommand):
                 )
             )
             
+            # Prepare email data for seller notification (no bids)
+            email_data = {
+                'auction': auction,
+                'winner': None,
+                'winning_bid': None,
+                'winning_amount': None,
+                'seller': auction.owner,
+                'site_url': getattr(settings, 'SITE_URL', 'http://localhost:8000'),
+            }
+            
             if not dry_run:
-                auction.status = 'closed'
-                auction.save()
-                result['closed'] = True
+                # Send seller notification about no bids
+                seller_sent = self.send_seller_notification(auction.owner.email, email_data)
+                
+                if seller_sent:
+                    result['email_sent'] = True
+                    
+                    # Close the auction
+                    auction.status = 'closed'
+                    auction.closed_at = timezone.now()
+                    auction.save()
+                    result['closed'] = True
+                else:
+                    result['error'] = True
+            else:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"🧪 DRY RUN: Would send seller notification about no bids to {auction.owner.email}"
+                    )
+                )
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"🧪 DRY RUN: Would close auction {auction.id} - {auction.title}"
+                    )
+                )
+                result['closed'] = True  # Simulate closing in dry run
             
             return result
         
@@ -198,8 +230,8 @@ class Command(BaseCommand):
             subject = f"🎉 Congratulations! You won the auction for {email_data['auction'].title}"
             
             # Create HTML email content
-            html_message = render_to_string('api/emails/winner_notification.html', email_data)
-            plain_message = render_to_string('api/emails/winner_notification.txt', email_data)
+            html_message = render_to_string('emails/winner_notification.html', email_data)
+            plain_message = render_to_string('emails/winner_notification.txt', email_data)
             
             # Send email
             sent = send_mail(
@@ -228,8 +260,8 @@ class Command(BaseCommand):
             subject = f"🏆 Your auction '{email_data['auction'].title}' has ended"
             
             # Create HTML email content
-            html_message = render_to_string('api/emails/seller_notification.html', email_data)
-            plain_message = render_to_string('api/emails/seller_notification.txt', email_data)
+            html_message = render_to_string('emails/seller_notification.html', email_data)
+            plain_message = render_to_string('emails/seller_notification.txt', email_data)
             
             # Send email
             sent = send_mail(
