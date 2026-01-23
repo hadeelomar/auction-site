@@ -1,9 +1,11 @@
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from typing import Dict, Any, Optional, Union
+from django.contrib.auth.models import User
 from .models import Notification
 
 
-def send_notification_to_user(user_id, notification_data):
+def send_notification_to_user(user_id: int, notification_data: Dict[str, Any]) -> None:
     """
     Send real-time notification to a specific user via WebSocket
     """
@@ -23,7 +25,7 @@ def send_notification_to_user(user_id, notification_data):
         pass
 
 
-def send_unread_count_update(user_id, count):
+def send_unread_count_update(user_id: int, count: int) -> None:
     """
     Send unread count update to a specific user via WebSocket
     """
@@ -43,7 +45,7 @@ def send_unread_count_update(user_id, count):
         pass
 
 
-def create_and_send_notification(user, notification_type, message):
+def create_and_send_notification(user: User, notification_type: str, message: str) -> Optional[Notification]:
     """
     Create notification in database and send via WebSocket
     Includes deduplication to prevent duplicate notifications

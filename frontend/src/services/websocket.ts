@@ -1,3 +1,18 @@
+interface WebSocketMessage {
+  type: string
+  notification?: Notification
+  count?: number
+  message?: string
+}
+
+interface Notification {
+  id: number
+  type: string
+  message: string
+  is_read: boolean
+  timestamp: string
+}
+
 class WebSocketService {
   private socket: WebSocket | null = null
   private reconnectAttempts = 0
@@ -68,7 +83,7 @@ class WebSocketService {
     }, delay)
   }
 
-  private handleMessage(data: any) {
+  private handleMessage(data: WebSocketMessage) {
     const { type } = data
 
     switch (type) {
@@ -81,8 +96,8 @@ class WebSocketService {
         break
       
       case 'unread_count_update':
-        this.unreadCount = data.count
-        this.emit('unread_count_update', data.count)
+        this.unreadCount = data.count || 0
+        this.emit('unread_count_update', data.count || 0)
         break
       
       case 'error':

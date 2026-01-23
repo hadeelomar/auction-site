@@ -32,6 +32,7 @@ urlpatterns = [
     path("auctions/create-sample/", views.create_sample_auctions, name="create-sample-auctions"),
     path("auctions/search/", views.search_auctions, name="search-auctions"),
     path("auctions/<int:item_id>/", views.auction_detail, name="auction-detail"),
+    path("auctions/export/", views.export_auctions_csv, name="export-auctions"),
     path("bids/", views.place_bid, name="place-bid"),
     path("user/bids/", views.user_bids, name="user-bids"),
     path("questions/", views.questions, name="questions"),
@@ -48,4 +49,8 @@ urlpatterns = [
     path("shares/track", views.track_share, name="track-share"),
     path("shares/analytics/<int:auction_id>", views.get_analytics, name="share-analytics"),
     path("shares/analytics", views.get_global_analytics, name="global-share-analytics"),
+    # admin endpoints
+    path("system/stats", views.get_system_stats, name="system-stats"),
+    path("system/health", views.database_health, name="database-health"),
+    path("system/health/app", views.application_health, name="application-health"),
 ]

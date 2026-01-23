@@ -4,10 +4,12 @@ from django.contrib.auth.models import User
 from .models import User as CustomUser, AuctionItem, Bid
 from django.core.exceptions import ValidationError
 from decimal import Decimal
+from typing import Any, Dict
+
 
 class CustomAuthenticationForm(AuthenticationForm):
     """Custom login form with Bootstrap-style styling"""
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.fields['username'].widget = forms.EmailInput(attrs={
             'class': 'form-input',
@@ -68,18 +70,18 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.fields['username'].widget = forms.HiddenInput()
         self.fields['username'].required = False
 
-    def clean_email(self):
+    def clean_email(self) -> str:
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("A user with that email already exists.")
         return email
 
-    def save(self, commit=True):
+    def save(self, commit: bool = True) -> User:
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
@@ -127,13 +129,13 @@ class AuctionForm(forms.Form):
         })
     )
     
-    def clean_title(self):
+    def clean_title(self) -> str:
         title = self.cleaned_data.get('title')
         if len(title.strip()) < 3:
             raise ValidationError("Title must be at least 3 characters long.")
         return title.strip()
     
-    def clean_description(self):
+    def clean_description(self) -> str:
         description = self.cleaned_data.get('description')
         if len(description.strip()) < 10:
             raise ValidationError("Description must be at least 10 characters long.")
@@ -162,11 +164,11 @@ class BidForm(forms.Form):
         })
     )
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.current_price = kwargs.pop('current_price', None)
         super().__init__(*args, **kwargs)
     
-    def clean_bid_amount(self):
+    def clean_bid_amount(self) -> Decimal:
         bid_amount = self.cleaned_data.get('bid_amount')
         
         if self.current_price is not None and bid_amount <= self.current_price:
@@ -199,7 +201,7 @@ class QuestionForm(forms.Form):
         })
     )
     
-    def clean_question_text(self):
+    def clean_question_text(self) -> str:
         question = self.cleaned_data.get('question_text')
         if len(question.strip()) < 5:
             raise ValidationError("Question must be at least 5 characters long.")

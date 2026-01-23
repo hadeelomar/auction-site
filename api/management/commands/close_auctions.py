@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from decimal import Decimal
 import logging
+from typing import Dict, Any, Optional, List
 
 from api.models import AuctionItem, Bid, User
 
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = 'Close ended auctions and send winner notification emails'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: Any) -> None:
         parser.add_argument(
             '--dry-run',
             action='store_true',
@@ -27,7 +28,7 @@ class Command(BaseCommand):
             help='Send test email to this address instead of actual winner',
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args: Any, **options: Dict[str, Any]) -> None:
         dry_run = options['dry_run']
         test_email = options['test_email']
         
@@ -92,7 +93,7 @@ class Command(BaseCommand):
             )
         )
 
-    def process_auction(self, auction, dry_run=False, test_email=None):
+    def process_auction(self, auction: AuctionItem, dry_run: bool = False, test_email: Optional[str] = None) -> Dict[str, Any]:
         """Process a single ended auction"""
         result = {
             'closed': False,
@@ -258,7 +259,7 @@ class Command(BaseCommand):
         
         return result
 
-    def send_winner_email(self, recipient_email, email_data):
+    def send_winner_email(self, recipient_email: str, email_data: Dict[str, Any]) -> bool:
         """Send winner notification email"""
         try:
             subject = f"🎉 Congratulations! You won the auction for {email_data['auction'].title}"
@@ -288,7 +289,7 @@ class Command(BaseCommand):
             logger.error(f"Error sending winner email to {recipient_email}: {str(e)}")
             return False
 
-    def send_seller_notification(self, seller_email, email_data):
+    def send_seller_notification(self, seller_email: str, email_data: Dict[str, Any]) -> bool:
         """Send notification to seller about auction ending"""
         try:
             subject = f"🏆 Your auction '{email_data['auction'].title}' has ended"
