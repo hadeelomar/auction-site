@@ -44,4 +44,8 @@ urlpatterns = [
     path("i18n/currency/", views.set_currency, name="set-currency"),
     path("i18n/locale/", i18n.get_locale_data, name="locale-data"),
     path("notifications/", views.get_notifications, name="get-notifications"),
+    # share analytics endpoints
+    path("shares/track", views.track_share, name="track-share"),
+    path("shares/analytics/<int:auction_id>", views.get_analytics, name="share-analytics"),
+    path("shares/analytics", views.get_global_analytics, name="global-share-analytics"),
 ]

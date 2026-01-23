@@ -39,7 +39,9 @@
     "noBids": "Henüz teklif yok",
     "wonBy": "Kazanan",
     "ended": "Sona Erdi",
-    "active": "Aktif"
+    "active": "Aktif",
+    "closed": "Sona Erdi",
+    "share": "Paylaş"
   },
   "bids": {
     "yourBid": "Teklifiniz",
@@ -158,6 +160,41 @@
     "submitUpdate": "Açık Artırma Güncelle",
     "loading": "Açık artırma ayrıntıları yükleniyor..."
   },
+  "createAuction": {
+    "createAuction": "Açık Artırma Oluştur",
+    "editAuction": "Açık Artırma Düzenle",
+    "updateAuction": "Açık Artırma Güncelle",
+    "activeAuctions": "Aktif Açık Artırmalar",
+    "endedAuctions": "Biten Açık Artırmalar",
+    "createDescription": "Yeni bir ürünü açık artırmaya koyun",
+    "updateDescription": "Açık artırma ayrıntılarınızı güncelleyin",
+    "itemDetails": "Ürün Ayrıntıları",
+    "title": "Başlık",
+    "titlePlaceholder": "Ürün başlığını girin",
+    "titleRequired": "Başlık gereklidir",
+    "titleMinLength": "Başlık en az 3 karakter olmalıdır",
+    "description": "Açıklama",
+    "descriptionPlaceholder": "Ürününüzü detaylı olarak açıklayın",
+    "descriptionRequired": "Açıklama gereklidir",
+    "descriptionMinLength": "Açıklama en az 10 karakter olmalıdır",
+    "startingPrice": "Başlangıç Fiyatı",
+    "startingPriceRequired": "Başlangıç fiyatı gereklidir",
+    "startingPricePositive": "Başlangıç fiyatı 0'dan büyük olmalıdır",
+    "endDate": "Bitiş Tarihi ve Saati",
+    "endDateRequired": "Bitiş tarihi gereklidir",
+    "endDateFuture": "Bitiş tarihi gelecekte olmalıdır",
+    "category": "Kategori",
+    "itemImage": "Ürün Görseli",
+    "dragDropText": "Buraya görseli sürükleyip bırakın veya tıklayarak göz atın",
+    "uploadHint": "PNG, JPG en fazla 10MB",
+    "selectImageFile": "Lütfen bir görsel dosyası seçin",
+    "imageSizeError": "Görsel boyutu 10MB'den az olmalıdır",
+    "creating": "Oluşturuluyor...",
+    "updating": "Güncelleniyor...",
+    "submitCreate": "Açık Artırma Oluştur",
+    "submitUpdate": "Açık Artırma Güncelle",
+    "loading": "Açık artırma ayrıntıları yükleniyor..."
+  },
   "footer": {
     "allRightsReserved": "Tüm hakları saklıdır."
   },
@@ -196,5 +233,21 @@
     "fileFormatHint": "PNG, JPG en fazla 5MB",
     "selectImageFile": "Lütfen bir resim dosyası seçin",
     "fileSizeError": "Dosya boyutu 5MB'den az olmalıdır"
+  },
+  "share": {
+    "title": "Share Auction",
+    "facebook": "Share on Facebook",
+    "twitter": "Share on Twitter",
+    "whatsapp": "Share on WhatsApp",
+    "email": "Share via Email",
+    "copy": "Copy Link",
+    "copied": "Copied!",
+    "qrCode": "QR Code",
+    "downloadQR": "Download QR",
+    "embed": "Embed Code",
+    "analytics": "Share Analytics",
+    "totalShares": "Total Shares",
+    "totalClicks": "Total Clicks",
+    "conversionRate": "Conversion Rate"
   }
 }

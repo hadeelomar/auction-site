@@ -13,13 +13,15 @@ from django.db import models, connection
 import logging
 # Rate limiting is handled inline with graceful fallback
 
-from api.models import User, AuctionItem, Bid, Question, Reply, Notification
+from api.models import User, AuctionItem, Bid, Question, Reply, Notification, ShareAnalytics
 from api.forms import CustomAuthenticationForm, CustomUserCreationForm
 from api.utils import create_and_send_notification
 
 import json
 from typing import Dict, Any
 from decimal import Decimal, InvalidOperation
+from django.db.models import Count, Q, F
+from datetime import timedelta
 
 
 @ensure_csrf_cookie
@@ -30,7 +32,6 @@ def get_csrf_token(request: HttpRequest) -> JsonResponse:
     return JsonResponse({'detail': 'CSRF cookie set'})
 
 
-@csrf_exempt
 def signup(request: HttpRequest) -> JsonResponse:
     """
     User registration endpoint.
@@ -92,7 +93,6 @@ def signup(request: HttpRequest) -> JsonResponse:
 
 
 
-@csrf_exempt
 def login(request: HttpRequest) -> JsonResponse:
     """
     User login endpoint with rate limiting (5 attempts per minute).
@@ -138,7 +138,6 @@ def login(request: HttpRequest) -> JsonResponse:
     return JsonResponse({'error': 'Invalid credentials'}, status=401)
 
 
-@csrf_exempt
 def logout(request: HttpRequest) -> JsonResponse:
     """
     User logout endpoint.
@@ -283,7 +282,6 @@ def auction_item_to_dict(request: HttpRequest, item: AuctionItem) -> Dict[str, A
     }
 
 
-@csrf_exempt
 def auctions(request: HttpRequest) -> JsonResponse:
     """
     GET  /api/auctions -> list ACTIVE auctions
@@ -360,7 +358,6 @@ def auctions(request: HttpRequest) -> JsonResponse:
     }, status=201)
 
 
-@csrf_exempt
 def auction_detail(request: HttpRequest, item_id: int) -> JsonResponse:
     """
     GET /api/auctions/<id> - Get auction details
@@ -453,7 +450,6 @@ def auction_detail(request: HttpRequest, item_id: int) -> JsonResponse:
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
-@csrf_exempt
 def place_bid(request: HttpRequest) -> JsonResponse:
     """
     POST /api/bids
@@ -638,7 +634,6 @@ def user_bids(request: HttpRequest) -> JsonResponse:
     return JsonResponse({'bids': bids_list}, status=200)
 
 
-@csrf_exempt
 def questions(request: HttpRequest) -> JsonResponse:
     """
     GET  /api/questions?item_id=X -> list questions for an item (paginated, with nested replies)
@@ -755,7 +750,6 @@ def questions(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
-@csrf_exempt
 def question_reply(request: HttpRequest, question_id: int) -> JsonResponse:
     """
     POST /api/questions/:id/reply -> add a reply to a question
@@ -810,7 +804,6 @@ def question_reply(request: HttpRequest, question_id: int) -> JsonResponse:
     }, status=201)
 
 
-@csrf_exempt
 def create_auction(request: HttpRequest) -> JsonResponse:
     """
     POST /api/auctions/create/ -> Create a new auction item
@@ -908,7 +901,6 @@ def create_auction(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'error': f'Failed to create auction: {str(e)}'}, status=500)
 
 
-@csrf_exempt
 def create_sample_auctions(request: HttpRequest) -> JsonResponse:
     """
     Create sample auction items for testing
@@ -1008,7 +1000,6 @@ def health(request: HttpRequest) -> HttpResponse:
     return HttpResponse("OK")
 
 
-@csrf_exempt
 def search_auctions(request: HttpRequest) -> JsonResponse:
     """
     GET /api/auctions/search?q=keyword&min_price=100&max_price=1000&status=active
@@ -1202,7 +1193,6 @@ class CustomLogoutView(LogoutView):
     """Custom logout view"""
     next_page = 'http://localhost:5173/login'
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_login(request):
     """API endpoint for login (for AJAX requests)"""
@@ -1228,7 +1218,6 @@ def api_login(request):
     else:
         return JsonResponse({'success': False, 'error': 'Invalid email or password'})
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_signup(request):
     """API endpoint for signup (for AJAX requests)"""
@@ -1424,3 +1413,175 @@ def get_notifications(request):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@require_http_methods(["POST"])
+def track_share(request: HttpRequest) -> JsonResponse:
+    """
+    Track when an auction is shared on any platform
+    POST /api/shares/track
+    """
+    try:
+        data = json.loads(request.body)
+        auction_id = data.get('auction_id')
+        platform = data.get('platform')
+        url = data.get('url')
+        
+        if not all([auction_id, platform, url]):
+            return JsonResponse({'error': 'Missing required fields'}, status=400)
+        
+        # Validate auction exists
+        try:
+            auction = AuctionItem.objects.get(id=auction_id)
+        except AuctionItem.DoesNotExist:
+            return JsonResponse({'error': 'Auction not found'}, status=404)
+        
+        # Get client information
+        ip_address = get_client_ip(request)
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        
+        # Create share analytics record
+        ShareAnalytics.objects.create(
+            auction=auction,
+            platform=platform,
+            url=url,
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+        
+        return JsonResponse({'message': 'Share tracked successfully'}, status=201)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+
+
+@require_http_methods(["GET"])
+def get_analytics(request: HttpRequest, auction_id: int) -> JsonResponse:
+    """
+    Get sharing analytics for a specific auction
+    GET /api/shares/analytics/<auction_id>
+    """
+    try:
+        # Validate auction exists
+        try:
+            auction = AuctionItem.objects.get(id=auction_id)
+        except AuctionItem.DoesNotExist:
+            return JsonResponse({'error': 'Auction not found'}, status=404)
+        
+        # Get total shares
+        total_shares = ShareAnalytics.objects.filter(auction=auction).count()
+        
+        # Get shares by platform
+        platform_stats = (
+            ShareAnalytics.objects
+            .filter(auction=auction)
+            .values('platform')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+        )
+        
+        # Get recent shares (last 7 days)
+        seven_days_ago = timezone.now() - timedelta(days=7)
+        recent_shares = ShareAnalytics.objects.filter(
+            auction=auction,
+            timestamp__gte=seven_days_ago
+        ).count()
+        
+        # Calculate daily average for recent shares
+        daily_average = recent_shares / 7 if recent_shares > 0 else 0
+        
+        # Get shares over time (last 30 days by day)
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        shares_over_time = []
+        
+        for i in range(30):
+            date = thirty_days_ago + timedelta(days=i)
+            next_date = date + timedelta(days=1)
+            
+            day_shares = ShareAnalytics.objects.filter(
+                auction=auction,
+                timestamp__gte=date,
+                timestamp__lt=next_date
+            ).count()
+            
+            shares_over_time.append({
+                'date': date.strftime('%Y-%m-%d'),
+                'shares': day_shares
+            })
+        
+        # Calculate conversion rate (this is a placeholder - you'd need to track actual clicks)
+        total_clicks = total_shares * 1.5  # Estimated 1.5 clicks per share
+        conversion_rate = round((total_clicks / total_shares * 100) if total_shares > 0 else 0, 1)
+        
+        analytics_data = {
+            'totalShares': total_shares,
+            'totalClicks': total_clicks,
+            'conversionRate': conversion_rate,
+            'recentShares': recent_shares,
+            'dailyAverage': round(daily_average, 1),
+            'platformStats': list(platform_stats),
+            'sharesOverTime': shares_over_time
+        }
+        
+        return JsonResponse(analytics_data, status=200)
+        
+    except Exception as e:
+        return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+
+
+@require_http_methods(["GET"])
+def get_global_analytics(request: HttpRequest) -> JsonResponse:
+    """
+    Get global sharing analytics across all auctions
+    GET /api/shares/analytics
+    """
+    try:
+        # Get total shares across all auctions
+        total_shares = ShareAnalytics.objects.count()
+        
+        # Get platform breakdown
+        platform_stats = (
+            ShareAnalytics.objects
+            .values('platform')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+        )
+        
+        # Get top shared auctions
+        top_auctions = (
+            ShareAnalytics.objects
+            .values('auction__id', 'auction__title')
+            .annotate(share_count=Count('id'))
+            .order_by('-share_count')[:10]
+        )
+        
+        # Get recent activity
+        recent_shares = ShareAnalytics.objects.filter(
+            timestamp__gte=timezone.now() - timedelta(days=7)
+        ).count()
+        
+        analytics_data = {
+            'totalShares': total_shares,
+            'recentShares': recent_shares,
+            'platformStats': list(platform_stats),
+            'topAuctions': list(top_auctions)
+        }
+        
+        return JsonResponse(analytics_data, status=200)
+        
+    except Exception as e:
+        return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+
+
+def get_client_ip(request: HttpRequest) -> str:
+    """
+    Get the client's IP address from the request
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip

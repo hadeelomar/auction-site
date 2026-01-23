@@ -12,6 +12,7 @@ Pillow
 django-allauth[socialaccount]>=0.57.0
 django-ratelimit>=4.1.0
 python-dotenv>=1.0.0
+django-security>=1.1.5
 djangorestframework>=3.14.0
 
 # websockets

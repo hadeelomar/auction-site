@@ -39,7 +39,9 @@
     "noBids": "Aucune offre pour le moment",
     "wonBy": "Remporté par",
     "ended": "Terminé",
-    "active": "Actif"
+    "active": "Actif",
+    "closed": "Closed",
+    "share": "Share"
   },
   "bids": {
     "yourBid": "Votre offre",
@@ -199,5 +201,21 @@
     "fileFormatHint": "PNG, JPG jusqu'à 5Mo",
     "selectImageFile": "Veuillez sélectionner un fichier image",
     "fileSizeError": "La taille du fichier doit être inférieure à 5Mo"
+  },
+  "share": {
+    "title": "Share Auction",
+    "facebook": "Share on Facebook",
+    "twitter": "Share on Twitter",
+    "whatsapp": "Share on WhatsApp",
+    "email": "Share via Email",
+    "copy": "Copy Link",
+    "copied": "Copied!",
+    "qrCode": "QR Code",
+    "downloadQR": "Download QR",
+    "embed": "Embed Code",
+    "analytics": "Share Analytics",
+    "totalShares": "Total Shares",
+    "totalClicks": "Total Clicks",
+    "conversionRate": "Conversion Rate"
   }
 }
