@@ -5,46 +5,46 @@
     <main class="main-content">
       <div class="page-container">
         <div class="page-header">
-          <h1 class="page-title">{{ isEditMode ? 'Edit Auction' : 'Create Auction' }}</h1>
-          <p class="page-description">{{ isEditMode ? 'Update your auction details' : 'List a new item for auction' }}</p>
+          <h1 class="page-title">{{ isEditMode ? t('createAuction.editAuction') : t('createAuction.createAuction') }}</h1>
+          <p class="page-description">{{ isEditMode ? t('createAuction.updateDescription') : t('createAuction.createDescription') }}</p>
         </div>
 
         <form class="auction-form" @submit.prevent="handleSubmit" v-if="!loading">
           <!-- item details -->
           <div class="form-section">
-            <h2 class="section-title">Item Details</h2>
+            <h2 class="section-title">{{ t('createAuction.itemDetails') }}</h2>
             
             <div class="form-group">
-              <label for="title" class="form-label">Title <span class="required">*</span></label>
+              <label for="title" class="form-label">{{ t('createAuction.title') }} <span class="required">*</span></label>
               <input 
                 id="title" 
                 v-model="formData.title" 
                 type="text" 
                 class="form-input" 
                 :class="{ error: errors.title }"
-                placeholder="Enter item title" 
+                :placeholder="t('createAuction.titlePlaceholder')" 
               />
               <span v-if="errors.title" class="error-message">{{ errors.title }}</span>
             </div>
 
             <div class="form-group">
-              <label for="description" class="form-label">Description <span class="required">*</span></label>
+              <label for="description" class="form-label">{{ t('createAuction.description') }} <span class="required">*</span></label>
               <textarea 
                 id="description" 
                 v-model="formData.description" 
                 class="form-textarea"
                 :class="{ error: errors.description }"
                 rows="4" 
-                placeholder="Describe your item in detail"
+                :placeholder="t('createAuction.descriptionPlaceholder')"
               ></textarea>
               <span v-if="errors.description" class="error-message">{{ errors.description }}</span>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label for="startingPrice" class="form-label">Starting Price <span class="required">*</span></label>
+                <label for="startingPrice" class="form-label">{{ t('createAuction.startingPrice') }} <span class="required">*</span></label>
                 <div class="input-with-prefix">
-                  <span class="input-prefix">£</span>
+                  <span class="input-prefix">{{ i18nStore.currentCurrencySymbol }}</span>
                   <input 
                     id="startingPrice" 
                     v-model="formData.startingPrice" 
@@ -58,7 +58,7 @@
               </div>
 
               <div class="form-group">
-                <label for="endDate" class="form-label">End Date & Time <span class="required">*</span></label>
+                <label for="endDate" class="form-label">{{ t('createAuction.endDate') }} <span class="required">*</span></label>
                 <input 
                   id="endDate" 
                   v-model="formData.endDate" 
@@ -70,18 +70,18 @@
               </div>
 
               <div class="form-group">
-                <label for="category" class="form-label">Category</label>
+                <label for="category" class="form-label">{{ t('createAuction.category') }}</label>
                 <select 
                   id="category" 
                   v-model="formData.category" 
                   class="form-input"
                 >
-                  <option value="electronics">Electronics</option>
-                  <option value="fashion">Fashion</option>
-                  <option value="home">Home</option>
-                  <option value="sports">Sports</option>
-                  <option value="art">Art</option>
-                  <option value="vehicles">Vehicles</option>
+                  <option value="electronics">{{ t('categories.electronics') }}</option>
+                  <option value="fashion">{{ t('categories.fashion') }}</option>
+                  <option value="home">{{ t('categories.home') }}</option>
+                  <option value="sports">{{ t('categories.sports') }}</option>
+                  <option value="art">{{ t('categories.art') }}</option>
+                  <option value="vehicles">{{ t('categories.vehicles') }}</option>
                 </select>
               </div>
             </div>
@@ -89,7 +89,7 @@
 
           <!-- image upload -->
           <div class="form-section">
-            <h2 class="section-title">Item Image</h2>
+            <h2 class="section-title">{{ t('createAuction.itemImage') }}</h2>
             <div class="image-upload-area" @click="fileInput?.click()">
               <input 
                 ref="fileInput"
@@ -115,8 +115,8 @@
                   <circle cx="9" cy="9" r="2"/>
                   <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
                 </svg>
-                <p class="upload-text">Drag and drop an image here, or click to browse</p>
-                <p class="upload-hint">PNG, JPG up to 10MB</p>
+                <p class="upload-text">{{ t('createAuction.dragDropText') }}</p>
+                <p class="upload-hint">{{ t('createAuction.uploadHint') }}</p>
               </div>
             </div>
             <span v-if="errors.image" class="error-message">{{ errors.image }}</span>
@@ -124,16 +124,16 @@
 
           <!-- form actions -->
           <div class="form-actions">
-            <router-link to="/" class="cancel-button">Cancel</router-link>
+            <router-link to="/" class="cancel-button">{{ t('common.cancel') }}</router-link>
             <button type="submit" class="submit-button" :disabled="isSubmitting">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/>
+                <path d="m14.5 12.5-8 8a2.119 2.119 0 0 1-3-3l8-8"/>
                 <path d="m16 16 6-6"/>
                 <path d="m8 8 6-6"/>
                 <path d="m9 7 8 8"/>
                 <path d="m21 11-8-8"/>
               </svg>
-              {{ isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Auction' : 'Create Auction') }}
+              {{ isSubmitting ? (isEditMode ? t('createAuction.updating') : t('createAuction.creating')) : (isEditMode ? t('createAuction.submitUpdate') : t('createAuction.submitCreate')) }}
             </button>
           </div>
           
@@ -145,7 +145,7 @@
         
         <!-- Loading state -->
         <div v-if="loading" class="loading-state">
-          <p>Loading auction details...</p>
+          <p>{{ t('createAuction.loading') }}</p>
         </div>
       </div>
     </main>
@@ -164,8 +164,10 @@ import { reactive, ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Navbar from '../components/Navbar.vue'
+import { useI18nStore } from '../stores/i18n'
 
 const { t } = useI18n()
+const i18nStore = useI18nStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -192,30 +194,30 @@ const validateForm = (): boolean => {
   const newErrors: Record<string, string> = {}
   
   if (!formData.title.trim()) {
-    newErrors.title = 'Title is required'
+    newErrors.title = t('createAuction.titleRequired')
   } else if (formData.title.length < 3) {
-    newErrors.title = 'Title must be at least 3 characters'
+    newErrors.title = t('createAuction.titleMinLength')
   }
   
   if (!formData.description.trim()) {
-    newErrors.description = 'Description is required'
+    newErrors.description = t('createAuction.descriptionRequired')
   } else if (formData.description.length < 10) {
-    newErrors.description = 'Description must be at least 10 characters'
+    newErrors.description = t('createAuction.descriptionMinLength')
   }
   
   if (!formData.startingPrice) {
-    newErrors.startingPrice = 'Starting price is required'
+    newErrors.startingPrice = t('createAuction.startingPriceRequired')
   } else if (parseFloat(formData.startingPrice) <= 0) {
-    newErrors.startingPrice = 'Starting price must be greater than 0'
+    newErrors.startingPrice = t('createAuction.startingPricePositive')
   }
   
   if (!formData.endDate) {
-    newErrors.endDate = 'End date is required'
+    newErrors.endDate = t('createAuction.endDateRequired')
   } else {
     const endDate = new Date(formData.endDate)
     const now = new Date()
     if (endDate <= now) {
-      newErrors.endDate = 'End date must be in the future'
+      newErrors.endDate = t('createAuction.endDateFuture')
     }
   }
   
@@ -230,13 +232,13 @@ const handleFileSelect = (event: Event) => {
   if (file) {
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      errors.value.image = 'Please select an image file'
+      errors.value.image = t('createAuction.selectImageFile')
       return
     }
     
     // Validate file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
-      errors.value.image = 'Image size must be less than 10MB'
+      errors.value.image = t('createAuction.imageSizeError')
       return
     }
     
