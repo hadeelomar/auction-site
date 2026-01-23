@@ -15,22 +15,12 @@ class WebSocketService {
     this.isConnecting = true
 
     try {
-      // Get auth token from cookies
-      const getCookie = (name: string): string | null => {
-        const value = `; ${document.cookie}`
-        const parts = value.split(`; ${name}=`)
-        if (parts.length === 2) return parts.pop()?.split(';').shift() || null
-        return null
-      }
-
-      const csrfToken = getCookie('csrftoken')
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const wsUrl = `${protocol}//${window.location.host}/ws/notifications/`
+      const wsUrl = `${protocol}//${window.location.host.replace(':5173', ':8001')}/ws/notifications/`
 
       this.socket = new WebSocket(wsUrl)
 
       this.socket.onopen = () => {
-        console.log('✅ WebSocket connected successfully')
         this.isConnecting = false
         this.reconnectAttempts = 0
         
@@ -41,15 +31,13 @@ class WebSocketService {
       this.socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data)
-          console.log('📨 WebSocket message received:', data)
           this.handleMessage(data)
         } catch (error) {
-          console.error('❌ Error parsing WebSocket message:', error)
+          console.error('Error parsing WebSocket message:', error)
         }
       }
 
       this.socket.onclose = (event) => {
-        console.log('❌ WebSocket disconnected:', event.code, event.reason)
         this.isConnecting = false
         this.socket = null
         
@@ -60,7 +48,7 @@ class WebSocketService {
       }
 
       this.socket.onerror = (error) => {
-        console.error('❌ WebSocket error:', error)
+        console.error('WebSocket error:', error)
         this.isConnecting = false
       }
 
@@ -75,8 +63,6 @@ class WebSocketService {
     this.reconnectAttempts++
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1)
     
-    console.log(`Scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`)
-    
     setTimeout(() => {
       this.connect()
     }, delay)
@@ -88,8 +74,10 @@ class WebSocketService {
     switch (type) {
       case 'new_notification':
         this.emit('new_notification', data.notification)
-        this.unreadCount++
-        this.emit('unread_count_update', this.unreadCount)
+        break
+      
+      case 'existing_notification':
+        this.emit('existing_notification', data.notification)
         break
       
       case 'unread_count_update':
@@ -103,7 +91,7 @@ class WebSocketService {
         break
       
       default:
-        console.log('Unknown message type:', type, data)
+        break
     }
   }
 
@@ -134,8 +122,6 @@ class WebSocketService {
   sendMessage(message: any) {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(message))
-    } else {
-      console.warn('WebSocket not connected, cannot send message:', message)
     }
   }
 

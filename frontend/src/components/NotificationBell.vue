@@ -5,7 +5,6 @@
       <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
     </svg>
     <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount }}</span>
-    <div v-if="unreadCount > 0" class="red-dot"></div>
     
     <!-- Notification Dropdown -->
     <div v-if="showDropdown" class="notification-dropdown" @click.stop>
@@ -63,9 +62,11 @@ const markAsRead = (notification: any) => {
   // Mark as read via WebSocket
   websocketService.markNotificationRead(notification.id)
   
-  // Update locally
+  // Update locally immediately for better UX
   notification.is_read = true
-  unreadCount.value = Math.max(0, websocketService.getUnreadCount())
+  
+  // Also update the count locally immediately, but it will be corrected by backend
+  unreadCount.value = Math.max(0, unreadCount.value - 1)
   
   // Update the unread count in navbar
   const event = new CustomEvent('notifications-updated', { 
@@ -80,10 +81,12 @@ const markAllRead = () => {
   // Mark all as read via WebSocket
   websocketService.markAllNotificationsRead()
   
-  // Update locally
+  // Update locally immediately for better UX
   notifications.value.forEach(notification => {
     notification.is_read = true
   })
+  
+  // Set count to 0 immediately
   unreadCount.value = 0
   
   // Update the unread count in navbar
@@ -94,14 +97,10 @@ const markAllRead = () => {
 }
 
 const fetchNotifications = async () => {
-  try {
-    const response = await fetch('/api/notifications/')
-    if (response.ok) {
-      const data = await response.json()
-      notifications.value = data.notifications || []
-    }
-  } catch (error) {
-    console.error('Error fetching notifications:', error)
+  // For now, just request the current unread count to ensure sync
+  // The actual notifications will come via WebSocket
+  if (websocketService.isConnected()) {
+    websocketService.sendMessage({ type: 'get_unread_count' })
   }
 }
 
@@ -122,16 +121,12 @@ const formatTime = (timestamp: string) => {
 
 // WebSocket event handlers
 const handleNewNotification = (notification: any) => {
-  console.log('🔔 New notification received:', notification)
-  
   // Add notification to the list
   notifications.value.unshift(notification)
   unreadCount.value = websocketService.getUnreadCount()
-  console.log('📊 Updated unread count:', unreadCount.value)
   
   // Force dropdown to refresh if it's open
   if (showDropdown.value) {
-    console.log('🔄 Forcing dropdown refresh')
     // Force Vue to re-render the list
     const temp = notifications.value
     notifications.value = []
@@ -142,45 +137,56 @@ const handleNewNotification = (notification: any) => {
   
   // Update the unread count in navbar
   const event = new CustomEvent('notifications-updated', { 
-    detail: { unreadCount: unreadCount.value } 
+    detail: { count: unreadCount.value } 
   })
   window.dispatchEvent(event)
 }
 
+const handleExistingNotification = (notification: any) => {
+  // Add notification to the list if not already present
+  const exists = notifications.value.find(n => n.id === notification.id)
+  if (!exists) {
+    notifications.value.push(notification)
+  }
+  
+  // Update unread count
+  unreadCount.value = websocketService.getUnreadCount()
+}
+
 const handleUnreadCountUpdate = (count: number) => {
-  console.log('📊 Unread count update:', count)
   unreadCount.value = count
   
   // Update the unread count in navbar
   const event = new CustomEvent('notifications-updated', { 
-    detail: { unreadCount: count } 
+    detail: { count: count } 
   })
   window.dispatchEvent(event)
 }
 
 onMounted(() => {
-  console.log('🔔 NotificationBell mounting, auth status:', authStore.isAuthenticated)
-  
   // Only connect if user is authenticated
   if (authStore.isAuthenticated) {
-    console.log('🔗 Connecting to WebSocket...')
     // Connect to WebSocket
     websocketService.connect()
     
     // Set up event listeners
     websocketService.on('new_notification', handleNewNotification)
+    websocketService.on('existing_notification', handleExistingNotification)
     websocketService.on('unread_count_update', handleUnreadCountUpdate)
     
-    // Fetch initial notifications
-    fetchNotifications()
-  } else {
-    console.log('❌ User not authenticated, skipping WebSocket connection')
+    // Request initial unread count after connection
+    setTimeout(() => {
+      if (websocketService.isConnected()) {
+        websocketService.sendMessage({ type: 'get_unread_count' })
+      }
+    }, 1000)
   }
 })
 
 onUnmounted(() => {
   // Clean up WebSocket event listeners
   websocketService.off('new_notification', handleNewNotification)
+  websocketService.off('existing_notification', handleExistingNotification)
   websocketService.off('unread_count_update', handleUnreadCountUpdate)
   
   // Disconnect WebSocket

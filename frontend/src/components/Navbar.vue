@@ -110,8 +110,8 @@
         </template>
 
         <template v-else>
-          <a href="http://localhost:8000/login/" class="login-button">{{ t('common.login') }}</a>
-          <a href="http://localhost:8000/signup/" class="signup-button">{{ t('common.signup') }}</a>
+          <a href="http://localhost:8001/login/" class="login-button">{{ t('common.login') }}</a>
+          <a href="http://localhost:8001/signup/" class="signup-button">{{ t('common.signup') }}</a>
         </template>
       </div>
     </div>
@@ -147,15 +147,8 @@ const handleLogout = async () => {
 }
 
 const fetchUnreadCount = async () => {
-  try {
-    const response = await fetch('/api/notifications/')
-    if (response.ok) {
-      const data = await response.json()
-      unreadNotificationCount.value = data.unread_count
-    }
-  } catch (error) {
-    console.error('Error fetching notifications:', error)
-  }
+  // No longer needed - WebSocket handles real-time notifications
+  console.log('📨 Notifications are now handled via WebSocket')
 }
 
 // Listen for notification updates from NotificationBell

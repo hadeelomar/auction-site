@@ -308,7 +308,7 @@ const handleSubmit = async () => {
         submitData.append('image', selectedFile.value)
       }
       
-      response = await fetch('/api/auctions/create/', {
+      response = await fetch('http://localhost:8001/api/auctions/create/', {
         method: 'POST',
         body: submitData,
         credentials: 'same-origin'
@@ -319,7 +319,7 @@ const handleSubmit = async () => {
     
     if (!response.ok) {
       if (response.status === 401) {
-        errors.value.general = `You must be logged in to ${isEditMode.value ? 'edit' : 'create'} an auction. Please <a href="http://localhost:8000/login/" class="error-link">sign in</a> first.`
+        errors.value.general = `You must be logged in to ${isEditMode.value ? 'edit' : 'create'} an auction. Please <a href="http://localhost:8001/login/" class="error-link">sign in</a> first.`
       } else if (data.error) {
         errors.value.general = data.error
       } else {

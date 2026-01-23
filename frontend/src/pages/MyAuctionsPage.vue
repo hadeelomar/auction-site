@@ -208,7 +208,7 @@ const fetchMyAuctions = async () => {
     error.value = ''
     
     // Get current user info first
-    const userResponse = await fetch('/api/auth/user/')
+    const userResponse = await fetch('http://localhost:8001/api/auth/user/')
     if (!userResponse.ok) {
       throw new Error('Failed to get user info')
     }

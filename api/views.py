@@ -1260,42 +1260,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def notifications(request):
-    """Get notifications for the current user"""
-    notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-timestamp')
-    
-    notification_data = []
-    for notification in notifications:
-        notification_data.append({
-            'id': notification.id,
-            'type': notification.type,
-            'message': notification.message,
-            'is_read': notification.is_read,
-            'timestamp': notification.timestamp.isoformat(),
-        })
-    
-    return Response(notification_data)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def mark_notification_read(request, notification_id):
-    """Mark a notification as read"""
-    try:
-        notification = Notification.objects.get(id=notification_id, user=request.user)
-        notification.is_read = True
-        notification.save()
-        return Response({'success': True})
-    except Notification.DoesNotExist:
-        return Response({'error': 'Notification not found'}, status=status.HTTP_404_NOT_FOUND)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def mark_all_notifications_read(request):
-    """Mark all notifications as read for current user"""
-    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
-    return Response({'success': True})
 
 def spa(request: HttpRequest) -> HttpResponse:
     """
@@ -1400,84 +1364,6 @@ def application_health(request: HttpRequest) -> JsonResponse:
     return JsonResponse(health_data, status=status_code)
 
 
-@csrf_exempt
-def notifications(request: HttpRequest) -> JsonResponse:
-    """
-    GET /api/notifications/
-    Get all notifications for the current user
-    """
-    if request.method != 'GET':
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Authentication required'}, status=401)
-    
-    try:
-        notifications = Notification.objects.filter(user=request.user).order_by('-timestamp')
-        
-        notification_data = []
-        for notification in notifications:
-            notification_data.append({
-                'id': notification.id,
-                'type': notification.get_type_display(),
-                'message': notification.message,
-                'is_read': notification.is_read,
-                'timestamp': notification.timestamp.isoformat(),
-            })
-        
-        return JsonResponse({
-            'notifications': notification_data,
-            'unread_count': notifications.filter(is_read=False).count()
-        })
-        
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
-
-@csrf_exempt
-def mark_notification_read(request: HttpRequest, notification_id: int) -> JsonResponse:
-    """
-    POST /api/notifications/<id>/mark-read/
-    Mark a specific notification as read
-    """
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Authentication required'}, status=401)
-    
-    try:
-        notification = Notification.objects.get(id=notification_id, user=request.user)
-        notification.is_read = True
-        notification.save()
-        
-        return JsonResponse({'success': True})
-        
-    except Notification.DoesNotExist:
-        return JsonResponse({'error': 'Notification not found'}, status=404)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
-
-@csrf_exempt
-def mark_all_notifications_read(request: HttpRequest) -> JsonResponse:
-    """
-    POST /api/notifications/mark-all-read/
-    Mark all notifications for the current user as read
-    """
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Authentication required'}, status=401)
-    
-    try:
-        Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
-        
-        return JsonResponse({'success': True})
-        
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
 
 
 @csrf_exempt
@@ -1506,6 +1392,35 @@ def set_currency(request: HttpRequest) -> JsonResponse:
         request.user.save()
         
         return JsonResponse({'currency': currency})
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@require_http_methods(["GET"])
+def get_notifications(request):
+    """Get user's notifications with read status"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        notifications = Notification.objects.filter(
+            user=request.user
+        ).order_by('-timestamp')[:20]  # Get latest 20
+        
+        notifications_data = []
+        for notif in notifications:
+            notifications_data.append({
+                'id': notif.id,
+                'type': notif.type,
+                'message': notif.message,
+                'timestamp': notif.timestamp.isoformat(),
+                'is_read': notif.is_read
+            })
+        
+        return JsonResponse({
+            'notifications': notifications_data
+        })
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)

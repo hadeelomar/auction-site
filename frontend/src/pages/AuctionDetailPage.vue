@@ -399,7 +399,7 @@ const isAuctionOwner = computed(() => {
   return authStore.isAuthenticated && auction.value && authStore.user?.id === auction.value.owner.id
 })
 
-const API_BASE_URL = 'http://localhost:8000/api'
+const API_BASE_URL = 'http://localhost:8001/api'
 
 const ownerName = computed(() => {
   if (!auction.value?.owner) return 'Unknown'

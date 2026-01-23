@@ -28,6 +28,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         
         # Send initial unread count
         await self.send_unread_count()
+        
+        # Send existing notifications
+        await self.send_existing_notifications()
     
     async def disconnect(self, close_code):
         """Handle WebSocket disconnection"""
@@ -41,19 +44,19 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         """Handle incoming WebSocket messages"""
         try:
             data = json.loads(text_data)
-            print(f"📨 WebSocket received message from user {self.user.username}: {data}")
             message_type = data.get('type')
             
             if message_type == 'mark_read':
                 notification_id = data.get('notification_id')
                 if notification_id:
-                    print(f"✅ Marking notification {notification_id} as read")
-                    await self.mark_notification_read(notification_id)
+                    success = await self.mark_notification_read(notification_id)
+                    if success:
+                        await self.send_unread_count()
             elif message_type == 'mark_all_read':
-                print(f"✅ Marking all notifications as read")
-                await self.mark_all_notifications_read()
+                updated = await self.mark_all_notifications_read()
+                if updated > 0:
+                    await self.send_unread_count()
             elif message_type == 'get_unread_count':
-                print(f"📊 Getting unread count")
                 await self.send_unread_count()
                 
         except json.JSONDecodeError:
@@ -62,7 +65,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 'message': 'Invalid JSON'
             })
         except Exception as e:
-            print(f"❌ Error handling WebSocket message: {e}")
             await self.send_json({
                 'type': 'error',
                 'message': str(e)
@@ -94,21 +96,16 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 is_read=False
             ).count()
             
-            print(f"📊 Sending unread count for {self.user.username}: {count}")
-            
-            # Use create_task to avoid blocking
-            import asyncio
-            asyncio.create_task(
-                self.channel_layer.group_send(
-                    self.user_group_name,
-                    {
-                        'type': 'unread_count_update',
-                        'count': count
-                    }
-                )
+            # Send directly to avoid race conditions
+            await self.channel_layer.group_send(
+                self.user_group_name,
+                {
+                    'type': 'unread_count_update',
+                    'count': count
+                }
             )
         except Exception as e:
-            print(f"❌ Error sending unread count: {e}")
+            pass
     
     @database_sync_to_async
     def mark_notification_read(self, notification_id):
@@ -121,9 +118,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             notification.is_read = True
             notification.save()
             
-            # Send updated unread count
-            self.send_unread_count()
-            
+            # Return True to indicate success - the caller will handle sending the count update
             return True
         except Notification.DoesNotExist:
             return False
@@ -137,10 +132,30 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 is_read=False
             ).update(is_read=True)
             
-            # Send updated unread count
-            self.send_unread_count()
-            
+            # Return the count of updated notifications - the caller will handle sending the count update
             return updated
         except Exception as e:
-            print(f"Error marking all as read: {e}")
             return 0
+
+    async def send_existing_notifications(self):
+        """Send existing notifications to the user"""
+        try:
+            notifications = Notification.objects.filter(
+                user=self.user
+            ).order_by('-timestamp')[:20]  # Last 20 notifications
+            
+            for notification in notifications:
+                notification_data = {
+                    'id': notification.id,
+                    'type': notification.type,
+                    'message': notification.message,
+                    'is_read': notification.is_read,
+                    'timestamp': notification.timestamp.isoformat(),
+                }
+                await self.send_json({
+                    'type': 'existing_notification',
+                    'notification': notification_data
+                })
+                
+        except Exception as e:
+            pass
