@@ -76,12 +76,10 @@
   },
   "browse": {
     "heroTitle": "Trouvez des offres incroyables",
-    "heroSubtitle": "Enchérissez sur des articles uniques de vendeurs du monde entier",
-    "topCategories": "Catégories populaires",
-    "featuredAuctions": "Enchères en vedette",
-    "endingSoon": "Se termine bientôt",
-    "seeAll": "Voir tout",
-    "bids": "offres",
+    "heroSubtitle": "Faites des offres sur des articles uniques de vendeurs du monde entier",
+    "topCategories": "Catégories principales",
+    "auctions": "Ventes",
+    "bids": "enchères",
     "endsIn": "Se termine dans"
   },
   "categories": {

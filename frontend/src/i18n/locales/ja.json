@@ -75,13 +75,11 @@
     "preferences": "設定"
   },
   "browse": {
-    "heroTitle": "素晴らしい取引を見つけよう",
+    "heroTitle": "素晴らしいお得情報を見つける",
     "heroSubtitle": "世界中の出品者からユニークな商品に入札",
-    "topCategories": "人気カテゴリー",
-    "featuredAuctions": "注目のオークション",
-    "endingSoon": "まもなく終了",
-    "seeAll": "すべて見る",
-    "bids": "件の入札",
+    "topCategories": "トップカテゴリー",
+    "auctions": "オークション",
+    "bids": "入札",
     "endsIn": "終了まで"
   },
   "categories": {

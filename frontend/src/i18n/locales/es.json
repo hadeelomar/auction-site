@@ -76,11 +76,9 @@
   },
   "browse": {
     "heroTitle": "Encuentra ofertas increíbles",
-    "heroSubtitle": "Oferta por artículos únicos de vendedores de todo el mundo",
+    "heroSubtitle": "Ofrece en artículos únicos de vendedores de todo el mundo",
     "topCategories": "Categorías principales",
-    "featuredAuctions": "Subastas destacadas",
-    "endingSoon": "Terminan pronto",
-    "seeAll": "Ver todo",
+    "auctions": "Subastas",
     "bids": "ofertas",
     "endsIn": "Termina en"
   },

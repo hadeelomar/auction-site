@@ -75,13 +75,11 @@
     "preferences": "偏好设置"
   },
   "browse": {
-    "heroTitle": "发现超值优惠",
-    "heroSubtitle": "竞拍来自世界各地卖家的独特商品",
+    "heroTitle": "找到超值优惠",
+    "heroSubtitle": "来自世界各地的卖家为您提供独特商品",
     "topCategories": "热门分类",
-    "featuredAuctions": "精选拍卖",
-    "endingSoon": "即将结束",
-    "seeAll": "查看全部",
-    "bids": "次出价",
+    "auctions": "拍卖",
+    "bids": "出价",
     "endsIn": "结束于"
   },
   "categories": {

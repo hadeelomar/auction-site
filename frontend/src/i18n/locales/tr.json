@@ -76,13 +76,11 @@
   },
   "browse": {
     "heroTitle": "Harika Fırsatlar Bulun",
-    "heroSubtitle": "Dünyanın dört bir yanındaki satıcılardan benzersiz ürünlere teklif verin",
+    "heroSubtitle": "Dünyadaki satıcılardan benzersiz ürünler için teklif verin",
     "topCategories": "Popüler Kategoriler",
-    "featuredAuctions": "Öne Çıkan Açık Artırmalar",
-    "endingSoon": "Yakında Bitiyor",
-    "seeAll": "Tümünü Gör",
-    "bids": "teklif",
-    "endsIn": "Bitiyor"
+    "auctions": "Açık Artırmalar",
+    "bids": "teklifler",
+    "endsIn": "süre içinde"
   },
   "categories": {
     "electronics": "Elektronik",

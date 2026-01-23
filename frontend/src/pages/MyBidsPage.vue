@@ -108,6 +108,13 @@
         </div>
       </div>
     </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <p>2026 Bido. {{ t('footer.allRightsReserved') }}</p>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -648,5 +655,25 @@ onMounted(() => {
   .bid-meta {
     justify-content: center;
   }
+}
+
+.footer {
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  padding: 2rem 0;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.footer-content p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
 }
 </style>

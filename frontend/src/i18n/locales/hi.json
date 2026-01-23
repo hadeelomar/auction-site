@@ -75,14 +75,12 @@
     "preferences": "प्राथमिकताएं"
   },
   "browse": {
-    "heroTitle": "अद्भुत सौदे खोजें",
-    "heroSubtitle": "दुनिया भर के विक्रेताओं से अनूठी वस्तुओं पर बोली लगाएं",
-    "topCategories": "शीर्ष श्रेणियाँ",
-    "featuredAuctions": "विशेष नीलामी",
-    "endingSoon": "जल्द समाप्त",
-    "seeAll": "सभी देखें",
-    "bids": "बोलियाँ",
-    "endsIn": "में समाप्त"
+    "heroTitle": "अद्भुत डील्स खोजें",
+    "heroSubtitle": "दुनिया भर के विक्रेताओं से अद्वितीय वस्तुओं पर बोली लगाएं",
+    "topCategories": "शीर्ष श्रेणियां",
+    "auctions": "नीलामी",
+    "bids": "बोली",
+    "endsIn": "में समाप्त होता है"
   },
   "categories": {
     "electronics": "इलेक्ट्रॉनिक्स",

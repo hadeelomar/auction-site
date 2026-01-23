@@ -75,12 +75,10 @@
     "preferences": "Einstellungen"
   },
   "browse": {
-    "heroTitle": "Finden Sie tolle Angebote",
+    "heroTitle": "Erstaunliche Angebote finden",
     "heroSubtitle": "Bieten Sie auf einzigartige Artikel von Verkäufern weltweit",
     "topCategories": "Top-Kategorien",
-    "featuredAuctions": "Empfohlene Auktionen",
-    "endingSoon": "Endet bald",
-    "seeAll": "Alle anzeigen",
+    "auctions": "Auktionen",
     "bids": "Gebote",
     "endsIn": "Endet in"
   },

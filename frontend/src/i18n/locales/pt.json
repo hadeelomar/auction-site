@@ -76,11 +76,9 @@
   },
   "browse": {
     "heroTitle": "Encontre Ofertas Incríveis",
-    "heroSubtitle": "Faça lances em itens únicos de vendedores ao redor do mundo",
-    "topCategories": "Categorias Populares",
-    "featuredAuctions": "Leilões em Destaque",
-    "endingSoon": "Terminando em Breve",
-    "seeAll": "Ver Tudo",
+    "heroSubtitle": "Faça lances em itens exclusivos de vendedores de todo o mundo",
+    "topCategories": "Principais Categorias",
+    "auctions": "Leilões",
     "bids": "lances",
     "endsIn": "Termina em"
   },

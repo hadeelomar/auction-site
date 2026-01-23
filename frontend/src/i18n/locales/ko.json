@@ -75,12 +75,10 @@
     "preferences": "설정"
   },
   "browse": {
-    "heroTitle": "놀라운 거래를 찾아보세요",
+    "heroTitle": "놀라운 거래 찾기",
     "heroSubtitle": "전 세계 판매자의 독특한 상품에 입찰하세요",
     "topCategories": "인기 카테고리",
-    "featuredAuctions": "추천 경매",
-    "endingSoon": "곧 종료",
-    "seeAll": "모두 보기",
+    "auctions": "경매",
     "bids": "입찰",
     "endsIn": "종료까지"
   },
