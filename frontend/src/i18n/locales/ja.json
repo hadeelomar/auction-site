@@ -67,7 +67,8 @@
     "askQuestion": "質問する",
     "reply": "返信",
     "postReply": "返信を投稿",
-    "replyPlaceholder": "返信を書いてください...",
+    "replyPlaceholder": "返信を書く...",
+    "posting": "投稿中...",
     "noQuestions": "まだ質問がありません。最初に質問してください！",
     "signInToAsk": "質問するにはログインしてください。"
   },

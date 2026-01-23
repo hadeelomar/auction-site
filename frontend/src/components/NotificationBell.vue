@@ -5,6 +5,7 @@
       <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
     </svg>
     <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount }}</span>
+    <div v-if="unreadCount > 0" class="red-dot"></div>
     
     <!-- Notification Dropdown -->
     <div v-if="showDropdown" class="notification-dropdown" @click.stop>
@@ -38,66 +39,58 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useAuthStore } from '../stores/auth'
+import websocketService from '../services/websocket'
 
-const props = defineProps<{
-  unreadCount: number
-}>()
-
-const emit = defineEmits<{
-  notificationClicked: (notification: any) => void
-}>()
-
+const authStore = useAuthStore()
 const showDropdown = ref(false)
 const notifications = ref<any[]>([])
+const unreadCount = ref(0)
+
+const emit = defineEmits<{
+  notificationClicked: [notification: any]
+}>()
 
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
-}
-
-const markAsRead = async (notification: any) => {
-  try {
-    const response = await fetch(`/api/notifications/${notification.id}/mark-read/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCsrfToken()
-      }
-    })
-    
-    if (response.ok) {
-      notification.is_read = true
-      emit('notificationClicked', notification)
-    }
-  } catch (error) {
-    console.error('Error marking notification as read:', error)
+  if (showDropdown.value) {
+    fetchNotifications()
   }
 }
 
-const markAllRead = async () => {
-  try {
-    const response = await fetch('/api/notifications/mark-all-read/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCsrfToken()
-      }
-    })
-    
-    if (response.ok) {
-      // Mark all notifications as read locally
-      notifications.value.forEach(notification => {
-        notification.is_read = true
-      })
-      // Update the unread count in navbar
-      const event = new CustomEvent('notifications-updated', { 
-        detail: { unreadCount: 0 } 
-      })
-      window.dispatchEvent(event)
-    }
-  } catch (error) {
-    console.error('Error marking all notifications as read:', error)
-  }
+const markAsRead = (notification: any) => {
+  // Mark as read via WebSocket
+  websocketService.markNotificationRead(notification.id)
+  
+  // Update locally
+  notification.is_read = true
+  unreadCount.value = Math.max(0, websocketService.getUnreadCount())
+  
+  // Update the unread count in navbar
+  const event = new CustomEvent('notifications-updated', { 
+    detail: { unreadCount: unreadCount.value } 
+  })
+  window.dispatchEvent(event)
+  
+  emit('notificationClicked', notification)
+}
+
+const markAllRead = () => {
+  // Mark all as read via WebSocket
+  websocketService.markAllNotificationsRead()
+  
+  // Update locally
+  notifications.value.forEach(notification => {
+    notification.is_read = true
+  })
+  unreadCount.value = 0
+  
+  // Update the unread count in navbar
+  const event = new CustomEvent('notifications-updated', { 
+    detail: { unreadCount: 0 } 
+  })
+  window.dispatchEvent(event)
 }
 
 const fetchNotifications = async () => {
@@ -117,40 +110,81 @@ const formatTime = (timestamp: string) => {
   const now = new Date()
   const diff = now.getTime() - date.getTime()
   
-  if (diff < 60000) { // less than 1 minute
-    return 'Just now'
-  } else if (diff < 3600000) { // less than 1 hour
-    const minutes = Math.floor(diff / 60000)
-    return `${minutes}m ago`
-  } else if (diff < 86400000) { // less than 1 day
-    const hours = Math.floor(diff / 3600000)
-    return `${hours}h ago`
-  } else {
-    const days = Math.floor(diff / 86400000)
-    return `${days}d ago`
-  }
+  const minutes = Math.floor(diff / (1000 * 60))
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes}m ago`
+  if (hours < 24) return `${hours}h ago`
+  return `${days}d ago`
 }
 
-const getCsrfToken = (): string => {
-  const cookies = document.cookie.split(';')
-  for (let cookie of cookies) {
-    const [name, value] = cookie.trim().split('=')
-    if (name === 'csrftoken') {
-      return decodeURIComponent(value)
-    }
+// WebSocket event handlers
+const handleNewNotification = (notification: any) => {
+  console.log('🔔 New notification received:', notification)
+  
+  // Add notification to the list
+  notifications.value.unshift(notification)
+  unreadCount.value = websocketService.getUnreadCount()
+  console.log('📊 Updated unread count:', unreadCount.value)
+  
+  // Force dropdown to refresh if it's open
+  if (showDropdown.value) {
+    console.log('🔄 Forcing dropdown refresh')
+    // Force Vue to re-render the list
+    const temp = notifications.value
+    notifications.value = []
+    nextTick(() => {
+      notifications.value = temp
+    })
   }
-  return ''
+  
+  // Update the unread count in navbar
+  const event = new CustomEvent('notifications-updated', { 
+    detail: { unreadCount: unreadCount.value } 
+  })
+  window.dispatchEvent(event)
+}
+
+const handleUnreadCountUpdate = (count: number) => {
+  console.log('📊 Unread count update:', count)
+  unreadCount.value = count
+  
+  // Update the unread count in navbar
+  const event = new CustomEvent('notifications-updated', { 
+    detail: { unreadCount: count } 
+  })
+  window.dispatchEvent(event)
 }
 
 onMounted(() => {
-  fetchNotifications()
+  console.log('🔔 NotificationBell mounting, auth status:', authStore.isAuthenticated)
   
-  // Poll for new notifications every 30 seconds
-  const interval = setInterval(fetchNotifications, 30000)
+  // Only connect if user is authenticated
+  if (authStore.isAuthenticated) {
+    console.log('🔗 Connecting to WebSocket...')
+    // Connect to WebSocket
+    websocketService.connect()
+    
+    // Set up event listeners
+    websocketService.on('new_notification', handleNewNotification)
+    websocketService.on('unread_count_update', handleUnreadCountUpdate)
+    
+    // Fetch initial notifications
+    fetchNotifications()
+  } else {
+    console.log('❌ User not authenticated, skipping WebSocket connection')
+  }
+})
+
+onUnmounted(() => {
+  // Clean up WebSocket event listeners
+  websocketService.off('new_notification', handleNewNotification)
+  websocketService.off('unread_count_update', handleUnreadCountUpdate)
   
-  onUnmounted(() => {
-    clearInterval(interval)
-  })
+  // Disconnect WebSocket
+  websocketService.disconnect()
 })
 </script>
 
@@ -189,6 +223,33 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.red-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .notification-dropdown {

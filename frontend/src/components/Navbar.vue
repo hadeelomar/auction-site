@@ -164,22 +164,14 @@ const handleNotificationUpdate = (event: Event) => {
   unreadNotificationCount.value = customEvent.detail.unreadCount
 }
 
-// Fetch notifications on mount and periodically
-let notificationInterval: number
-
 onMounted(() => {
   fetchUnreadCount()
-  // Poll for new notifications every 30 seconds
-  notificationInterval = setInterval(fetchUnreadCount, 30000)
   
   // Listen for notification updates from NotificationBell
   window.addEventListener('notifications-updated', handleNotificationUpdate)
 })
 
 onUnmounted(() => {
-  if (notificationInterval) {
-    clearInterval(notificationInterval)
-  }
   window.removeEventListener('notifications-updated', handleNotificationUpdate)
 })
 </script>

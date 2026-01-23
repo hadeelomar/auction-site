@@ -204,19 +204,23 @@ class Command(BaseCommand):
                     # Create in-app notifications
                     # Winner notification
                     from api.models import Notification
-                    Notification.objects.create(
-                        user=winner,
-                        type='auction_won',
-                        message=f'🎉 Congratulations! You won the auction for "{auction.title}" with a bid of ${winning_amount:.2f}',
+                    from api.utils import create_and_send_notification
+                    create_and_send_notification(
+                        winner,
+                        'auction_won',
+                        f'🎉 Congratulations! You won the auction for "{auction.title}" with a bid of ${winning_amount:.2f}',
                     )
                     
                     # Notify all other bidders that they lost
                     other_bidders = Bid.objects.filter(item=auction).exclude(user=winner).values_list('user', flat=True).distinct()
                     for bidder_id in other_bidders:
-                        Notification.objects.create(
-                            user_id=bidder_id,
-                            type='auction_lost',
-                            message=f'The auction "{auction.title}" has ended. The winning bid was ${winning_amount:.2f}',
+                        from django.contrib.auth import get_user_model
+                        User = get_user_model()
+                        bidder = User.objects.get(id=bidder_id)
+                        create_and_send_notification(
+                            bidder,
+                            'auction_lost',
+                            f'The auction "{auction.title}" has ended. The winning bid was ${winning_amount:.2f}',
                         )
                 else:
                     result['error'] = True

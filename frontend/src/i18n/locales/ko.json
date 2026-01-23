@@ -67,6 +67,7 @@
     "askQuestion": "질문하기",
     "reply": "답변",
     "postReply": "답변 게시",
+    "posting": "게시 중...",
     "replyPlaceholder": "답변을 작성하세요...",
     "noQuestions": "아직 질문이 없습니다. 첫 번째 질문을 해보세요!",
     "signInToAsk": "질문하려면 로그인해주세요.",

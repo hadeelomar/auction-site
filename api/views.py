@@ -15,6 +15,7 @@ import logging
 
 from api.models import User, AuctionItem, Bid, Question, Reply, Notification
 from api.forms import CustomAuthenticationForm, CustomUserCreationForm
+from api.utils import create_and_send_notification
 
 import json
 from typing import Dict, Any
@@ -514,17 +515,17 @@ def place_bid(request: HttpRequest) -> JsonResponse:
     previous_bids = Bid.objects.filter(item=item).exclude(user=request.user).order_by('-bid_amount')
     if previous_bids.exists():
         previous_highest_bidder = previous_bids.first().user
-        Notification.objects.create(
-            user=previous_highest_bidder,
-            type='outbid',
-            message=f'You have been outbid on "{item.title}". New bid: ${bid_amount:.2f}',
+        create_and_send_notification(
+            previous_highest_bidder,
+            'outbid',
+            f'You have been outbid on "{item.title}". New bid: ${bid_amount:.2f}',
         )
 
     # Send notification to auction owner about new bid
-    Notification.objects.create(
-        user=item.owner,
-        type='new_bid',
-        message=f'New bid of ${bid_amount:.2f} placed on your auction "{item.title}"',
+    create_and_send_notification(
+        item.owner,
+        'new_bid',
+        f'New bid of ${bid_amount:.2f} placed on your auction "{item.title}"',
     )
 
     item.current_price = bid_amount
@@ -729,10 +730,10 @@ def questions(request: HttpRequest) -> JsonResponse:
         )
 
         # Send notification to auction owner about new question
-        Notification.objects.create(
-            user=item.owner,
-            type='new_question',
-            message=f'New question posted on your auction "{item.title}": "{question_text[:100]}..."',
+        create_and_send_notification(
+            item.owner,
+            'new_question',
+            f'New question posted on your auction "{item.title}": "{question_text[:100]}..."',
         )
 
         return JsonResponse({
@@ -787,10 +788,10 @@ def question_reply(request: HttpRequest, question_id: int) -> JsonResponse:
     )
 
     # Send notification to the person who asked the question
-    Notification.objects.create(
-        user=question.user,
-        type='question_answered',
-        message=f'Your question on "{question.item.title}" has been answered: "{reply_text[:100]}..."',
+    create_and_send_notification(
+        question.user,
+        'question_answered',
+        f'Your question on "{question.item.title}" has been answered: "{reply_text[:100]}..."',
     )
 
     return JsonResponse({
