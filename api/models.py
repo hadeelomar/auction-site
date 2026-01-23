@@ -62,6 +62,12 @@ class AuctionItem(models.Model):
         ('vehicles', 'Vehicles'),
     ]
 
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('closed', 'Closed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
     title = models.CharField(max_length=150)
     description = models.TextField()
     image = models.ImageField(upload_to="items/", null=True, blank=True)
@@ -70,6 +76,28 @@ class AuctionItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     ends_at = models.DateTimeField()
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='electronics')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    
+    winner = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name="won_auctions",
+        help_text="Winner of the auction (set when auction closes)"
+    )
+    winning_bid_amount = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        null=True, 
+        blank=True,
+        help_text="Final winning bid amount"
+    )
+    closed_at = models.DateTimeField(
+        null=True, 
+        blank=True,
+        help_text="When the auction was closed"
+    )
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="items")
 
@@ -83,10 +111,22 @@ class AuctionItem(models.Model):
             models.Index(fields=['created_at']),
             models.Index(fields=['-created_at']),
             models.Index(fields=['-ends_at']),
+            models.Index(fields=['status']),
+            models.Index(fields=['winner']),
         ]
 
     def __str__(self):
         return self.title
+
+    @property
+    def end_datetime(self):
+        """Alias for ends_at to match the management command"""
+        return self.ends_at
+
+    @property
+    def seller(self):
+        """Alias for owner to match the email templates"""
+        return self.owner
 
 
 class Bid(models.Model):

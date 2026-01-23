@@ -46,8 +46,8 @@
                 </span>
               </div>
               <div class="auction-meta">
-                <span :class="['auction-status', auction.ends_at > new Date().toISOString() ? 'active' : 'ended']">
-                  {{ auction.ends_at > new Date().toISOString() ? t('auction.active') : t('auction.ended') }}
+                <span :class="['auction-status', getStatusClass(auction)]">
+                  {{ getStatusText(auction) }}
                 </span>
                 <span class="auction-time">{{ auction.time_left }}</span>
               </div>
@@ -157,6 +157,22 @@ const router = useRouter()
 
 const formatPrice = (price: number): string => i18nStore.formatPrice(price)
 
+const getStatusClass = (auction: Auction): string => {
+  if (auction.ends_at > new Date().toISOString()) {
+    return 'active'
+  } else {
+    return 'closed'
+  }
+}
+
+const getStatusText = (auction: Auction): string => {
+  if (auction.ends_at > new Date().toISOString()) {
+    return t('auction.active')
+  } else {
+    return t('auction.closed')
+  }
+}
+
 const fetchMyAuctions = async () => {
   try {
     loading.value = true
@@ -175,8 +191,8 @@ const fetchMyAuctions = async () => {
       return
     }
     
-    // Fetch auctions for this user
-    const response = await fetch(`/api/auctions/search/?owner=${userData.username}`)
+    // Fetch auctions for this user (include both active and closed)
+    const response = await fetch(`/api/auctions/search/?owner=${userData.username}&status=`)
     if (!response.ok) {
       throw new Error('Failed to fetch auctions')
     }
@@ -376,6 +392,11 @@ onMounted(() => {
 .auction-status.active {
   background: #d1fae5;
   color: #059669;
+}
+
+.auction-status.closed {
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .auction-status.ended {
