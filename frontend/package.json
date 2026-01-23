@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "dev:all": "concurrently \"npm run dev\" \"cd .. && python manage.py runserver\" --names \"frontend,backend\"",
+        "dev:all": "concurrently \"npm run dev\" \"cd .. && python run_asgi.py\" --names \"frontend,backend\"",
         "build": "vue-tsc && vite build && mv ../api/static/api/spa/index.html ../api/templates/api/spa/.",
         "build-windows": "vue-tsc && vite build && move ..\\api\\static\\api\\spa\\index.html ..\\api\\templates\\api\\spa\\.",
         "preview": "vite preview"

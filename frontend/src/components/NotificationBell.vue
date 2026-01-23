@@ -42,13 +42,21 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import websocketService from '../services/websocket'
 
+interface Notification {
+  id: number
+  type: string
+  message: string
+  is_read: boolean
+  timestamp: string
+}
+
 const authStore = useAuthStore()
 const showDropdown = ref(false)
-const notifications = ref<any[]>([])
+const notifications = ref<Notification[]>([])
 const unreadCount = ref(0)
 
 const emit = defineEmits<{
-  notificationClicked: [notification: any]
+  notificationClicked: [notification: Notification]
 }>()
 
 const toggleDropdown = () => {
@@ -58,7 +66,7 @@ const toggleDropdown = () => {
   }
 }
 
-const markAsRead = (notification: any) => {
+const markAsRead = (notification: Notification) => {
   // Mark as read via WebSocket
   websocketService.markNotificationRead(notification.id)
   
@@ -120,7 +128,7 @@ const formatTime = (timestamp: string) => {
 }
 
 // WebSocket event handlers
-const handleNewNotification = (notification: any) => {
+const handleNewNotification = (notification: Notification) => {
   // Add notification to the list
   notifications.value.unshift(notification)
   unreadCount.value = websocketService.getUnreadCount()
@@ -142,7 +150,7 @@ const handleNewNotification = (notification: any) => {
   window.dispatchEvent(event)
 }
 
-const handleExistingNotification = (notification: any) => {
+const handleExistingNotification = (notification: Notification) => {
   // Add notification to the list if not already present
   const exists = notifications.value.find(n => n.id === notification.id)
   if (!exists) {

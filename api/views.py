@@ -22,6 +22,7 @@ from typing import Dict, Any
 from decimal import Decimal, InvalidOperation
 from django.db.models import Count, Q, F
 from datetime import timedelta
+import os
 
 
 @ensure_csrf_cookie
@@ -220,6 +221,7 @@ def update_profile(request: HttpRequest) -> JsonResponse:
         user.set_password(new_password)
 
     if 'profile_image' in request.FILES:
+        from .utils.image_utils import create_profile_image
         image = request.FILES['profile_image']
 
         if image.size > 5 * 1024 * 1024:
@@ -229,13 +231,21 @@ def update_profile(request: HttpRequest) -> JsonResponse:
         if image.content_type not in allowed_types:
             return JsonResponse({'error': 'Invalid image type'}, status=400)
 
+        # Delete old profile image if exists
         if user.profile_image:
             try:
-                user.profile_image.delete(save=False)
+                old_path = os.path.join(settings.BASE_DIR, 'media', str(user.profile_image))
+                if os.path.exists(old_path):
+                    os.remove(old_path)
             except Exception:
                 pass
 
-        user.profile_image = image
+        # Process and save new profile image
+        result = create_profile_image(image)
+        if result['success']:
+            user.profile_image.name = result['path']
+        else:
+            return JsonResponse({'error': f'Image processing failed: {result["error"]}'}, status=400)
 
     user.save()
 
@@ -1585,3 +1595,126 @@ def get_client_ip(request: HttpRequest) -> str:
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+def get_system_stats(request: HttpRequest) -> JsonResponse:
+    """
+    GET /api/system/stats
+    Get comprehensive system statistics for admin dashboard
+    """
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        from django.db.models import Count, Avg, Sum
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        now = timezone.now()
+        last_24h = now - timedelta(hours=24)
+        last_7d = now - timedelta(days=7)
+        
+        # User statistics
+        total_users = User.objects.count()
+        new_users_24h = User.objects.filter(date_joined__gte=last_24h).count()
+        new_users_7d = User.objects.filter(date_joined__gte=last_7d).count()
+        
+        # Auction statistics
+        total_auctions = AuctionItem.objects.count()
+        active_auctions = AuctionItem.objects.filter(ends_at__gt=now).count()
+        ended_auctions = AuctionItem.objects.filter(ends_at__lte=now).count()
+        
+        # Bid statistics
+        total_bids = Bid.objects.count()
+        bids_24h = Bid.objects.filter(timestamp__gte=last_24h).count()
+        avg_bid_amount = Bid.objects.aggregate(avg=Avg('bid_amount'))['avg'] or 0
+        
+        # Q&A statistics
+        total_questions = Question.objects.count()
+        total_replies = Reply.objects.count()
+        
+        # Category breakdown
+        category_stats = {}
+        for category, _ in AuctionItem.CATEGORY_CHOICES:
+            count = AuctionItem.objects.filter(category=category).count()
+            if count > 0:
+                category_stats[category] = count
+        
+        # Recent activity
+        recent_auctions = AuctionItem.objects.filter(
+            created_at__gte=last_24h
+        ).count()
+        
+        stats = {
+            'users': {
+                'total': total_users,
+                'new_24h': new_users_24h,
+                'new_7d': new_users_7d
+            },
+            'auctions': {
+                'total': total_auctions,
+                'active': active_auctions,
+                'ended': ended_auctions,
+                'recent': recent_auctions
+            },
+            'bids': {
+                'total': total_bids,
+                'last_24h': bids_24h,
+                'average_amount': float(avg_bid_amount)
+            },
+            'qa': {
+                'total_questions': total_questions,
+                'total_replies': total_replies
+            },
+            'categories': category_stats,
+            'timestamp': now.isoformat()
+        }
+        
+        return JsonResponse(stats, status=200)
+        
+    except Exception as e:
+        return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+
+
+def export_auctions_csv(request: HttpRequest) -> JsonResponse:
+    """
+    GET /api/auctions/export
+    Export auction data as CSV for admin use
+    """
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        import csv
+        from django.http import HttpResponse
+        
+        # Get all auctions with related data
+        auctions = AuctionItem.objects.select_related('owner').prefetch_related('bids').all()
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="auctions_export.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow([
+            'ID', 'Title', 'Owner', 'Category', 'Starting Price', 
+            'Current Price', 'Bids Count', 'Status', 'Created At', 'Ends At'
+        ])
+        
+        for auction in auctions:
+            writer.writerow([
+                auction.id,
+                auction.title,
+                auction.owner.email,
+                auction.category,
+                auction.starting_price,
+                auction.current_price,
+                auction.bids.count(),
+                'Active' if auction.ends_at > timezone.now() else 'Ended',
+                auction.created_at.isoformat(),
+                auction.ends_at.isoformat()
+            ])
+        
+        return response
+        
+    except Exception as e:
+        return JsonResponse({'error': f'Export failed: {str(e)}'}, status=500)

@@ -1,12 +1,18 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
+from typing import Optional
+from django.http import HttpRequest
+from django.contrib.auth.models import User
+from allauth.account.forms import SignupForm
+from allauth.socialaccount.models import SocialLogin
+from allauth.socialaccount.forms import SignupForm as SocialSignupForm
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     """Custom adapter for django-allauth account management."""
     
-    def save_user(self, request, user, form, commit=True):
+    def save_user(self, request: HttpRequest, user: User, form: SignupForm, commit: bool = True) -> User:
         """Save user with our custom fields."""
         user = super().save_user(request, user, form, commit=False)
         user.username = user.email
@@ -18,7 +24,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     """Custom adapter for social account management."""
     
-    def pre_social_login(self, request, sociallogin):
+    def pre_social_login(self, request: HttpRequest, sociallogin: SocialLogin) -> None:
         """
         Connect social account to existing user if email matches.
         """
@@ -34,14 +40,14 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             except User.DoesNotExist:
                 pass
     
-    def save_user(self, request, sociallogin, form=None):
+    def save_user(self, request: HttpRequest, sociallogin: SocialLogin, form: Optional[SocialSignupForm] = None) -> User:
         """Save user from social login with proper username."""
         user = super().save_user(request, sociallogin, form)
         user.username = user.email
         user.save()
         return user
     
-    def populate_user(self, request, sociallogin, data):
+    def populate_user(self, request: HttpRequest, sociallogin: SocialLogin, data: dict) -> SocialLogin:
         """Populate user data from social account."""
         user = super().populate_user(request, sociallogin, data)
         user.username = data.get('email', '')

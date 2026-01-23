@@ -271,9 +271,27 @@ const handleSubmit = async () => {
   
   isSubmitting.value = true
   
+  interface ApiResponse {
+  message?: string
+  item?: AuctionItem
+  auction?: AuctionItem
+  error?: string
+}
+
+interface AuctionItem {
+  id: number
+  title: string
+  description: string
+  starting_price: string
+  current_price: string
+  ends_at: string
+  category: string
+  image?: string
+}
+
   try {
     let response: Response
-    let data: any
+    let data: ApiResponse
     
     if (isEditMode.value) {
       // Edit mode - send JSON data
@@ -332,7 +350,11 @@ const handleSubmit = async () => {
     if (isEditMode.value) {
       router.push('/auctions')
     } else {
-      router.push(`/auction/${data.auction.id}`)
+      if (data.auction) {
+        router.push(`/auction/${data.auction.id}`)
+      } else if (data.item) {
+        router.push(`/auction/${data.item.id}`)
+      }
     }
     
   } catch (err) {
