@@ -67,6 +67,9 @@
     "title": "Questions & Answers",
     "askQuestion": "Ask Question",
     "reply": "Reply",
+    "postReply": "Post Reply",
+    "replyPlaceholder": "Write your reply...",
+    "posting": "Posting...",
     "noQuestions": "No questions yet. Be the first to ask!",
     "signInToAsk": "Please sign in to ask a question."
   },
@@ -117,13 +120,15 @@
   },
   "myAuctions": {
     "title": "My Auctions",
-    "description": "Manage auctions you've created",
-    "newAuction": "New Auction",
+    "description": "Manage your auction listings",
     "loading": "Loading your auctions...",
-    "currentBid": "current bid",
-    "noAuctions": "You haven't created any auctions yet",
+    "noAuctions": "You haven't created any auctions yet.",
     "createFirst": "Create your first auction",
-    "deleting": "Deleting..."
+    "newAuction": "Create Auction",
+    "currentBid": "current bid",
+    "deleting": "Deleting...",
+    "activeAuctions": "Active Auctions",
+    "endedAuctions": "Ended Auctions"
   },
   "createAuction": {
     "createAuction": "Create Auction",

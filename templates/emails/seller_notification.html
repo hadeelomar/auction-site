@@ -248,8 +248,15 @@
                 
                 <div class="detail-row">
                     <span class="detail-label">Starting Price:</span>
-                    <span class="detail-value">${{ auction.starting_price|floatformat:2 }}</span>
+                    <span class="detail-value">{{ starting_price }}</span>
                 </div>
+                
+                {% if winning_bid %}
+                <div class="detail-row">
+                    <span class="detail-label">Winning Bid:</span>
+                    <span class="detail-value price">{{ winning_bid }}</span>
+                </div>
+                {% endif %}
             </div>
 
             <div style="text-align: center;">

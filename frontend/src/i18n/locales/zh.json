@@ -66,8 +66,11 @@
     "title": "问答",
     "askQuestion": "提问",
     "reply": "回复",
-    "noQuestions": "暂无问题。成为第一个提问的人！",
-    "signInToAsk": "请登录后提问。"
+    "postReply": "发布回复",
+    "replyPlaceholder": "写下您的回复...",
+    "posting": "发布中...",
+    "noQuestions": "还没有问题。成为第一个提问的人！",
+    "signInToAsk": "请登录以提问。"
   },
   "settings": {
     "language": "语言",
@@ -116,13 +119,15 @@
   },
   "myAuctions": {
     "title": "我的拍卖",
-    "description": "管理您创建的拍卖",
-    "newAuction": "新拍卖",
+    "description": "管理您的拍卖列表",
     "loading": "正在加载您的拍卖...",
-    "currentBid": "当前出价",
-    "noAuctions": "您还没有创建任何拍卖",
+    "noAuctions": "您还没有创建任何拍卖。",
     "createFirst": "创建您的第一个拍卖",
-    "deleting": "删除中..."
+    "newAuction": "创建拍卖",
+    "currentBid": "当前出价",
+    "deleting": "删除中...",
+    "activeAuctions": "进行中的拍卖",
+    "endedAuctions": "已结束的拍卖"
   },
   "createAuction": {
     "createAuction": "创建拍卖",

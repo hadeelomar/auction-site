@@ -19,7 +19,23 @@
         </div>
 
         <!-- Loading state -->
-        <div v-if="loading" class="loading-state">
+        <!-- Tabs -->
+      <div class="tabs">
+        <button 
+          @click="activeTab = 'active'" 
+          :class="['tab-button', { active: activeTab === 'active' }]"
+        >
+          {{ t('myAuctions.activeAuctions') || 'Active Auctions' }}
+        </button>
+        <button 
+          @click="activeTab = 'ended'" 
+          :class="['tab-button', { active: activeTab === 'ended' }]"
+        >
+          {{ t('myAuctions.endedAuctions') || 'Ended Auctions' }}
+        </button>
+      </div>
+
+      <div v-if="loading" class="loading-state">
           <p>{{ t('myAuctions.loading') }}</p>
         </div>
         
@@ -31,7 +47,7 @@
         
         <!-- auctions list -->
         <div v-else class="auctions-list">
-          <div v-for="auction in auctions" :key="auction.id" class="auction-card">
+          <div v-for="auction in filteredAuctions" :key="auction.id" class="auction-card">
             <div class="auction-image">
               <img :src="auction.image || '/placeholder.svg?height=80&width=80'" :alt="auction.title" />
             </div>
@@ -56,23 +72,23 @@
               <button 
                 @click="handleEdit(auction)" 
                 class="edit-button"
-                :disabled="auction.bid_count > 0"
-                :title="auction.bid_count > 0 ? 'Cannot edit auction with bids' : 'Edit auction'"
+                :disabled="auction.status === 'closed' && auction.bid_count > 0"
+                :title="auction.status === 'closed' && auction.bid_count > 0 ? 'Cannot edit closed auction with bids' : 'Edit auction'"
               >
                 {{ t('common.edit') }}
               </button>
               <button 
                 @click="handleDelete(auction)" 
                 class="delete-button"
-                :disabled="deletingAuction === auction.id || auction.bid_count > 0"
-                :title="auction.bid_count > 0 ? 'Cannot delete auction with bids' : 'Delete auction'"
+                :disabled="deletingAuction === auction.id || (auction.status === 'closed' && auction.bid_count > 0)"
+                :title="auction.status === 'closed' && auction.bid_count > 0 ? 'Cannot delete closed auction with bids' : 'Delete auction'"
               >
                 {{ deletingAuction === auction.id ? t('myAuctions.deleting') : t('common.delete') }}
               </button>
             </div>
           </div>
 
-          <div v-if="auctions.length === 0" class="empty-state">
+          <div v-if="filteredAuctions.length === 0" class="empty-state">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
               <path d="m3.3 7 8.7 5 8.7-5"/>
@@ -118,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Navbar from '../components/Navbar.vue'
@@ -138,6 +154,7 @@ interface Auction {
   time_left: string
   ends_at: string
   category: string
+  status: string
   owner: {
     id: number
     username: string
@@ -152,10 +169,22 @@ const error = ref('')
 const deletingAuction = ref<number | null>(null)
 const showDeleteModal = ref(false)
 const auctionToDelete = ref<Auction | null>(null)
+const activeTab = ref<'active' | 'ended'>('active')
 
 const router = useRouter()
 
 const formatPrice = (price: number): string => i18nStore.formatPrice(price)
+
+// Filter auctions based on active tab
+const filteredAuctions = computed(() => {
+  return auctions.value.filter(auction => {
+    if (activeTab.value === 'active') {
+      return auction.status === 'active' || auction.ends_at > new Date().toISOString()
+    } else {
+      return auction.status === 'closed' || auction.ends_at <= new Date().toISOString()
+    }
+  })
+})
 
 const getStatusClass = (auction: Auction): string => {
   if (auction.ends_at > new Date().toISOString()) {
@@ -179,7 +208,7 @@ const fetchMyAuctions = async () => {
     error.value = ''
     
     // Get current user info first
-    const userResponse = await fetch('/api/auth/user/')
+    const userResponse = await fetch('http://localhost:8001/api/auth/user/')
     if (!userResponse.ok) {
       throw new Error('Failed to get user info')
     }
@@ -285,6 +314,36 @@ onMounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  color: #111827;
+  background: #f3f4f6;
+}
+
+.tab-button.active {
+  color: #ea580c;
+  background: #fff7ed;
 }
 
 .page-title {

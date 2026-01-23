@@ -66,6 +66,9 @@
     "title": "Preguntas y respuestas",
     "askQuestion": "Hacer una pregunta",
     "reply": "Responder",
+    "postReply": "Publicar Respuesta",
+    "replyPlaceholder": "Escribe tu respuesta...",
+    "posting": "Publicando...",
     "noQuestions": "Aún no hay preguntas. ¡Sé el primero en preguntar!",
     "signInToAsk": "Por favor inicia sesión para hacer una pregunta."
   },
@@ -116,13 +119,15 @@
   },
   "myAuctions": {
     "title": "Mis Subastas",
-    "description": "Administra las subastas que has creado",
-    "newAuction": "Nueva Subasta",
+    "description": "Gestiona tus listados de subastas",
     "loading": "Cargando tus subastas...",
-    "currentBid": "oferta actual",
-    "noAuctions": "Aún no has creado ninguna subasta",
+    "noAuctions": "Aún no has creado ninguna subasta.",
     "createFirst": "Crea tu primera subasta",
-    "deleting": "Eliminando..."
+    "newAuction": "Crear Subasta",
+    "currentBid": "puja actual",
+    "deleting": "Eliminando...",
+    "activeAuctions": "Subastas Activas",
+    "endedAuctions": "Subastas Finalizadas"
   },
   "createAuction": {
     "createAuction": "Crear Subasta",

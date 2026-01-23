@@ -277,7 +277,7 @@ const handleSubmit = async () => {
     if (formData.newPassword) formDataToSend.append('new_password', formData.newPassword)
     if (croppedBlob.value) formDataToSend.append('profile_image', croppedBlob.value, 'profile.jpg')
 
-    const response = await fetch('http://localhost:8000/api/profile/update/', {
+    const response = await fetch('http://localhost:8001/api/profile/update/', {
       method: 'POST',
       headers: { 'X-CSRFToken': csrfToken || '' },
       credentials: 'include',
@@ -318,7 +318,7 @@ function getCookie(name: string): string | null {
 }
 
 async function fetchCsrfToken() {
-  try { await fetch('http://localhost:8000/api/auth/csrf/', { credentials: 'include' }) } catch (err) { console.error('Failed to fetch CSRF token:', err) }
+  try { await fetch('http://localhost:8001/api/auth/csrf/', { credentials: 'include' }) } catch (err) { console.error('Failed to fetch CSRF token:', err) }
 }
 
 function showToast(message: string, type: 'success' | 'error' = 'success') {

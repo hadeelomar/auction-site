@@ -41,6 +41,7 @@ urlpatterns = [
     path("i18n/currencies/", i18n.get_supported_currencies, name="currencies"),
     path("i18n/convert/", i18n.convert_currency, name="convert-currency"),
     path("i18n/language/", i18n.set_language, name="set-language"),
-    path("i18n/currency/", i18n.set_currency, name="set-currency"),
+    path("i18n/currency/", views.set_currency, name="set-currency"),
     path("i18n/locale/", i18n.get_locale_data, name="locale-data"),
+    path("notifications/", views.get_notifications, name="get-notifications"),
 ]

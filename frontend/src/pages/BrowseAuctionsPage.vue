@@ -226,7 +226,7 @@ const fetchAuctions = async () => {
     error.value = ''
     
     // Fetch all active auctions from search endpoint
-    const response = await fetch('/api/auctions/search/?status=active')
+    const response = await fetch('http://localhost:8001/api/auctions/search/?status=active')
     if (!response.ok) {
       throw new Error('Failed to fetch auctions')
     }
@@ -235,7 +235,7 @@ const fetchAuctions = async () => {
     auctions.value = data.auctions
     
     // Get ending soon auctions (next 24 hours)
-    const endingSoonResponse = await fetch('/api/auctions/search/?status=ending_soon')
+    const endingSoonResponse = await fetch('http://localhost:8001/api/auctions/search/?status=ending_soon')
     if (endingSoonResponse.ok) {
       const endingSoonData = await endingSoonResponse.json()
       endingSoon.value = endingSoonData.auctions

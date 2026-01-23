@@ -36,6 +36,7 @@
         <LanguageSelector />
 
         <template v-if="authStore.isAuthenticated">
+          <!-- notification bell -->
           <!-- create auction -->
           <router-link to="/create" class="create-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -56,6 +57,9 @@
             </svg>
             <span class="nav-link-text">{{ t('nav.myBids') }}</span>
           </router-link>
+
+          <!-- notifications -->
+          <NotificationBell :unread-count="unreadNotificationCount" class="nav-link" />
 
           <!-- profile dropdown -->
           <div class="profile-dropdown" @click="showDropdown = !showDropdown">
@@ -106,8 +110,8 @@
         </template>
 
         <template v-else>
-          <a href="http://localhost:8000/login/" class="login-button">{{ t('common.login') }}</a>
-          <a href="http://localhost:8000/signup/" class="signup-button">{{ t('common.signup') }}</a>
+          <a href="http://localhost:8001/login/" class="login-button">{{ t('common.login') }}</a>
+          <a href="http://localhost:8001/signup/" class="signup-button">{{ t('common.signup') }}</a>
         </template>
       </div>
     </div>
@@ -115,19 +119,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../stores/auth'
 import LanguageSelector from './LanguageSelector.vue'
+import NotificationBell from './NotificationBell.vue'
 
 const { t } = useI18n()
 
 const router = useRouter()
 const authStore = useAuthStore()
-
 const searchQuery = ref('')
 const showDropdown = ref(false)
+const unreadNotificationCount = ref(0)
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
@@ -140,6 +145,28 @@ const handleLogout = async () => {
   showDropdown.value = false
   router.push('/')
 }
+
+const fetchUnreadCount = async () => {
+  // No longer needed - WebSocket handles real-time notifications
+  console.log('📨 Notifications are now handled via WebSocket')
+}
+
+// Listen for notification updates from NotificationBell
+const handleNotificationUpdate = (event: Event) => {
+  const customEvent = event as CustomEvent
+  unreadNotificationCount.value = customEvent.detail.unreadCount
+}
+
+onMounted(() => {
+  fetchUnreadCount()
+  
+  // Listen for notification updates from NotificationBell
+  window.addEventListener('notifications-updated', handleNotificationUpdate)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('notifications-updated', handleNotificationUpdate)
+})
 </script>
 
 <style scoped>

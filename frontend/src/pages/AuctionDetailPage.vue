@@ -188,7 +188,7 @@
             <h2>{{ t('qna.title') }}</h2>
             
             <!-- Ask Question Form -->
-            <div v-if="authStore.isAuthenticated" class="ask-question-form">
+            <div v-if="authStore.isAuthenticated && !isAuctionOwner" class="ask-question-form">
               <div v-if="questionMessage" :class="['qa-message', questionMessageType]">
                 {{ questionMessage }}
               </div>
@@ -210,7 +210,7 @@
                 </button>
               </form>
             </div>
-            <div v-else class="login-prompt">
+            <div v-else-if="!authStore.isAuthenticated" class="login-prompt">
               <p>{{ t('qna.signInToAsk').split('sign in')[0] }}<router-link to="/login">{{ t('common.login').toLowerCase() }}</router-link>{{ t('qna.signInToAsk').split('sign in')[1] || ' to ask a question.' }}</p>
             </div>
 
@@ -241,7 +241,7 @@
                 </div>
 
                 <!-- Reply Form -->
-                <div v-if="authStore.isAuthenticated" class="reply-form-container">
+                <div v-if="isAuctionOwner" class="reply-form-container">
                   <button 
                     v-if="replyingToQuestionId !== question.id"
                     @click="replyingToQuestionId = question.id"
@@ -249,10 +249,11 @@
                   >
                     {{ t('qna.reply') }}
                   </button>
+                  
                   <div v-else class="reply-form">
                     <textarea
                       v-model="replyText"
-                      :placeholder="t('detail.replyPlaceholder')"
+                      :placeholder="t('qna.replyPlaceholder')"
                       class="reply-input"
                       :disabled="isSubmittingReply"
                       rows="2"
@@ -271,8 +272,8 @@
                         class="submit-reply-btn"
                         :disabled="isSubmittingReply || !replyText.trim()"
                       >
-                        <span v-if="isSubmittingReply">{{ t('detail.posting') }}</span>
-                        <span v-else>{{ t('detail.postReply') }}</span>
+                        <span v-if="isSubmittingReply">{{ t('qna.posting') }}</span>
+                        <span v-else>{{ t('qna.postReply') }}</span>
                       </button>
                     </div>
                   </div>
@@ -302,7 +303,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Navbar from '../components/Navbar.vue'
@@ -393,7 +394,12 @@ const replyingToQuestionId = ref<number | null>(null)
 const replyText = ref('')
 const isSubmittingReply = ref(false)
 
-const API_BASE_URL = 'http://localhost:8000/api'
+// Computed property to check if current user is the auction owner
+const isAuctionOwner = computed(() => {
+  return authStore.isAuthenticated && auction.value && authStore.user?.id === auction.value.owner.id
+})
+
+const API_BASE_URL = 'http://localhost:8001/api'
 
 const ownerName = computed(() => {
   if (!auction.value?.owner) return 'Unknown'

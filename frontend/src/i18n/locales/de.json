@@ -66,8 +66,13 @@
     "title": "Fragen und Antworten",
     "askQuestion": "Frage stellen",
     "reply": "Antworten",
-    "noQuestions": "Noch keine Fragen. Stellen Sie die erste Frage!",
-    "signInToAsk": "Bitte melden Sie sich an, um eine Frage zu stellen."
+    "postReply": "Antwort senden",
+    "posting": "Wird gesendet...",
+    "replyPlaceholder": "Schreibe deine Antwort...",
+    "noQuestions": "Noch keine Fragen. Sei der Erste, der fragt!",
+    "signInToAsk": "Bitte melde dich an, um eine Frage zu stellen.",
+    "askPlaceholder": "Stellen Sie eine Frage zu diesem Artikel...",
+    "loadingQuestions": "Fragen werden geladen..."
   },
   "settings": {
     "language": "Sprache",
@@ -116,13 +121,15 @@
   },
   "myAuctions": {
     "title": "Meine Auktionen",
-    "description": "Verwalten Sie Ihre erstellten Auktionen",
-    "newAuction": "Neue Auktion",
-    "loading": "Ihre Auktionen werden geladen...",
-    "currentBid": "aktuelles Gebot",
-    "noAuctions": "Sie haben noch keine Auktionen erstellt",
+    "description": "Verwalten Sie Ihre Auktionsauflistungen",
+    "loading": "Lade Ihre Auktionen...",
+    "noAuctions": "Sie haben noch keine Auktionen erstellt.",
     "createFirst": "Erstellen Sie Ihre erste Auktion",
-    "deleting": "Wird gelöscht..."
+    "newAuction": "Auktion Erstellen",
+    "currentBid": "aktuelles Gebot",
+    "deleting": "Lösche...",
+    "activeAuctions": "Aktive Auktionen",
+    "endedAuctions": "Beendete Auktionen"
   },
   "createAuction": {
     "createAuction": "Auktion Erstellen",

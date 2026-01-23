@@ -54,7 +54,7 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     // Redirect to Django login page instead of Vue route
-    window.location.href = "http://localhost:8000/login/"
+    window.location.href = "http://localhost:8001/login/"
     return false
   }
 })
