@@ -259,3 +259,43 @@ class Notification(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.get_type_display()}"
+
+
+class ShareAnalytics(models.Model):
+    """
+    Model to track sharing analytics for auctions
+    """
+    PLATFORM_CHOICES = [
+        ('facebook', 'Facebook'),
+        ('twitter', 'Twitter'),
+        ('whatsapp', 'WhatsApp'),
+        ('email', 'Email'),
+        ('copy-link', 'Copy Link'),
+        ('embed', 'Embed Code'),
+        ('qr-download', 'QR Code Download'),
+    ]
+    
+    auction = models.ForeignKey(
+        'AuctionItem',
+        on_delete=models.CASCADE,
+        related_name='share_analytics'
+    )
+    platform = models.CharField(
+        max_length=20,
+        choices=PLATFORM_CHOICES
+    )
+    url = models.URLField()
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = "share_analytics"
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['auction', '-timestamp']),
+            models.Index(fields=['platform', '-timestamp']),
+        ]
+    
+    def __str__(self):
+        return f"{self.auction.title} - {self.platform} - {self.timestamp}"

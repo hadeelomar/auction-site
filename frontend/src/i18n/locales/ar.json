@@ -39,7 +39,9 @@
     "noBids": "لا توجد عروض بعد",
     "wonBy": "فاز به",
     "ended": "انتهى",
-    "active": "نشط"
+    "active": "نشط",
+    "closed": "Closed",
+    "share": "Share"
   },
   "bids": {
     "yourBid": "عرضك",
@@ -199,5 +201,21 @@
     "fileFormatHint": "PNG, JPG حتى 5 ميجابايت",
     "selectImageFile": "يرجى اختيار ملف صورة",
     "fileSizeError": "يجب أن يكون حجم الملف أقل من 5 ميجابايت"
+  },
+  "share": {
+    "title": "مشاركة المزاد",
+    "facebook": "مشاركة على فيسبوك",
+    "twitter": "مشاركة على تويتر",
+    "whatsapp": "مشاركة على واتساب",
+    "email": "مشاركة عبر البريد الإلكتروني",
+    "copy": "نسخ الرابط",
+    "copied": "تم النسخ!",
+    "qrCode": "رمز QR",
+    "downloadQR": "تحميل QR",
+    "embed": "رمز التضمين",
+    "analytics": "تحليلات المشاركة",
+    "totalShares": "إجمالي المشاركات",
+    "totalClicks": "إجمالي النقرات",
+    "conversionRate": "معدل التحويل"
   }
 }

@@ -103,6 +103,18 @@
                 </div>
               </div>
 
+              <!-- Share Button -->
+              <div class="share-section">
+                <button @click="showShareModal = true" class="share-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                    <line x1="12" x2="12" y1="2" y2="15"/>
+                  </svg>
+                  {{ t('auction.share') }}
+                </button>
+              </div>
+
               <!-- Bidding Section -->
               <div class="bidding-section">
                 <h3>{{ t('auction.placeBid') }}</h3>
@@ -299,14 +311,34 @@
         <p>2026 Bido. {{ t('footer.allRightsReserved') }}</p>
       </div>
     </footer>
+
+    <!-- Share Modal -->
+    <Teleport to="body">
+      <div v-if="showShareModal" class="modal-overlay" @click="showShareModal = false">
+        <div class="modal-content" @click.stop>
+          <ShareComponent
+            v-if="auction"
+            :auction-id="auction.id"
+            :auction-title="auction.title"
+            :auction-description="auction.description"
+            :auction-image="auction.image || undefined"
+            :current-price="parseFloat(auction.current_price)"
+            :show-analytics="isOwnAuction"
+            @close="showShareModal = false"
+            @share-tracked="handleShareTracked"
+          />
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Navbar from '../components/Navbar.vue'
+import ShareComponent from '../components/ShareComponent.vue'
 import { useAuthStore } from '../stores/auth'
 import { useI18nStore } from '../stores/i18n'
 
@@ -382,6 +414,7 @@ const bidAmount = ref<number | null>(null)
 const isSubmittingBid = ref(false)
 const bidMessage = ref<string | null>(null)
 const bidMessageType = ref<'success' | 'error'>('success')
+const showShareModal = ref(false)
 let pollingInterval: ReturnType<typeof setInterval> | null = null
 
 const questions = ref<Question[]>([])
@@ -695,6 +728,10 @@ async function submitReply(questionId: number): Promise<void> {
   } finally {
     isSubmittingReply.value = false
   }
+}
+
+function handleShareTracked(platform: string, url: string): void {
+  console.log(`Share tracked: ${platform} - ${url}`)
 }
 
 onMounted(async () => {
@@ -1427,11 +1464,60 @@ onUnmounted(() => {
   font-size: 0.875rem;
 }
 
+/* Share Button Styles */
+.share-section {
+  margin-top: 1rem;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  justify-content: center;
+}
+
+.share-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+}
+
 .footer {
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  background: #1f2937;
+  color: white;
+  text-align: center;
   padding: 2rem 0;
-  margin-top: auto;
+  margin-top: 4rem;
 }
 
 .footer-content {

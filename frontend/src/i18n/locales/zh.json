@@ -39,7 +39,9 @@
     "noBids": "暂无出价",
     "wonBy": "获胜者",
     "ended": "已结束",
-    "active": "进行中"
+    "active": "进行中",
+    "closed": "Closed",
+    "share": "Share"
   },
   "bids": {
     "yourBid": "您的出价",
@@ -199,5 +201,21 @@
     "fileFormatHint": "PNG、JPG 最大5MB",
     "selectImageFile": "请选择图像文件",
     "fileSizeError": "文件大小必须小于5MB"
+  },
+  "share": {
+    "title": "Share Auction",
+    "facebook": "Share on Facebook",
+    "twitter": "Share on Twitter",
+    "whatsapp": "Share on WhatsApp",
+    "email": "Share via Email",
+    "copy": "Copy Link",
+    "copied": "Copied!",
+    "qrCode": "QR Code",
+    "downloadQR": "Download QR",
+    "embed": "Embed Code",
+    "analytics": "Share Analytics",
+    "totalShares": "Total Shares",
+    "totalClicks": "Total Clicks",
+    "conversionRate": "Conversion Rate"
   }
 }
