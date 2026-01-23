@@ -1,0 +1,284 @@
+[
+{
+  "model": "api.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$SG8Ili87wjgsrImjS8zwuH$y6TVDPxWLMlGCH2wFhJGlUQVo2yVrHmpXKcfHe+Bmwk=",
+    "last_login": "2026-01-18T20:41:42.831Z",
+    "is_superuser": false,
+    "username": "janesmith@example.com",
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "email": "janesmith@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-18T20:24:11.017Z",
+    "profile_image": "profile_images/profile.jpg",
+    "date_of_birth": "2000-02-17",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "api.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$CJdXIxpJLM2YYCZG1uEakm$wZP/4jJP//o45EOVaa9VWuAzPIlgeUmwWTm09X/yj/A=",
+    "last_login": "2026-01-22T23:48:25.025Z",
+    "is_superuser": false,
+    "username": "johndoe@example.com",
+    "first_name": "John1",
+    "last_name": "Doe",
+    "email": "johndoe@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-18T20:48:24.585Z",
+    "profile_image": "profile_images/profile_h9oIOyM.jpg",
+    "date_of_birth": "2001-01-26",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "api.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$U5Kv5z9GgZlkK9RJ2jmksk$XIDd6ii8FNQyYrR0970Dh+ZF2RuhqttzdXWEGxIS5RE=",
+    "last_login": "2026-01-22T11:09:10.093Z",
+    "is_superuser": false,
+    "username": "test@example.com",
+    "first_name": "",
+    "last_name": "",
+    "email": "test@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-22T11:08:59.369Z",
+    "profile_image": "",
+    "date_of_birth": "2000-01-01",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "api.user",
+  "pk": 4,
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "demo_seller",
+    "first_name": "Demo",
+    "last_name": "Seller",
+    "email": "demo@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-22T11:27:29.370Z",
+    "profile_image": "",
+    "date_of_birth": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "api.user",
+  "pk": 5,
+  "fields": {
+    "password": "!S64IZZhp0zjQmhY9XV7lONyl0TEDKjbHQ6PEwZr3",
+    "last_login": "2026-01-22T23:56:25.817Z",
+    "is_superuser": false,
+    "username": "hadeelomar1409@gmail.com",
+    "first_name": "Hadeel",
+    "last_name": "Omar",
+    "email": "hadeelomar1409@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-22T22:05:22.720Z",
+    "profile_image": "",
+    "date_of_birth": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "api.user",
+  "pk": 6,
+  "fields": {
+    "password": "!avGGkE13l3fpFSgWEsitGWXPr8wBseCtmJgTUxuT",
+    "last_login": "2026-01-22T23:45:27.753Z",
+    "is_superuser": false,
+    "username": "group36example@gmail.com",
+    "first_name": "Test",
+    "last_name": "User",
+    "email": "group36example@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-22T22:10:05.803Z",
+    "profile_image": "",
+    "date_of_birth": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "api.auctionitem",
+  "pk": 1,
+  "fields": {
+    "title": "test",
+    "description": "test description",
+    "image": "",
+    "starting_price": "10.00",
+    "current_price": "12.00",
+    "created_at": "2026-01-22T11:09:38.662Z",
+    "ends_at": "2026-01-30T12:00:00Z",
+    "category": "electronics",
+    "owner": 3
+  }
+},
+{
+  "model": "api.auctionitem",
+  "pk": 3,
+  "fields": {
+    "title": "Vintage Camera",
+    "description": "Classic film camera from the 1960s. Excellent condition, fully functional. Great for photography enthusiasts and collectors.",
+    "image": "",
+    "starting_price": "150.00",
+    "current_price": "200.00",
+    "created_at": "2026-01-22T11:27:29.388Z",
+    "ends_at": "2026-01-29T11:27:29.387Z",
+    "category": "electronics",
+    "owner": 4
+  }
+},
+{
+  "model": "api.auctionitem",
+  "pk": 4,
+  "fields": {
+    "title": "Designer Handbag",
+    "description": "Authentic designer handbag in excellent condition. Premium leather with gold hardware.",
+    "image": "",
+    "starting_price": "250.00",
+    "current_price": "300.00",
+    "created_at": "2026-01-22T11:27:29.395Z",
+    "ends_at": "2026-01-25T11:27:29.387Z",
+    "category": "fashion",
+    "owner": 4
+  }
+},
+{
+  "model": "api.auctionitem",
+  "pk": 5,
+  "fields": {
+    "title": "Modern Sofa",
+    "description": "Comfortable 3-seater sofa in pristine condition. Perfect for any living room.",
+    "image": "",
+    "starting_price": "500.00",
+    "current_price": "750.00",
+    "created_at": "2026-01-22T11:27:29.402Z",
+    "ends_at": "2026-01-27T11:27:29.387Z",
+    "category": "home",
+    "owner": 4
+  }
+},
+{
+  "model": "api.auctionitem",
+  "pk": 6,
+  "fields": {
+    "title": "Mountain Bike",
+    "description": "High-performance mountain bike with recent servicing. Excellent trails.",
+    "image": "",
+    "starting_price": "800.00",
+    "current_price": "1200.00",
+    "created_at": "2026-01-22T11:27:29.409Z",
+    "ends_at": "2026-01-24T11:27:29.387Z",
+    "category": "sports",
+    "owner": 4
+  }
+},
+{
+  "model": "api.auctionitem",
+  "pk": 7,
+  "fields": {
+    "title": "Abstract Painting",
+    "description": "Original abstract painting by emerging artist. Vibrant colors, museum quality.",
+    "image": "",
+    "starting_price": "300.00",
+    "current_price": "450.00",
+    "created_at": "2026-01-22T11:27:29.421Z",
+    "ends_at": "2026-02-01T11:27:29.387Z",
+    "category": "art",
+    "owner": 4
+  }
+},
+{
+  "model": "api.auctionitem",
+  "pk": 8,
+  "fields": {
+    "title": "Classic Car",
+    "description": "Well-maintained classic car with low mileage. Reliable daily driver.",
+    "image": "",
+    "starting_price": "5000.00",
+    "current_price": "6500.00",
+    "created_at": "2026-01-22T11:27:29.428Z",
+    "ends_at": "2026-02-05T11:27:29.387Z",
+    "category": "vehicles",
+    "owner": 4
+  }
+},
+{
+  "model": "api.auctionitem",
+  "pk": 9,
+  "fields": {
+    "title": "Test item 1",
+    "description": "test item is crazy",
+    "image": "items/Screenshot_From_2026-01-21_17-15-33_0WYCfqY.png",
+    "starting_price": "25.00",
+    "current_price": "25.00",
+    "created_at": "2026-01-23T06:10:40.929Z",
+    "ends_at": "2026-01-27T10:14:00Z",
+    "category": "sports",
+    "owner": 5
+  }
+},
+{
+  "model": "api.bid",
+  "pk": 1,
+  "fields": {
+    "user": 2,
+    "item": 1,
+    "bid_amount": "11.00",
+    "timestamp": "2026-01-22T13:22:08.369Z",
+    "is_winning": false
+  }
+},
+{
+  "model": "api.bid",
+  "pk": 2,
+  "fields": {
+    "user": 2,
+    "item": 1,
+    "bid_amount": "12.00",
+    "timestamp": "2026-01-22T18:54:55.281Z",
+    "is_winning": true
+  }
+},
+{
+  "model": "api.question",
+  "pk": 1,
+  "fields": {
+    "user": 2,
+    "item": 8,
+    "question_text": "Is this brand new or used?",
+    "timestamp": "2026-01-22T17:02:35.789Z"
+  }
+},
+{
+  "model": "api.reply",
+  "pk": 1,
+  "fields": {
+    "question": 1,
+    "user": 2,
+    "reply_text": "Used!",
+    "timestamp": "2026-01-22T17:02:43.829Z"
+  }
+}
+]

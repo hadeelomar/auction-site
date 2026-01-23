@@ -9,7 +9,8 @@ from django.utils.dateparse import parse_date
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.db import models
+from django.db import models, connection
+import logging
 # Rate limiting is handled inline with graceful fallback
 
 from api.models import User, AuctionItem, Bid, Question, Reply
@@ -1223,3 +1224,99 @@ def spa(request: HttpRequest) -> HttpResponse:
     Rendering build files
     """
     return render(request, "api/spa/index.html")
+
+
+logger = logging.getLogger(__name__)
+
+
+@require_http_methods(["GET"])
+def database_health(request: HttpRequest) -> JsonResponse:
+    """
+    Check database connectivity and performance.
+    Returns health status for monitoring systems.
+    """
+    try:
+        # Test basic database connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            result = cursor.fetchone()
+            
+        if result[0] != 1:
+            return JsonResponse({
+                "status": "unhealthy",
+                "database": "connection_failed",
+                "error": "Database query returned unexpected result"
+            }, status=503)
+        
+        # Get database stats for PostgreSQL
+        db_stats = {}
+        if connection.vendor == 'postgresql':
+            with connection.cursor() as cursor:
+                # Get connection count
+                cursor.execute("""
+                    SELECT count(*) FROM pg_stat_activity 
+                    WHERE state = 'active'
+                """)
+                active_connections = cursor.fetchone()[0]
+                
+                # Get database size
+                cursor.execute("""
+                    SELECT pg_size_pretty(pg_database_size(current_database()))
+                """)
+                db_size = cursor.fetchone()[0]
+                
+                db_stats = {
+                    "active_connections": active_connections,
+                    "database_size": db_size,
+                    "vendor": "postgresql"
+                }
+        else:
+            db_stats = {
+                "vendor": connection.vendor,
+                "database": "sqlite_development"
+            }
+        
+        return JsonResponse({
+            "status": "healthy",
+            "database": db_stats,
+            "timestamp": connection.timezone
+        })
+        
+    except Exception as e:
+        logger.error(f"Database health check failed: {str(e)}")
+        return JsonResponse({
+            "status": "unhealthy",
+            "database": "connection_failed",
+            "error": str(e)
+        }, status=503)
+
+
+@require_http_methods(["GET"])
+def application_health(request: HttpRequest) -> JsonResponse:
+    """
+    Overall application health check including database.
+    """
+    health_data = {
+        "status": "healthy",
+        "application": "auction_site",
+        "version": "1.0.0",
+        "checks": {}
+    }
+    
+    # Check database
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            health_data["checks"]["database"] = "healthy"
+    except Exception as e:
+        health_data["status"] = "unhealthy"
+        health_data["checks"]["database"] = f"unhealthy: {str(e)}"
+    
+    # Check environment
+    import os
+    health_data["checks"]["environment"] = os.getenv('DJANGO_ENV', 'development')
+    
+    # Determine HTTP status
+    status_code = 200 if health_data["status"] == "healthy" else 503
+    
+    return JsonResponse(health_data, status=status_code)

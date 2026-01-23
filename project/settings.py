@@ -103,10 +103,22 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/stable/ref/settings/#databases
 
-
 DATABASES = {
     'default': database.config()
 }
+
+# Database connection pooling and optimization
+if DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
+    # PostgreSQL-specific settings
+    DATABASES['default'].update({
+        'OPTIONS': {
+            'connect_timeout': 60,
+            'MAX_CONNS': 20,
+            'MIN_CONNS': 5,
+        },
+        'CONN_HEALTH_CHECKS': True,
+        'CONN_MAX_AGE': 600,  # 10 minutes
+    })
 
 AUTH_USER_MODEL = 'api.User'
 
