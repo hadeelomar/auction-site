@@ -11,7 +11,7 @@ export interface User {
   date_of_birth: string | null
 }
 
-const API_BASE_URL = "http://localhost:8000/api"
+const API_BASE_URL = "http://localhost:8001/api"
 
 function getCookie(name: string): string | null {
   const value = `; ${document.cookie}`

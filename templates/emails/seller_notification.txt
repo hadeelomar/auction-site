@@ -1,0 +1,53 @@
+🔨 YOUR AUCTION HAS ENDED 🔨
+
+Dear {{ seller.get_full_name|default:seller.username }},
+
+Your auction has ended. Here are the results:
+
+AUCTION DETAILS:
+===============
+Title: {{ auction.title }}
+Description: {{ auction.description|truncatewords:50 }}
+Starting Price: ${{ auction.starting_price|floatformat:2 }}
+Auction Ended: {{ auction.ends_at|date:"F j, Y, g:i A" }}
+Total Bids Received: {{ auction.bids.all|length }}
+
+{% if winning_bid %}
+RESULT: SOLD! 🎉
+================
+Winning Bid: ${{ winning_amount|floatformat:2 }}
+Winner: {{ winner.get_full_name|default:winner.username }}
+Winner Email: {{ winner.email }}
+
+NEXT STEPS:
+============
+1. Contact the winner to arrange payment
+2. Discuss delivery/pickup options
+3. Complete the transaction
+
+The winner has been notified and will be expecting your contact.
+{% else %}
+RESULT: NO BIDS ❌
+==================
+Unfortunately, your auction ended without any bids.
+
+SUGGESTIONS:
+===========
+- Consider relisting with a lower starting price
+- Improve the item description
+- Add better photos
+- Choose a better ending time
+{% endif %}
+
+VIEW THE AUCTION:
+==================
+{{ site_url }}/auctions/{{ auction.id }}
+
+Thank you for using the Bido Auction Platform!
+
+Best regards,
+The Bido Team
+
+---
+This is an automated message. Please do not reply to this email.
+© 2026 Bido. All rights reserved.

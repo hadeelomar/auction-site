@@ -66,8 +66,11 @@
     "title": "Perguntas e Respostas",
     "askQuestion": "Fazer Pergunta",
     "reply": "Responder",
+    "postReply": "Publicar Resposta",
+    "replyPlaceholder": "Escreva sua resposta...",
+    "posting": "Publicando...",
     "noQuestions": "Ainda não há perguntas. Seja o primeiro a perguntar!",
-    "signInToAsk": "Por favor sign in para fazer uma pergunta."
+    "signInToAsk": "Por favor, faça login para fazer uma pergunta."
   },
   "settings": {
     "language": "Idioma",
@@ -116,13 +119,15 @@
   },
   "myAuctions": {
     "title": "Meus Leilões",
-    "description": "Gerencie os leilões que você criou",
-    "newAuction": "Novo Leilão",
+    "description": "Gerencie suas listagens de leilões",
     "loading": "Carregando seus leilões...",
-    "currentBid": "lance atual",
-    "noAuctions": "Você ainda não criou nenhum leilão",
+    "noAuctions": "Você ainda não criou nenhum leilão.",
     "createFirst": "Crie seu primeiro leilão",
-    "deleting": "Excluindo..."
+    "newAuction": "Criar Leilão",
+    "currentBid": "lance atual",
+    "deleting": "Excluindo...",
+    "activeAuctions": "Leilões Ativos",
+    "endedAuctions": "Leilões Encerrados"
   },
   "createAuction": {
     "createAuction": "Criar Leilão",
