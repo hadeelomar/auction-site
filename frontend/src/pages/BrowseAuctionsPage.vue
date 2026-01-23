@@ -7,15 +7,15 @@
       <!-- Hero Section -->
       <section class="hero-section">
         <div class="hero-content">
-          <div class="hero-dessert">
-            <div class="dessert-box dessert-box-1"></div>
-            <div class="dessert-box dessert-box-2"></div>
-            <div class="dessert-box dessert-box-3"></div>
-            <div class="dessert-box dessert-box-4"></div>
-            <div class="dessert-circle dessert-circle-1"></div>
-            <div class="dessert-circle dessert-circle-2"></div>
-            <div class="dessert-line dessert-line-1"></div>
-            <div class="dessert-line dessert-line-2"></div>
+          <div class="hero-desert">
+            <div class="desert-box desert-box-1"></div>
+            <div class="desert-box desert-box-2"></div>
+            <div class="desert-box desert-box-3"></div>
+            <div class="desert-box desert-box-4"></div>
+            <div class="desert-circle desert-circle-1"></div>
+            <div class="desert-circle desert-circle-2"></div>
+            <div class="desert-line desert-line-1"></div>
+            <div class="desert-line desert-line-2"></div>
           </div>
           <div class="hero-text">
             <h1 class="hero-title">{{ t('browse.heroTitle') }}</h1>
@@ -301,7 +301,7 @@ onMounted(() => {
   gap: 3rem;
 }
 
-.hero-dessert {
+.hero-desert {
   position: absolute;
   top: 0;
   left: 0;
@@ -319,14 +319,14 @@ onMounted(() => {
 }
 
 /* Subtle desert sand boxes */
-.dessert-box {
+.desert-box {
   position: absolute;
   background: linear-gradient(135deg, #fed7aa, #fdba74);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(251, 191, 36, 0.1);
 }
 
-.dessert-box-1 {
+.desert-box-1 {
   width: 140px;
   height: 90px;
   top: 15%;
@@ -335,7 +335,7 @@ onMounted(() => {
   animation: float 12s ease-in-out infinite;
 }
 
-.dessert-box-2 {
+.desert-box-2 {
   width: 100px;
   height: 140px;
   top: 45%;
@@ -344,7 +344,7 @@ onMounted(() => {
   animation: float 15s ease-in-out infinite reverse;
 }
 
-.dessert-box-3 {
+.desert-box-3 {
   width: 120px;
   height: 70px;
   bottom: 20%;
@@ -353,7 +353,7 @@ onMounted(() => {
   animation: float 10s ease-in-out infinite;
 }
 
-.dessert-box-4 {
+.desert-box-4 {
   width: 80px;
   height: 80px;
   top: 30%;
@@ -363,13 +363,13 @@ onMounted(() => {
 }
 
 /* Sand particles */
-.dessert-circle {
+.desert-circle {
   position: absolute;
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(254, 215, 170, 0.3), rgba(253, 186, 116, 0.2));
 }
 
-.dessert-circle-1 {
+.desert-circle-1 {
   width: 180px;
   height: 180px;
   top: -40px;
@@ -377,7 +377,7 @@ onMounted(() => {
   animation: pulse 14s ease-in-out infinite;
 }
 
-.dessert-circle-2 {
+.desert-circle-2 {
   width: 120px;
   height: 120px;
   bottom: -30px;
@@ -386,13 +386,13 @@ onMounted(() => {
 }
 
 /* Sand drift lines */
-.dessert-line {
+.desert-line {
   position: absolute;
   background: linear-gradient(90deg, rgba(254, 215, 170, 0.4), rgba(253, 186, 116, 0.2));
   border-radius: 2px;
 }
 
-.dessert-line-1 {
+.desert-line-1 {
   width: 250px;
   height: 2px;
   top: 25%;
@@ -401,7 +401,7 @@ onMounted(() => {
   animation: slide 18s ease-in-out infinite;
 }
 
-.dessert-line-2 {
+.desert-line-2 {
   width: 180px;
   height: 2px;
   bottom: 35%;
@@ -710,63 +710,63 @@ onMounted(() => {
     margin-left: 0;
   }
 
-  .hero-dessert {
+  .hero-desert {
     position: relative;
     width: 100%;
     height: 180px;
     order: 1;
   }
 
-  .dessert-box-1 {
+  .desert-box-1 {
     width: 70px;
     height: 45px;
     top: 5%;
     left: 5%;
   }
 
-  .dessert-box-2 {
+  .desert-box-2 {
     width: 50px;
     height: 70px;
     top: 35%;
     left: 20%;
   }
 
-  .dessert-box-3 {
+  .desert-box-3 {
     width: 60px;
     height: 35px;
     bottom: 15%;
     left: 10%;
   }
 
-  .dessert-box-4 {
+  .desert-box-4 {
     width: 40px;
     height: 40px;
     top: 50%;
     left: 35%;
   }
 
-  .dessert-circle-1 {
+  .desert-circle-1 {
     width: 90px;
     height: 90px;
     top: 0;
     left: -20px;
   }
 
-  .dessert-circle-2 {
+  .desert-circle-2 {
     width: 70px;
     height: 70px;
     bottom: 0;
     right: 0;
   }
 
-  .dessert-line-1 {
+  .desert-line-1 {
     width: 120px;
     height: 1px;
     top: 25%;
     left: -30px;
   }
 
-  .dessert-line-2 {
+  .desert-line-2 {
     width: 90px;
     height: 1px;
     bottom: 25%;
@@ -777,22 +777,27 @@ onMounted(() => {
     font-size: 1.75rem;
   }
 
-  /* Allow wrapping on mobile but still spread out */
   .categories-grid {
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
     gap: 1.5rem;
     padding: 0;
+    max-width: 320px;
+    margin: 0 auto;
   }
 
   .category-icon {
-    width: 64px;
-    height: 64px;
+    width: 90px;
+    height: 90px;
   }
 
   .category-icon svg {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .category-name {
+    font-size: 0.9rem;
   }
 
   .auctions-grid {
